@@ -1,42 +1,65 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.AI;
 
-public class OfficerManager : UnitManager
+public class OfficerManager : UnitManager, IVisitable
 {
+    [SerializeField] BaseStats baseStats;
+    public Stats Stats { get; private set; }
+
+    public void Accept(IVisitor visitor) => visitor.Visit(this);
+
 
     public int RegimentNumber;
 
     public GameObject PawnPrefab;
 
-    public bool SpawnPawns = true;
-    public int RegimentSize = 42;
+    public int RegimentSize = 120;
     public List<PawnManager> pawns = new List<PawnManager>();
 
-    //Formation variables
-    public Formation RegimentFormation;
+    [Header("Regiment formation")]
+    private Formation _regimentFormation;
+    public Formation RegimentFormation
+    {
+        get => _regimentFormation;
+        set
+        {
+            if(value != _regimentFormation)
+            {
+                _regimentFormation = value;
+                _formationChanged = true;
+            }
+        }
+    }
+    private bool _formationChanged = false;
     public float Range = 20f;
-    public bool Loaded = true;
 
-    //STATS
-    public float Morale = 100;
-    public float Stamina = 100;
+    [Header("Regiment weapons")]
     public int Ammo = 50;
     public int MaxAmmo = 50;
 
-    //State variable
-    public OfficialStates state = OfficialStates.Idle;
+    [Header("Regiment state")]
     public bool FireAll = true;
     public bool MultipleLineFire = false;
     private OfficerManager targetRegiment = null;
+    private FiniteStateMachine OfficerStateMachine;
+    public string stateName;
 
     //TIMERS
-    public Timer ReloadTimer = new Timer(5f);
+    //public Timer ReloadTimer = new Timer(5f);
 
-    //DEBUG
+    [Header("Debug")]
     public bool ShowSightLines = false;
     public bool ShowFormation = false;
+
+    private void Awake()
+    {
+        Stats = new Stats(new StatsMediator(), baseStats);
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -44,16 +67,18 @@ public class OfficerManager : UnitManager
         Initialize();
         InitializeFormation();
 
-        if(SpawnPawns)
-        {
-            for (int i = 0; i < RegimentSize; i++)
-            {
-                Vector2 v2 = GetFormationCoords(i);
-                SpawnPawn(Utility.V2toV3(v2) + transform.position);
-            }
-        }
+
+        SpawnRegimentSpawns();
     }
 
+    private void SpawnRegimentSpawns()
+    {
+        for (int i = 0; i < RegimentSize; i++)
+        {
+            Vector2 v2 = GetFormationCoords(i);
+            SpawnPawn(Utility.V2toV3(v2) + transform.position);
+        }
+    }
     public override void Initialize()
     {
         ms = GetComponent<MeshRenderer>();
@@ -72,32 +97,32 @@ public class OfficerManager : UnitManager
 
         ms.material = m;
 
-        //FLAG INITIALIZE
+        OfficerStateMachine = new FiniteStateMachine();
 
+        StateMachineInitializer();
     }
     private void InitializeFormation()
     {
-        RegimentFormation = new Line(42);
+        RegimentFormation = new Line(RegimentSize);
     }
 
     // Update is called once per frame
     void Update()
     {
+        targetRegiment = EnemyInRange(Range);
+
         //STATE MACHINE
-        StateTransitions();
-        StateActions();
+        OfficerStateMachine.Update();
+
+        stateName = OfficerStateMachine.currentState.name;
 
         //UPDATE TIMER
         UpdateTimers();
-
-        targetRegiment = EnemyInRange(Range);
     }
 
     private void UpdateTimers()
     {
-        float t = Time.deltaTime;
-
-        ReloadTimer.UpdateTimer(t);
+        Stats.Mediator.Update(Time.deltaTime);
     }
 
 
@@ -131,6 +156,13 @@ public class OfficerManager : UnitManager
     }
 
     //FORMATION MANAGEMENT
+    private void CheckFormation()
+    {
+        pawns.RemoveAll(item => item == null);
+
+        RegimentSize = pawns.Count;
+        RegimentFormation = new Line(RegimentSize);
+    }
     public void SetFormation(Formation formation)
     {
         RegimentFormation = formation;
@@ -188,18 +220,52 @@ public class OfficerManager : UnitManager
             }
         }
         Ammo -= 1;
-        Loaded = false;
     }
-    public bool CheckFireStatus()
+    public void SendRelaodMessage()
     {
         for (int i = 0; i < pawns.Count; i++)
         {
             if (GetPawnRank(i) == 1)
             {
-                //CHECK ONLY FIRST RANK
-                if (!pawns[i].HaveFired)
+                //FIRE ONLY FIRST RANK
+                pawns[i].CallReload();
+            }
+        }
+        Ammo -= 1;
+    }
+    public bool CheckLoadedStatus()
+    {
+        //TRUE IF ALL LOADED, FALSE IF AT LEAST ONE IS NOT LOADED
+        for (int i = 0; i < pawns.Count; i++)
+        {
+            if (GetPawnRank(i) == 1)
+            {
+                if (pawns[i] != null)
                 {
-                    return false;
+                    //CHECK ONLY FIRST RANK
+                    if (!pawns[i].Loaded)
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+    public bool CheckUnLoadedStatus()
+    {
+        //TRUE IF ALL UNLOADED, FALSE IF AT LEAST ONE IS LOADED
+        for (int i = 0; i < pawns.Count; i++)
+        {
+            if (GetPawnRank(i) == 1)
+            {
+                if (pawns[i] != null)
+                {
+                    //CHECK ONLY FIRST RANK
+                    if (pawns[i].Loaded)
+                    {
+                        return false;
+                    }
                 }
             }
         }
@@ -207,75 +273,141 @@ public class OfficerManager : UnitManager
     }
 
     //STATE MACHINE
-    private void StateActions()
+    public State GetState()
     {
-        switch (state)
-        {
-            case OfficialStates.Idle:
-                {
-                    //SEND FORMATION TO ALL PAWNS
-                    SendFormation();
-
-                    break;
-                }
-
-            case OfficialStates.Reloading:
-                {
-                    //Start ReloadTimer
-                    ReloadTimer.StartTimer();
-                    break;
-                }
-
-            case OfficialStates.Firing:
-                {
-                    if(Loaded)
-                    {
-                        SendFireMessage();
-                    }
-                    break;
-                }
-        }
+        return OfficerStateMachine.currentState;
     }
-    private void StateTransitions()
+    private void StateMachineInitializer()
     {
-        switch (state)
-        {
-            case OfficialStates.Idle:
-                {
-                    if (Loaded && FireAll && targetRegiment != null && ArePawnIdle() && um.IsIdle())
-                    {
-                        //FIRE IF ENEMY IN SIGHT AND LOADED AND FIREALL AND NOT MOVING
-                        state = OfficialStates.Firing;
-                        Debug.Log("Fire");
-                    }
-                    if (!Loaded)
-                    {
-                        //IF IS NOT LOADED
-                        state = OfficialStates.Reloading;
-                    }
-                    break;
-                }
+        List<State> officerStates = new List<State>();
+        List<Transition> officerTransitions = new List<Transition>();
 
-            case OfficialStates.Reloading:
-                {
-                    if (ReloadTimer.finished)
-                    {
-                        //IF FINISHED RELOADING
-                        state = OfficialStates.Idle;
-                    }
-                    break;
-                }
+        //STATES
+        //IDLE
+        State Idle = new State(
+                "Idle",
+                () => { Debug.Log("Idle"); },
+                null,
+                () => {
+                    CheckFormation();
 
-            case OfficialStates.Firing:
-                {
-                    if (CheckFireStatus())
+                    if (um.MovementPoints.Count != 0 || _formationChanged)
                     {
-                        //IF FINISHED FIRING
-                        state = OfficialStates.Idle;
+                        SendFormation();
+                        um.SetDestination(Utility.V3toV2(transform.position), transform.rotation);
+                        _formationChanged = false;
                     }
-                    break;
                 }
-        }
+            );
+        officerStates.Add(Idle);
+        //MOVING
+        State Moving = new State(
+                "Moving",
+                () => { Debug.Log("Moving"); },
+                null,
+                () => {
+                    SendFormation();
+                }
+            );
+        officerStates.Add(Moving);
+        //FIRING
+        State Firing = new State(
+                "Firing",
+                () => {
+                    SendFireMessage();
+                    Debug.Log("FIRE!");
+                },
+                null,
+                null
+            );
+        officerStates.Add(Firing);
+        //RELOADING
+        State Reloading = new State(
+                "Reloading",
+                () => {
+                    //SEND RELOAD MESSAGE
+                    SendRelaodMessage();
+                    Debug.Log("Reload");
+                },
+                null,
+                null
+            );
+        officerStates.Add(Reloading);
+
+        //TRANSITIONS
+            //IDLE -> MOVING
+        Transition IdleMoving = new Transition(
+                Idle,
+                Moving,
+                () => {
+                    if (um.MovementPoints.Count != 0 || !ArePawnIdle())
+                    {
+                        return true;
+                    }
+                    return false;
+                }
+            );
+        officerTransitions.Add( IdleMoving );
+            //MOVING -> IDLE
+        Transition MovingIdle = new Transition(
+                Moving,
+                Idle,
+                () => {
+                    if (um.MovementPoints.Count == 0 && ArePawnIdle())
+                    {
+                        return true;
+                    }
+                    return false;
+                }
+            );
+        officerTransitions.Add( MovingIdle );
+            //IDLE -> FIRING
+        Transition IdleFiring = new Transition(
+                Idle,
+                Firing,
+                () => {
+                    if (targetRegiment != null)
+                    {
+                        return true;
+                    }
+                    return false;
+                }
+            );
+        officerTransitions.Add(IdleFiring);
+            //FIRING -> RELOADING
+        Transition FiringReloading = new Transition(
+                Firing,
+                Reloading,
+                () => {
+                    if (CheckUnLoadedStatus())
+                    {
+                        return true;
+                    }
+                    return false;
+                }
+            );
+        officerTransitions.Add(FiringReloading);
+            //RELOADING -> IDLE
+        Transition ReloadingIdle = new Transition(
+                Reloading,
+                Idle,
+                () => {
+                    if (CheckLoadedStatus())
+                    {
+                        return true;
+                    }
+                    return false;
+                }
+            );
+        officerTransitions.Add(ReloadingIdle);
+
+
+        OfficerStateMachine.AddStates(officerStates);
+        OfficerStateMachine.AddTransitions(officerTransitions);
+
+        OfficerStateMachine.initialState = Idle;
+
+        OfficerStateMachine.Initialize();
     }
 
     //SENSING
@@ -295,7 +427,7 @@ public class OfficerManager : UnitManager
             Debug.DrawLine(Start, Start + Utility.V2toV3(a), Color.red, 0f, true);
             Debug.DrawLine(Start, Start + Utility.V2toV3(b), Color.red, 0f, true);
         }
-        OfficerManager[] Units = (OfficerManager[])FindObjectsOfType(typeof(OfficerManager));
+        List<OfficerManager> Units = GameUtility.FindAllRegiments();
 
         foreach(OfficerManager of in Units)
         {
@@ -338,11 +470,4 @@ public class OfficerManager : UnitManager
             Gizmos.DrawSphere(FormationSlot, 0.2f);
         }
     }
-}
-
-public enum OfficialStates
-{
-    Idle,
-    Firing,
-    Reloading
 }

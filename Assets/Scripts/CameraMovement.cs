@@ -16,13 +16,17 @@ public class CameraMovement : MonoBehaviour
     float scrollDirection = 0f;
 
     public float speed = 2f;
+    public float ElevationSpeed = 10f;
     public float horizontalRotationSpeed = 2f;
     public float verticalRotationSpeed = 1f;
     private bool rotate = false;
 
+    public float minHeight = 2f;
+    public float maxHeight = 40f;
+
     Camera camera;
 
-    float y = 4.16f;
+    float y;
 
     OfficerManager selectedOfficial;
 
@@ -56,6 +60,7 @@ public class CameraMovement : MonoBehaviour
     void Start()
     {
         camera = Utility.Camera;
+        y = camera.transform.position.y;
     }
 
     // Update is called once per frame
@@ -91,8 +96,8 @@ public class CameraMovement : MonoBehaviour
     {
         scrollDirection = scroll.ReadValue<float>();
 
-        y += scrollDirection * 2f * Time.deltaTime;
-        y = Mathf.Clamp(y, 2, 40);
+        y += scrollDirection * ElevationSpeed * Time.deltaTime;
+        y = Mathf.Clamp(y, minHeight, maxHeight);
 
         transform.position = new Vector3(transform.position.x, y, transform.position.z);
     }

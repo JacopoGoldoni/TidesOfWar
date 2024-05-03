@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PawnManager : UnitManager
@@ -12,10 +13,14 @@ public class PawnManager : UnitManager
 
     private GameObject rifle;
 
-    public bool HaveFired = false;
+    public bool Loaded = true;
+
+    AudioSource audioData;
+    ParticleSystem particleSystem;
 
     //TIMERS
-    private Timer fireTimer;
+    private CountdownTimer fireTimer;
+    private CountdownTimer reloadTimer;
 
     // Start is called before the first frame update
     void Start()
@@ -27,53 +32,101 @@ public class PawnManager : UnitManager
     {
         ms = GetComponent<MeshRenderer>();
         um = GetComponent<PawnMovement>();
+        audioData = GetComponent<AudioSource>();
+        particleSystem = GetComponentInChildren<ParticleSystem>();
 
         ms.material = yourMaterial;
 
         rifle = transform.GetChild(0).gameObject;
     }
 
-    // Update is called once per frame
-    void Update()
+    public void MoveTo(Vector2 dest, Quaternion quat)
     {
-        if(masterOfficer.ArePawnIdle())
-        {
-            TakeRifleDown();
-        }
-        else
+        um.SetDestination(dest, quat);
+        um.unitState = UnitState.Idle;
+    }
+
+    public void Update()
+    {
+        if(masterOfficer.RegimentFormation.name == "Column")
         {
             TakeRifleUp();
         }
+        else
+        {
+            if (!um.IsIdle())
+            {
+                TakeRifleUp();
+            }
+            else
+            {
+                TakeRifleDown();
+            }
+        }
 
-        //UPDATE TIMERS
-        UpdateTimer();
+        if (reloadTimer != null)
+        {
+            reloadTimer.Tick(Time.deltaTime);
+        }
+
+        if (fireTimer != null)
+        {
+            fireTimer.Tick(Time.deltaTime);
+        }
     }
 
-    private void UpdateTimer()
+    public void Die()
     {
-        if(fireTimer != null)
-        {
-            fireTimer.UpdateTimer(Time.deltaTime);
+        Destroy(transform.gameObject);
+    }
 
-            if (fireTimer.finished)
+    //FIRE
+    public void CallFire()
+    {
+        fireTimer = new CountdownTimer(Random.Range(0f, 2f));
+        fireTimer.OnTimerStop = Fire;
+        fireTimer.Start();
+    }
+    private void Fire()
+    {
+        //UNLOAD GUN
+        Loaded = false;
+
+        //PLAY AUDIO CLIP
+        audioData.clip = SFXUtility.GetAudio("MusketFire" + Random.Range(1, 4));
+        audioData.Play(0);
+        
+        //PLAY PARTCLE EFFECT
+        particleSystem.Play();
+
+        //TRACE FOR HIT
+        Transform muzzleTransform = transform.GetChild(1).transform;
+        
+        Ray ray = new Ray(muzzleTransform.position, Quaternion.Euler(Random.Range(-5f, 5f), Random.Range(-10f, 10f), 0f) * muzzleTransform.forward * 20f);
+        RaycastHit hit;
+
+        Debug.DrawRay(ray.origin, ray.direction * 20f, Color.red, 2f);
+        if (Physics.Raycast(ray, out hit))
+        {
+            PawnManager pm = hit.transform.GetComponent<PawnManager>();
+            if(pm != null)
             {
-                Fire();
+                //KILL PAWN
+                pm.Die();
             }
         }
     }
 
-    public void MoveTo(Vector2 dest, Quaternion quat)
+    //RELOAD
+    public void CallReload()
     {
-        um.SetDestination(dest, quat);
+        reloadTimer = new CountdownTimer(10f);
+        reloadTimer.OnTimerStop = Reload;
+        reloadTimer.Start();
     }
-
-    public void CallFire()
+    private void Reload()
     {
-        fireTimer = new Timer(Random.Range(0f, 2f));
-    }
-    private void Fire()
-    {
-        HaveFired = true;
+        Loaded = true;
     }
 
     public void TakeRifleUp()

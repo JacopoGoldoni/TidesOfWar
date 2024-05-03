@@ -12,15 +12,19 @@ public class UIManager : MonoBehaviour
     GameObject UI;
     GameObject regimentCardHolder;
     GameObject CommandTab;
+    GameObject NotificationTab;
 
     List<GameObject> regimentCards = new List<GameObject>();
 
+    //UI ELEMENTS PREFAB
     public GameObject RegimentCardPrefab;
     public GameObject OrderButtonPrefab;
+    public GameObject NotificationTabPrefab;
 
     //COMMAND EVENT
     private UnityAction LineAction;
     private UnityAction ColumnAction;
+    private UnityAction StopAction;
 
     //FLAG VARIABLES
     //(target, flag)
@@ -45,16 +49,14 @@ public class UIManager : MonoBehaviour
     {
         cameraManagerRef = GetComponent<CameraManager>();
 
-        //UI CANVAS
+        //UI BUILDERS
         Canvas_Builder();
-
         RegimentCardHolder_Builder();
-
         CommandTab_Builder();
-
         PopulateCommandTab();
+        NotificationTab_Builder();
 
-        foreach (OfficerManager of in FindObjectsOfType<OfficerManager>())
+        foreach (OfficerManager of in GameUtility.FindAllRegiments())
         {
             (GameObject, GameObject) tf;
             tf.Item1 = of.gameObject;
@@ -139,7 +141,7 @@ public class UIManager : MonoBehaviour
         RectTransform rectTransform1 = CommandTab.GetComponent<RectTransform>();
         rectTransform1.pivot = new Vector2(0.5f, 0.5f);
         rectTransform1.anchoredPosition = new Vector2(0, -450);
-        rectTransform1.sizeDelta = new Vector2(200, 100);
+        rectTransform1.sizeDelta = new Vector2(100, 100);
 
         CommandTab.SetActive(false);
     }
@@ -149,7 +151,9 @@ public class UIManager : MonoBehaviour
         RegimentFlag.name = "Regiment flag";
         RegimentFlag.layer = 5;
 
-        Sprite sprite = Resources.Load<Sprite>("GFX/FRA_democratic");
+        Factions regimentFaction = target.GetComponent<OfficerManager>().faction;
+
+        Sprite sprite = GFXUtility.GetFlag(regimentFaction);
 
         Image image = RegimentFlag.AddComponent<Image>();
         image.sprite = sprite;
@@ -160,13 +164,29 @@ public class UIManager : MonoBehaviour
         rectTransform1.pivot = new Vector2(0.5f, 0.5f);
         rectTransform1.sizeDelta = new Vector2(sprite.texture.width, sprite.texture.height) / 10f;
 
-        Button flagButton = RegimentFlag.AddComponent<Button>();
-        flagButton.onClick.AddListener(() => FlagAction(target.transform));
+        if(regimentFaction == Utility.Camera.GetComponent<CameraManager>().faction)
+        {
+            Button flagButton = RegimentFlag.AddComponent<Button>();
+            flagButton.onClick.AddListener(() => FlagAction(target.transform));
+        }
 
 
         RegimentFlag.transform.position = Utility.Camera.WorldToScreenPoint(target.transform.position + Vector3.up * 1f);
 
         return RegimentFlag;
+    }
+    private void NotificationTab_Builder()
+    {
+        GameObject notificationtab = Instantiate(NotificationTabPrefab);
+        notificationtab.name = "Notification Tab";
+        notificationtab.layer = 5;
+
+        notificationtab.transform.parent = UI.transform;
+
+        RectTransform rectTransform = notificationtab.GetComponent<RectTransform>();
+        rectTransform.anchoredPosition = new Vector2(0, -300); 
+
+        NotificationTab = notificationtab;
     }
 
     private void FlagAction(Transform target)
@@ -209,10 +229,11 @@ public class UIManager : MonoBehaviour
 
         RegimentCard.transform.parent = regimentCardHolder.transform;
 
-        regimentCards.Add(RegimentCard);
-
         RegimentCardManager regimentCardManager = RegimentCard.GetComponent<RegimentCardManager>();
         regimentCardManager.SetAmmoSlider(regiment.Ammo, regiment.MaxAmmo);
+        regimentCardManager.Initialize(regiment.faction);
+
+        regimentCards.Add(RegimentCard);
 
         //Displacement
         regimentCardHolder.GetComponent<RectTransform>().sizeDelta = new Vector2(regimentCards.Count * 100 + 10, 110);
@@ -276,7 +297,17 @@ public class UIManager : MonoBehaviour
                 );
         }
     }
+    public void SendStopOrder()
+    {
+        int n = cameraManagerRef.selectedOfficers.Count;
 
+        for (int i = 0; i < n; i++)
+        {
+            OfficerManager om = cameraManagerRef.selectedOfficers[i];
+            om.um.SetDestination(Utility.V3toV2( om.transform.position), om.transform.rotation);
+            om.um.unitState = UnitState.Idle;
+        }
+    }
 
     //COMMAND TAB MANAGEMENT
     private void CommandTabCheck()
@@ -299,5 +330,14 @@ public class UIManager : MonoBehaviour
         Sprite ColumnSprite = Resources.Load<Sprite>("GFX/TOW_Column");
         ColumnAction += SendColumnFormation;
         OrderButton_Build("Column formation", ColumnSprite, ColumnAction);
+
+        Sprite StopSprite = Resources.Load<Sprite>("GFX/TOW_Column");
+        StopAction += SendStopOrder;
+        OrderButton_Build("Stop", StopSprite, StopAction);
+
+        int n = CommandTab.transform.childCount;
+
+        RectTransform rectTransform = CommandTab.GetComponent<RectTransform>();
+        rectTransform.sizeDelta = new Vector2(n * 100, 100);
     }
 }

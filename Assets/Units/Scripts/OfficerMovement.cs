@@ -21,7 +21,12 @@ public class OfficerMovement : UnitMovement
     void Update()
     {
         UpdateAgentSpeed();
-        UpdateMove();
+        if (
+            ((OfficerManager)um).GetState().name == "Idle" || ((OfficerManager)um).GetState().name == "Moving"
+            )
+        {
+            UpdateMove();
+        }
     }
 
     private void UpdateMove()
@@ -36,22 +41,27 @@ public class OfficerMovement : UnitMovement
                 unitState = UnitState.Walk;
             }
 
-            if (navAgent.remainingDistance == 0f && !navAgent.pathPending)
+            if (!IsMoving())
             {
-                if( ((OfficerManager)um).ArePawnIdle() )
+                //NOT MOVING
+                if(!IsRotating())
                 {
-                    //ARRIVED AT DESTINATION
-                    if (MovementPoints.Count > 1)
+                    //NOT ROTATING
+                    if (((OfficerManager)um).ArePawnIdle())
                     {
-                        //PROCEED TO NEXT POINT
-                        MovementPoints.RemoveAt(0);
-                        unitState = UnitState.Idle;
-                    }
-                    else
-                    {
-                        //LAST ORDER
-                        MovementPoints.Clear();
-                        unitState = UnitState.Idle;
+                        //ALL REGIMENT ARRIVED AT DESTINATION
+                        if (MovementPoints.Count > 1)
+                        {
+                            //PROCEED TO NEXT POINT
+                            MovementPoints.RemoveAt(0);
+                            unitState = UnitState.Idle;
+                        }
+                        else
+                        {
+                            //LAST ORDER
+                            MovementPoints.Clear();
+                            unitState = UnitState.Idle;
+                        }
                     }
                 }
                 else
@@ -60,31 +70,5 @@ public class OfficerMovement : UnitMovement
                 }
             }
         }
-    }
-
-    private void RotateToward(Quaternion targetRot)
-    {
-        transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, RotationSpeed * Time.deltaTime);
-    }
-
-    public override void SetDestination(Vector2 newDest, Quaternion newQuat)
-    {
-        MovementPoints.Clear();
-        MovementPoints.Add(
-             new MovementOrder(
-                 Utility.V2toV3(newDest),
-                 newQuat
-                 )
-             );
-        unitState = UnitState.Idle;
-    }
-    public override void AddDestination(Vector2 newDest, Quaternion newQuat)
-    {
-        MovementPoints.Add(
-            new MovementOrder(
-                Utility.V2toV3(newDest), 
-                newQuat
-                )
-            );
     }
 }

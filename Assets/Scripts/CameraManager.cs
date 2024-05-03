@@ -12,6 +12,9 @@ public class CameraManager : MonoBehaviour
     List<GameObject> projectionDests = new List<GameObject>();
     List<GameObject> projectionSights = new List<GameObject>();
 
+    List<float> sizes = new List<float>();
+    List<Mesh> sm = new List<Mesh>();
+
     public Factions faction = Factions.France;
 
     //COMPONENTS
@@ -19,19 +22,33 @@ public class CameraManager : MonoBehaviour
     UIManager uimanager;
     LineRenderer tr;
 
+    Material OlogramMaterial;
+    Material OlogramMaterial2;
+
     Vector3 OrderPoint = new Vector3(0, 0, 0);
     Vector3 OrderPoint2 = new Vector3(0, 0, 0);
     Vector3 OrderPoint3 = new Vector3(0, 0, 0);
     bool ShowArrow = false;
 
+    //NOTIFICATION
+    EventBinding<NotificationEvent> notificationBinding;
+
+
     private void OnEnable()
     {
         playerControls.Enable();
+
+        //BIND NOTIFICATION BUS
+        notificationBinding = new EventBinding<NotificationEvent>(() => { return; });
+        EventBus<NotificationEvent>.Register(notificationBinding);
     }
 
     private void OnDisable()
     {
         playerControls.Disable();
+
+        //UNBIND NOTIFICATION BUS
+        EventBus<NotificationEvent>.Deregister(notificationBinding);
     }
 
     private void Start()
@@ -41,6 +58,9 @@ public class CameraManager : MonoBehaviour
 
         tr = GetComponent<LineRenderer>();
         tr.widthMultiplier = 0.5f;
+
+        OlogramMaterial = Resources.Load("OlogramMaterial", typeof(Material)) as Material;
+        OlogramMaterial2 = Resources.Load("OlogramMaterial2", typeof(Material)) as Material;
     }
 
     private void Update()
@@ -89,6 +109,16 @@ public class CameraManager : MonoBehaviour
 
         DeleteAllProjections();
         ProjectAll();
+
+        if(Input.GetKeyDown(KeyCode.L))
+        {
+            EventBus<NotificationEvent>.Raise(new NotificationEvent
+            {
+                name = "Notification",
+                description = "Test description",
+                duration = 2f
+            });
+        }
     }
 
     //UNIT SELECTION FUNCTIONS
@@ -181,63 +211,65 @@ public class CameraManager : MonoBehaviour
     //PROJECTIONS
     private void ProjectAll()
     {
-        List<float> sizes = new List<float>();
-        List<Mesh> sm = new List<Mesh>();
-        
         if(selectedOfficers.Count != 0)
         {
+            //CHECK SIGHT MESHES NEEDED
             foreach(OfficerManager of in selectedOfficers)
             {
                 int n = of.RegimentFormation.Lines;
 
                 if(!sizes.Contains(n / 2f))
                 {
+                    //IF NEEDED CREATE A NEW SIGHT MESH
                     sizes.Add(n / 2f);
                     sm.Add(
                         SightMesh(11, n / 4f, of.Range, n * 0.5f)
                         );
                 }
             }
-        }
 
-        foreach (OfficerManager o in selectedOfficers)
-        {
-            //PROJECT DESTINATIONS
-            if(o.um.MovementPoints.Count != 0)
+            foreach (OfficerManager o in selectedOfficers)
             {
-                GameObject projectionDest = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                projectionDest.GetComponent<MeshRenderer>().material = Resources.Load("OlogramMaterial", typeof(Material)) as Material;
-                projectionDest.GetComponent<Collider>().enabled = false;
+                //PROJECT DESTINATIONS IF ANY ORDER IS GIVEN
+                if (o.um.MovementPoints.Count != 0)
+                {
+                    GameObject projectionDest = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    projectionDest.GetComponent<MeshRenderer>().material = OlogramMaterial;
+                    projectionDest.GetComponent<Collider>().enabled = false;
 
-                projectionDest.transform.position = o.um.MovementPoints[0].pos;
+                    projectionDest.transform.position = o.um.MovementPoints[0].pos;
 
-                projectionDests.Add(projectionDest);
+                    projectionDests.Add(projectionDest);
+                }
+
+                //PROJECT SIGHTS
+                GameObject projectionSight = new GameObject();
+                MeshFilter mf = projectionSight.AddComponent<MeshFilter>();
+                MeshRenderer mr = projectionSight.AddComponent<MeshRenderer>();
+
+
+                int meshIndex = sizes.FindIndex(a => a == o.RegimentFormation.Lines / 2f);
+                mf.mesh = sm[meshIndex];
+
+                mr.material = OlogramMaterial2;
+
+                projectionSight.transform.position = o.transform.position;
+                projectionSight.transform.rotation = o.transform.rotation;
+
+                projectionSights.Add(projectionSight);
             }
-
-            //PROJECT SIGHTS
-            GameObject projectionSight = new GameObject();
-            MeshFilter mf = projectionSight.AddComponent<MeshFilter>();
-            MeshRenderer mr = projectionSight.AddComponent<MeshRenderer>();
-
-            int meshIndex = sizes.FindIndex(a => a == o.RegimentFormation.Lines / 2f);
-            mf.mesh = sm[meshIndex];
-
-            mr.material = Resources.Load("OlogramMaterial2", typeof(Material)) as Material;
-            projectionSight.transform.position = o.transform.position;
-            projectionSight.transform.rotation = o.transform.rotation;
-            projectionSight.transform.parent = o.transform;
-
-            projectionDests.Add(projectionSight);
         }
     }
     private void DeleteAllProjections()
     {
+        //DESTINATIONS
         foreach(GameObject p in projectionDests)
         {
             Destroy(p);
         }
         projectionDests.Clear();
 
+        //SIGHTS
         foreach (GameObject p in projectionSights)
         {
             Destroy(p);

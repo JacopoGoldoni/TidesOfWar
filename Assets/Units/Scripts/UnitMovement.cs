@@ -1,71 +1,95 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.AI;
 
 public abstract class UnitMovement : MonoBehaviour
 {
-    //Components
+    //VARIABLES
+    [Header("Components")]
     public NavMeshAgent navAgent;
     public UnitManager um;
 
+    [Header("Movement")]
     public Vector3 direction = new Vector3(0, 0, 0);
     public Vector3 rotationVector = new Vector3(0, 0, 0);
-
     public List<MovementOrder> MovementPoints = new List<MovementOrder>();
+    public UnitState unitState;
 
+    [Header("Move and rotation")]
     public float MovementSpeed = 2f;
     public float RotationSpeed = 10f;
     public float MovementThreashold = 0.1f;
-    public float RotationThreashold = 1f;
+    public float RotationThreashold = 0.1f;
 
-    //AREA COSTS
+    [Header("Area costs")]
     public const float BaseCost = 2f;
     public const float CostWeight = 1f;
 
-    public UnitState unitState = UnitState.Idle;
+
 
     //INITIALIZE
-    public abstract void Initialize();
+    public virtual void Initialize()
+    {
+        navAgent = GetComponent<NavMeshAgent>();
+        um = GetComponent<UnitManager>();
+    }
 
     //MOVEMENT
-    public abstract void SetDestination(Vector2 newDest, Quaternion newQuat);
-    public abstract void AddDestination(Vector2 newDest, Quaternion newQuat);
+    public void SetDestination(Vector2 newDest, Quaternion newQuat)
+    {
+        MovementPoints.Clear();
+        MovementPoints.Add(
+             new MovementOrder(
+                 Utility.V2toV3(newDest),
+                 newQuat
+                 )
+             );
+    }
+    public void AddDestination(Vector2 newDest, Quaternion newQuat)
+    {
+        MovementPoints.Add(
+            new MovementOrder(
+                Utility.V2toV3(newDest),
+                newQuat
+                )
+            );
+    }
+    public void ClearDestination()
+    {
+        MovementPoints.Clear();
+    }
     public void UpdateAgentSpeed()
     {
         NavMeshHit navHit;
         navAgent.SamplePathPosition(NavMesh.AllAreas, 0f, out navHit);
 
-        float cost = BaseCost - NavMesh.GetAreaCost(IndexFromMask(navHit.mask));
+        float cost = BaseCost - NavMesh.GetAreaCost(Utility.IndexFromMask(navHit.mask));
 
         navAgent.speed = MovementSpeed * (1 + cost * CostWeight);
     }
-
-    private int IndexFromMask(int mask)
+    public void RotateToward(Quaternion targetRot)
     {
-        for(int i = 0; i < 32; i++)
-        {
-            if((1 << i) == mask)
-            {
-                return i;
-            }
-        }
-        return -1;
+        transform.rotation = Quaternion.Lerp(transform.rotation, targetRot, RotationSpeed * Time.deltaTime);
     }
 
-    //CONDITION FUNCTIONS
+    //CONDITIONS
     public bool IsMoving()
     {
-        if(unitState == UnitState.Walk || unitState == UnitState.Running)
+        if(navAgent != null)
         {
-            return true;
+            return !(navAgent.remainingDistance == 0f && !navAgent.pathPending);
         }
-
         return false;
+    }
+    public bool IsRotating()
+    {
+        return (Mathf.Abs(CurrentRotation().eulerAngles.y - transform.rotation.eulerAngles.y) > RotationThreashold);
     }
     public bool IsIdle()
     {
-        return unitState == UnitState.Idle;
+        return !IsMoving() && !IsRotating();
     }
 
     public Vector3 CurrentDestination()
@@ -99,7 +123,7 @@ public struct MovementOrder
 
     public MovementOrder(Vector3 position, Quaternion rotation)
     {
-        this.pos = position;
-        this.rot = rotation;
+        pos = position;
+        rot = rotation;
     }
 }

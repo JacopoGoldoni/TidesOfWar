@@ -30,13 +30,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5394780246718189914}
+  serializedVersion: 2
   m_LocalRotation: {x: 0.36857238, y: 0.60310423, z: -0.36789703, w: 0.6042115}
   m_LocalPosition: {x: -5.35, y: 8.58, z: -1.31}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 62.767, y: 89.895, z: 0}
 --- !u!20 &5394780246718189916
 Camera:
@@ -52,9 +52,17 @@ Camera:
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
+  m_Iso: 200
+  m_ShutterSpeed: 0.005
+  m_Aperture: 16
+  m_FocusDistance: 10
+  m_FocalLength: 50
+  m_BladeCount: 5
+  m_Curvature: {x: 2, y: 11}
+  m_BarrelClipping: 0.25
+  m_Anamorphism: 0
   m_SensorSize: {x: 36, y: 24}
   m_LensShift: {x: 0, y: 0}
-  m_FocalLength: 50
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
@@ -119,11 +127,23 @@ MonoBehaviour:
   m_Dithering: 0
   m_ClearDepth: 1
   m_AllowXRRendering: 1
+  m_AllowHDROutput: 1
+  m_UseScreenCoordOverride: 0
+  m_ScreenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
   m_Version: 2
+  m_TaaSettings:
+    m_Quality: 3
+    m_FrameInfluence: 0.1
+    m_JitterScale: 1
+    m_MipBias: 0
+    m_VarianceClampScale: 0.9
+    m_ContrastAdaptiveSharpening: 0
 --- !u!120 &5394780246718189890
 LineRenderer:
+  serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -139,6 +159,8 @@ LineRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -220,16 +242,20 @@ LineRenderer:
       atime6: 0
       atime7: 0
       m_Mode: 0
+      m_ColorSpace: -1
       m_NumColorKeys: 2
       m_NumAlphaKeys: 2
     numCornerVertices: 20
     numCapVertices: 0
     alignment: 0
     textureMode: 0
+    textureScale: {x: 1, y: 1}
     shadowBias: 0.5
     generateLightingData: 0
+  m_MaskInteraction: 0
   m_UseWorldSpace: 1
   m_Loop: 0
+  m_ApplyActiveColorSpace: 0
 --- !u!114 &5394780246718189891
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -245,6 +271,8 @@ MonoBehaviour:
   RegimentCardPrefab: {fileID: 1583091804582833179, guid: 20fb174cf68b2d14e9133aaf289db731,
     type: 3}
   OrderButtonPrefab: {fileID: 1583091804582833179, guid: 40f0d41dffc4d2e4789dc98f1e41e8b4,
+    type: 3}
+  NotificationTabPrefab: {fileID: 5011348675239373288, guid: f0d20a9b212aa0941a36987c377f3a50,
     type: 3}
 --- !u!114 &5394780246718189888
 MonoBehaviour:
@@ -267,7 +295,7 @@ MonoBehaviour:
     m_Interactions: 
     m_SingletonActionBindings: []
     m_Flags: 0
-  selectedOfficials: []
+  selectedOfficers: []
   faction: 0
 --- !u!114 &5394780246718189889
 MonoBehaviour:
@@ -281,6 +309,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3562f6d3a7479534799c6c6e4deb475a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 2
-  horizontalRotationSpeed: 4
-  verticalRotationSpeed: 2
+  speed: 10
+  ElevationSpeed: 100
+  horizontalRotationSpeed: 40
+  verticalRotationSpeed: 40
+  minHeight: 0.5
+  maxHeight: 40
