@@ -44,7 +44,7 @@ public class FiniteStateMachine
     {
         foreach(Transition t in transitions)
         {
-            if(t.neededState == currentState)
+            if(t.neededState.CompareTo(currentState) == 1)
             {
                 if(t.IsTransitionable())
                 {
@@ -102,9 +102,29 @@ public class State
         this._onUpdateTask = _onUpdateTask;
     }
 
+    public virtual int CompareTo(State state)
+    {
+        if (name == state.name)
+        {
+            return 1;
+        }
+        return 0;
+    }
+
     public void OnEnterState() { if(_onEnterTask != null) _onEnterTask.Invoke(); }
     public void OnExitState() { if (_onExitTask != null) _onExitTask.Invoke(); }
     public void OnUpdateState() { if (_onUpdateTask != null) _onUpdateTask.Invoke(); }
+}
+
+public class AnyState : State, IComparable<State>
+{
+    public AnyState() : base("Any", null, null, null) { }
+
+    public override int CompareTo(State state)
+    {
+        return 1;
+    }
+
 }
 
 public class Transition

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEditor.Build.Pipeline;
 using UnityEngine;
 
@@ -35,6 +36,17 @@ public static class Utility
             }
         }
         return -1;
+    }
+
+    public static bool IsInView(GameObject gameObject)
+    {
+        Transform viewTransform = Camera.transform;
+        
+        if( Vector3.Dot( gameObject.transform.position - viewTransform.position, viewTransform.forward) > 0)
+        {
+            return true;
+        }
+        return false;
     }
 }
 

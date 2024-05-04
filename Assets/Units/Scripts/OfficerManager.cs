@@ -8,9 +8,9 @@ using UnityEngine.AI;
 
 public class OfficerManager : UnitManager, IVisitable
 {
-    [SerializeField] BaseStats baseStats;
+    //STATS
+    [SerializeField] BaseStats UnitTemplate;
     public Stats Stats { get; private set; }
-
     public void Accept(IVisitor visitor) => visitor.Visit(this);
 
 
@@ -18,10 +18,11 @@ public class OfficerManager : UnitManager, IVisitable
 
     public GameObject PawnPrefab;
 
-    public int RegimentSize = 120;
-    public List<PawnManager> pawns = new List<PawnManager>();
+    [HideInInspector] public List<PawnManager> pawns = new List<PawnManager>();
+    
 
     [Header("Regiment formation")]
+    public int RegimentSize = 120;
     private Formation _regimentFormation;
     public Formation RegimentFormation
     {
@@ -48,9 +49,8 @@ public class OfficerManager : UnitManager, IVisitable
     private OfficerManager targetRegiment = null;
     private FiniteStateMachine OfficerStateMachine;
     public string stateName;
-
-    //TIMERS
-    //public Timer ReloadTimer = new Timer(5f);
+    public uint Morale = 100;
+    public uint FleeThreashold = 25;
 
     [Header("Debug")]
     public bool ShowSightLines = false;
@@ -58,7 +58,7 @@ public class OfficerManager : UnitManager, IVisitable
 
     private void Awake()
     {
-        Stats = new Stats(new StatsMediator(), baseStats);
+        Stats = new Stats(new StatsMediator(), UnitTemplate);
     }
 
     // Start is called before the first frame update
@@ -160,8 +160,25 @@ public class OfficerManager : UnitManager, IVisitable
     {
         pawns.RemoveAll(item => item == null);
 
-        RegimentSize = pawns.Count;
-        RegimentFormation = new Line(RegimentSize);
+        if(RegimentSize != pawns.Count)
+        {
+            RegimentSize = pawns.Count;
+
+            string t = GetFormationType();
+
+            switch(t)
+            {
+                case "Line":
+                    RegimentFormation = new Line(RegimentSize);
+                    break;
+                case "Column":
+                    RegimentFormation = new Column(RegimentSize);
+                    break;
+                default:
+                    RegimentFormation = new Line(RegimentSize);
+                    break;
+            }
+        }
     }
     public void SetFormation(Formation formation)
     {
@@ -206,6 +223,10 @@ public class OfficerManager : UnitManager, IVisitable
     public int GetPawnRank(int ID)
     {
         return RegimentFormation.GetRank(ID);
+    }
+    public string GetFormationType()
+    {
+        return RegimentFormation.GetType().ToString();
     }
 
     //FIRE MANAGEMENT
@@ -283,10 +304,13 @@ public class OfficerManager : UnitManager, IVisitable
         List<Transition> officerTransitions = new List<Transition>();
 
         //STATES
+        //ANY
+        AnyState anyState = new AnyState();
+        officerStates.Add( anyState );
         //IDLE
         State Idle = new State(
                 "Idle",
-                () => { Debug.Log("Idle"); },
+                null,
                 null,
                 () => {
                     CheckFormation();
@@ -303,7 +327,7 @@ public class OfficerManager : UnitManager, IVisitable
         //MOVING
         State Moving = new State(
                 "Moving",
-                () => { Debug.Log("Moving"); },
+                null,
                 null,
                 () => {
                     SendFormation();
@@ -315,7 +339,6 @@ public class OfficerManager : UnitManager, IVisitable
                 "Firing",
                 () => {
                     SendFireMessage();
-                    Debug.Log("FIRE!");
                 },
                 null,
                 null
@@ -327,15 +350,42 @@ public class OfficerManager : UnitManager, IVisitable
                 () => {
                     //SEND RELOAD MESSAGE
                     SendRelaodMessage();
-                    Debug.Log("Reload");
                 },
                 null,
                 null
             );
         officerStates.Add(Reloading);
+        //FLEE
+        State Fleeing = new State(
+                "Fleeing",
+                () => { 
+                    um.ClearDestination();
+                    um.SetDestination(Utility.V3toV2(transform.position), transform.rotation);
+                },
+                null,
+                () => 
+                {
+                    SendFormation();
+                }
+            );
+        officerStates.Add(Fleeing);
+
 
         //TRANSITIONS
-            //IDLE -> MOVING
+        //ANY -> FLEEING
+        Transition AnyFleeing = new Transition(
+                anyState,
+                Fleeing,
+                () => {
+                    if(Morale < FleeThreashold)
+                    {
+                        return true;
+                    }
+                    return false;
+                }
+            );
+        officerTransitions.Add(AnyFleeing);
+        //IDLE -> MOVING
         Transition IdleMoving = new Transition(
                 Idle,
                 Moving,
@@ -366,7 +416,7 @@ public class OfficerManager : UnitManager, IVisitable
                 Idle,
                 Firing,
                 () => {
-                    if (targetRegiment != null)
+                    if (targetRegiment != null && CheckLoadedStatus() && GetFormationType() == "Line")
                     {
                         return true;
                     }
@@ -400,6 +450,20 @@ public class OfficerManager : UnitManager, IVisitable
                 }
             );
         officerTransitions.Add(ReloadingIdle);
+        //IDLE -> RELOADING
+        Transition IdleReloading = new Transition(
+                Reloading,
+                Idle,
+                () => {
+                    if (CheckUnLoadedStatus())
+                    {
+                        return true;
+                    }
+                    return false;
+                }
+            );
+        officerTransitions.Add(IdleReloading);
+
 
 
         OfficerStateMachine.AddStates(officerStates);

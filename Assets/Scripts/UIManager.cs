@@ -41,7 +41,10 @@ public class UIManager : MonoBehaviour
         //UPDATE FLAG POSITIONS
         foreach((GameObject, GameObject) o in regimentFlags)
         {
-            o.Item2.transform.position = Utility.Camera.WorldToScreenPoint(o.Item1.transform.position + Vector3.up * 1f);
+            if(Utility.IsInView(o.Item1))
+            {
+                o.Item2.transform.position = Utility.Camera.WorldToScreenPoint(o.Item1.transform.position + Vector3.up * 1f);
+            }
         }
     }
 
