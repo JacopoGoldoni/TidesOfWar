@@ -308,7 +308,6 @@ public class UIManager : MonoBehaviour
         {
             OfficerManager om = cameraManagerRef.selectedOfficers[i];
             om.um.SetDestination(Utility.V3toV2( om.transform.position), om.transform.rotation);
-            om.um.unitState = UnitState.Idle;
         }
     }
 

@@ -43,7 +43,6 @@ public class PawnManager : UnitManager
     public void MoveTo(Vector2 dest, Quaternion quat)
     {
         um.SetDestination(dest, quat);
-        um.unitState = UnitState.Idle;
     }
 
     public void Update()

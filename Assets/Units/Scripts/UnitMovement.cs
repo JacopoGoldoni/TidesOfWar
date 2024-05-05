@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.AI;
@@ -15,7 +17,6 @@ public abstract class UnitMovement : MonoBehaviour
     public Vector3 direction = new Vector3(0, 0, 0);
     public Vector3 rotationVector = new Vector3(0, 0, 0);
     public List<MovementOrder> MovementPoints = new List<MovementOrder>();
-    public UnitState unitState;
 
     [Header("Move and rotation")]
     public float MovementSpeed = 2f;
@@ -37,7 +38,7 @@ public abstract class UnitMovement : MonoBehaviour
     }
 
     //MOVEMENT
-    public void SetDestination(Vector2 newDest, Quaternion newQuat)
+    public virtual void SetDestination(Vector2 newDest, Quaternion newQuat)
     {
         MovementPoints.Clear();
         MovementPoints.Add(
@@ -79,7 +80,7 @@ public abstract class UnitMovement : MonoBehaviour
     {
         if(navAgent != null)
         {
-            return !(navAgent.remainingDistance == 0f && !navAgent.pathPending);
+            return navAgent.remainingDistance > 0f || navAgent.pathPending;
         }
         return false;
     }
@@ -116,6 +117,7 @@ public abstract class UnitMovement : MonoBehaviour
     }
 }
 
+[Serializable]
 public struct MovementOrder
 {
     public Vector3 pos;

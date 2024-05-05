@@ -5,6 +5,8 @@ using UnityEngine.AI;
 
 public class OfficerMovement : UnitMovement
 {
+    public bool HasChangedOrder = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -29,19 +31,25 @@ public class OfficerMovement : UnitMovement
         }
     }
 
+    public override void SetDestination(Vector2 newDest, Quaternion newQuat)
+    {
+        HasChangedOrder = true;
+        base.SetDestination(newDest, newQuat);
+    }
+
     private void UpdateMove()
     {
         //IF HAS ORDERS
         if (MovementPoints.Count != 0)
         {
-            if(unitState == UnitState.Idle)
+            //CALCULATE PATH
+            if(HasChangedOrder)
             {
-                //SET DESTINATION
                 navAgent.SetDestination(MovementPoints[0].pos);
-                unitState = UnitState.Walk;
+                HasChangedOrder = false;
             }
-
-            if (!IsMoving())
+            else
+            if (!IsMoving()) //PROBLEM HERE!
             {
                 //NOT MOVING
                 if(!IsRotating())
@@ -54,13 +62,12 @@ public class OfficerMovement : UnitMovement
                         {
                             //PROCEED TO NEXT POINT
                             MovementPoints.RemoveAt(0);
-                            unitState = UnitState.Idle;
+                            HasChangedOrder = true;
                         }
                         else
                         {
                             //LAST ORDER
                             MovementPoints.Clear();
-                            unitState = UnitState.Idle;
                         }
                     }
                 }

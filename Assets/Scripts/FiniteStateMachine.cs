@@ -49,6 +49,7 @@ public class FiniteStateMachine
                 if(t.IsTransitionable())
                 {
                     ChangeState(t.targetState, true);
+                    return;
                 }
             }
         }

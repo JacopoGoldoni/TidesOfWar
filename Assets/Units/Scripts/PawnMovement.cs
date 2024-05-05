@@ -16,8 +16,6 @@ public class PawnMovement : UnitMovement
     {
         um = GetComponent<PawnManager>();
         navAgent = GetComponent<NavMeshAgent>();
-
-        unitState = UnitState.Idle;
     }
 
     void Update()
@@ -36,11 +34,7 @@ public class PawnMovement : UnitMovement
         if (MovementPoints.Count != 0)
         {
             //SET DESTINATION
-            if (unitState == UnitState.Idle)
-            {
-                navAgent.SetDestination(MovementPoints[0].pos);
-                unitState = UnitState.Walk;
-            }
+            navAgent.SetDestination(MovementPoints[0].pos);
 
             if (!IsMoving())
             {
@@ -49,7 +43,6 @@ public class PawnMovement : UnitMovement
                 {
                     //ALIGNED WITH FORMATION
                     MovementPoints.RemoveAt(0);
-                    unitState = UnitState.Idle;
                 }
                 else
                 {

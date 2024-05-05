@@ -359,7 +359,6 @@ public class OfficerManager : UnitManager, IVisitable
         State Fleeing = new State(
                 "Fleeing",
                 () => { 
-                    um.ClearDestination();
                     um.SetDestination(Utility.V3toV2(transform.position), transform.rotation);
                 },
                 null,
