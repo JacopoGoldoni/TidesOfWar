@@ -1,5 +1,7 @@
+using Den.Tools;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Matrix
@@ -148,6 +150,78 @@ public class Matrix
         return Vector3.zero;
     }
 
+    //DECOMPOSITIONS
+    public (Matrix, Matrix) QR_Decomposition()
+    {
+        List<Matrix> Qs = new List<Matrix>();
+
+        //Qs matrixes calculation
+        for(int t = 0; t < sizeX - 1; t++)
+        {
+            Matrix A = new Matrix(sizeX, sizeY);
+            if(t == 0)
+            {
+                A = this;
+            }
+
+            Matrix x = A.Column(0);
+            
+            float a = 0;
+            for (int i = 0; i < x.sizeY; i++)
+            {
+                a += Mathf.Pow(x.values[0, i], 2);
+            }
+            a = Mathf.Sqrt(a);
+
+            Matrix u = x + Identity(this.sizeX).Column(0) * a;
+
+            float b = 0;
+            for (int i = 0; i < u.sizeY; i++)
+            {
+                b += Mathf.Pow(u.values[0, i], 2);
+            }
+            b = Mathf.Sqrt(b);
+
+            Matrix v = u * (1f / b);
+
+            Qs[t] = HouseholderMatrix(v);
+
+            Matrix M = Qs[t] * this;
+            A = M.ExtractMatrix((1, 1), (M.sizeX - 1, M.sizeY - 1));
+        }
+
+        Matrix Q = Identity(sizeX);
+        for(int i = 0; i < Qs.Count; i++)
+        {
+            Q *= Qs[i];
+        }
+
+        Matrix R = Q.Transposed() * this;
+
+        return (Q, R);
+    }
+
+    //EIGENVALUES
+    public List<float> Eigenvalues(int n)
+    {
+        Matrix A = this;
+
+        for(int k = 0; k < n; k++)
+        {
+            (Matrix, Matrix) QR = A.QR_Decomposition();
+            A = QR.Item2 * QR.Item1;
+        }
+
+        List<float> eigenvalues = new List<float>(sizeX);
+
+        for(int i = 0; i < sizeX; i++)
+        {
+            eigenvalues[i] = A.values[i,i];
+        }
+
+        return eigenvalues;
+    }
+
     //UTILITY
     public static Matrix Join(Matrix a, Matrix b)
     {
@@ -251,6 +325,20 @@ public class Matrix
         {
             return null;
         }
+    }
+    public Matrix ExtractMatrix((int, int) a, (int, int) b)
+    {
+        Matrix m = new Matrix(b.Item1 - a.Item1, b.Item2 - a.Item2);
+
+        for(int i = a.Item1; i <= b.Item1; i++)
+        {
+            for (int j = a.Item2; j <= b.Item2; j++)
+            {
+                m.values[i - a.Item1,j - a.Item2] = values[i,j];
+            }
+        }
+
+        return m;
     }
 
     //DEBUG

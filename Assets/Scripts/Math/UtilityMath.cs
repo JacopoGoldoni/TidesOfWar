@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Profiling.Memory.Experimental;
 using UnityEngine;
 
 public static class UtilityMath
@@ -95,5 +96,24 @@ public static class UtilityMath
         float angle = 2 * Mathf.Atan2((Quaternion.ToEulerAngles(dq) * Mathf.Rad2Deg).magnitude, dq.w);
 
         return angle;
+    }
+
+    public static float Sigmoid(float x)
+    {
+        float s = Mathf.Exp(x);
+
+        return s / (1 + s);
+    }
+
+    public static float NRoot(float A, int N)
+    {
+        float epsilon = 0.00001f;
+        float n = N;
+        float x = A / n;
+        while(Mathf.Abs(A - Mathf.Pow(x, N)) > epsilon)
+        {
+            x = (1.0f / n) * ((n - 1) * x + (A / (Mathf.Pow(x, N - 1))));
+        }
+        return x;
     }
 }

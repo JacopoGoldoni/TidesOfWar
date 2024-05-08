@@ -19,16 +19,10 @@ public class OfficerMovement : UnitMovement
         navAgent = GetComponent<NavMeshAgent>();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void UpdateMovement()
     {
         UpdateAgentSpeed();
-        if (
-            ((OfficerManager)um).GetState().name == "Idle" || ((OfficerManager)um).GetState().name == "Moving"
-            )
-        {
-            UpdateMove();
-        }
+        UpdateMove();
     }
 
     public override void SetDestination(Vector2 newDest, Quaternion newQuat)
@@ -39,42 +33,38 @@ public class OfficerMovement : UnitMovement
 
     private void UpdateMove()
     {
-        //IF HAS ORDERS
-        if (MovementPoints.Count != 0)
+        //CALCULATE PATH
+        if (HasChangedOrder)
         {
-            //CALCULATE PATH
-            if(HasChangedOrder)
+            navAgent.SetDestination(MovementPoints[0].pos);
+            HasChangedOrder = false;
+        }
+        else
+        if (!IsMoving())
+        {
+            //NOT MOVING
+            if (!IsRotating())
             {
-                navAgent.SetDestination(MovementPoints[0].pos);
-                HasChangedOrder = false;
-            }
-            else
-            if (!IsMoving()) //PROBLEM HERE!
-            {
-                //NOT MOVING
-                if(!IsRotating())
+                //NOT ROTATING
+                if (((OfficerManager)um).ArePawnIdle())
                 {
-                    //NOT ROTATING
-                    if (((OfficerManager)um).ArePawnIdle())
+                    //ALL REGIMENT ARRIVED AT DESTINATION
+                    if (MovementPoints.Count > 1)
                     {
-                        //ALL REGIMENT ARRIVED AT DESTINATION
-                        if (MovementPoints.Count > 1)
-                        {
-                            //PROCEED TO NEXT POINT
-                            MovementPoints.RemoveAt(0);
-                            HasChangedOrder = true;
-                        }
-                        else
-                        {
-                            //LAST ORDER
-                            MovementPoints.Clear();
-                        }
+                        //PROCEED TO NEXT POINT
+                        MovementPoints.RemoveAt(0);
+                        HasChangedOrder = true;
+                    }
+                    else
+                    {
+                        //LAST ORDER
+                        MovementPoints.Clear();
                     }
                 }
-                else
-                {
-                    RotateToward(MovementPoints[0].rot);
-                }
+            }
+            else
+            {
+                RotateToward(MovementPoints[0].rot);
             }
         }
     }

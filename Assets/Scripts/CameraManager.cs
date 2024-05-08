@@ -3,15 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
+using Den.Tools.GUI.Popup;
+using System;
 
 public class CameraManager : MonoBehaviour
 {
     public InputAction playerControls;
 
     public List<OfficerManager> selectedOfficers = new List<OfficerManager>();
+
+    //3D UI ELEMENTS
     List<GameObject> projectionDests = new List<GameObject>();
     List<GameObject> projectionSights = new List<GameObject>();
 
+    //SIGHTS VARIABLES
     List<float> sizes = new List<float>();
     List<Mesh> sm = new List<Mesh>();
 
@@ -110,6 +115,7 @@ public class CameraManager : MonoBehaviour
         DeleteAllProjections();
         ProjectAll();
 
+        //NOTIFICATION TEST
         if(Input.GetKeyDown(KeyCode.L))
         {
             EventBus<NotificationEvent>.Raise(new NotificationEvent
@@ -168,16 +174,8 @@ public class CameraManager : MonoBehaviour
 
             Quaternion rot = Quaternion.LookRotation(Utility.V2toV3(Orientation), Vector3.up);
 
-            if(Input.GetKey(KeyCode.LeftShift))
-            {
-                //ADD ORDER
-                unit.um.AddDestination(pos, rot);
-            }
-            else
-            {
-                //SET ORDER
-                unit.um.SetDestination(pos, rot);
-            }
+            //SEND ORDER
+            unit.SendOrder(Input.GetKey(KeyCode.LeftShift), pos, rot);
 
             //UPDATE PROJECTIONS
             DeleteAllProjections();
@@ -218,12 +216,12 @@ public class CameraManager : MonoBehaviour
             {
                 int n = of.RegimentFormation.Lines;
 
-                if(!sizes.Contains(n / 2f))
+                if(!sizes.Contains(n * 0.5f))
                 {
                     //IF NEEDED CREATE A NEW SIGHT MESH
-                    sizes.Add(n / 2f);
+                    sizes.Add(n * 0.5f);
                     sm.Add(
-                        SightMesh(11, n / 4f, of.Range, n * 0.5f)
+                        SightMesh(11, n * 0.25f, of.Range, n * 0.5f)
                         );
                 }
             }
@@ -242,22 +240,43 @@ public class CameraManager : MonoBehaviour
                     projectionDests.Add(projectionDest);
                 }
 
-                //PROJECT SIGHTS
-                GameObject projectionSight = new GameObject();
-                MeshFilter mf = projectionSight.AddComponent<MeshFilter>();
-                MeshRenderer mr = projectionSight.AddComponent<MeshRenderer>();
-
-
-                int meshIndex = sizes.FindIndex(a => a == o.RegimentFormation.Lines / 2f);
-                mf.mesh = sm[meshIndex];
-
-                mr.material = OlogramMaterial2;
-
-                projectionSight.transform.position = o.transform.position;
-                projectionSight.transform.rotation = o.transform.rotation;
-
-                projectionSights.Add(projectionSight);
+                ProjectSight(o);
             }
+        }
+    }
+    private void ProjectSight(OfficerManager om)
+    {
+        bool hasSight = false;
+        //PROJECT SIGHTS
+        foreach (GameObject p in projectionSights)
+        {
+            string pNumber = p.name.Split('_')[0];
+
+            if (om.RegimentNumber == Int32.Parse(pNumber))
+            {
+                hasSight = true;
+                break;
+            }
+        }
+
+        if (!hasSight)
+        {
+            GameObject projectionSight = new GameObject();
+            MeshFilter mf = projectionSight.AddComponent<MeshFilter>();
+            MeshRenderer mr = projectionSight.AddComponent<MeshRenderer>();
+
+            projectionSight.name = om.RegimentNumber + "_Sight";
+
+            int meshIndex = sizes.FindIndex(a => a == om.RegimentFormation.Lines / 2f);
+            mf.mesh = sm[meshIndex];
+
+            mr.material = OlogramMaterial2;
+
+            projectionSight.transform.position = om.transform.position;
+            projectionSight.transform.rotation = om.transform.rotation;
+            projectionSight.transform.parent = om.transform;
+
+            projectionSights.Add(projectionSight);
         }
     }
     private void DeleteAllProjections()
@@ -272,9 +291,24 @@ public class CameraManager : MonoBehaviour
         //SIGHTS
         foreach (GameObject p in projectionSights)
         {
-            Destroy(p);
+            string pNumber = p.name.Split('_')[0];
+            
+            bool hasRegiment = false;
+            foreach (OfficerManager o in selectedOfficers)
+            {
+                if (o.RegimentNumber == Int32.Parse(pNumber))
+                {
+                    hasRegiment = true;
+                    break;
+                }
+            }
+
+            if(!hasRegiment)
+            {
+                projectionSights.Remove(p);
+                Destroy(p);
+            }
         }
-        projectionSights.Clear();
     }
     private Mesh SightMesh(int arcVertices, float baseWidth, float SightRadius, float CenterRadius)
     {
@@ -326,5 +360,4 @@ public class CameraManager : MonoBehaviour
 
         return sightMesh;
     }
-    
 }

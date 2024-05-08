@@ -22,6 +22,13 @@ public abstract class Formation
         return y;
     }
 
+    public int GetLine(int ID)
+    {
+        int y = (ID % Lines);
+
+        return y;
+    }
+
     public void SetSizeByRanks(int size, int ranks)
     {
         Ranks = ranks;

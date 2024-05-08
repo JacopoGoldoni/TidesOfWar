@@ -14,6 +14,7 @@ public class PawnManager : UnitManager
     private GameObject rifle;
 
     public bool Loaded = true;
+    private float fireRange = 0f;
 
     AudioSource audioData;
     ParticleSystem particleSystem;
@@ -32,12 +33,15 @@ public class PawnManager : UnitManager
     {
         ms = GetComponent<MeshRenderer>();
         um = GetComponent<PawnMovement>();
+
         audioData = GetComponent<AudioSource>();
         particleSystem = GetComponentInChildren<ParticleSystem>();
 
         ms.material = yourMaterial;
 
         rifle = transform.GetChild(0).gameObject;
+
+        fireRange = masterOfficer.Range;
     }
 
     public void MoveTo(Vector2 dest, Quaternion quat)
@@ -100,11 +104,28 @@ public class PawnManager : UnitManager
 
         //TRACE FOR HIT
         Transform muzzleTransform = transform.GetChild(1).transform;
+
+        Vector3 FireDirection = transform.forward;
+
+        OfficerManager target = masterOfficer.targetRegiment;
+
+        float targetWidth = target.RegimentFormation.Lines * target.RegimentFormation.a;
+        Vector3 targetPos = target.transform.position;
+        Vector3 targetRight = target.transform.right;
         
-        Ray ray = new Ray(muzzleTransform.position, Quaternion.Euler(Random.Range(-5f, 5f), Random.Range(-10f, 10f), 0f) * muzzleTransform.forward * 20f);
+        float s = (float)(ID + 1) / masterOfficer.RegimentFormation.Lines;
+
+        FireDirection = (targetPos - targetRight * (targetWidth * (s - 0.5f)) ) - transform.position;
+        FireDirection.Normalize();
+
+        float precision = masterOfficer.Precision;
+
+        FireDirection = Quaternion.Euler(Random.Range(- precision / 2f, precision / 2f), Random.Range(- precision, precision), 0f) * FireDirection;
+
+        Ray ray = new Ray(muzzleTransform.position, FireDirection * fireRange);
         RaycastHit hit;
 
-        Debug.DrawRay(ray.origin, ray.direction * 20f, Color.red, 2f);
+        Debug.DrawRay(ray.origin, ray.direction * fireRange, Color.red, 2f);
         if (Physics.Raycast(ray, out hit))
         {
             PawnManager pm = hit.transform.GetComponent<PawnManager>();

@@ -18,10 +18,10 @@ public class FiniteStateMachine
 
     public void Update()
     {
-        //UPDATE BEHAVIOUR
-        currentState.OnUpdateState();
         //UPDATE STATE
         CheckStateTransitions();
+        //UPDATE BEHAVIOUR
+        currentState.OnUpdateState();
     }
     public bool ChangeState(State newState, bool doExit)
     {

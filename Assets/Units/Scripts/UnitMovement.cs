@@ -1,3 +1,4 @@
+using Den.Tools;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,7 +9,6 @@ using UnityEngine.AI;
 
 public abstract class UnitMovement : MonoBehaviour
 {
-    //VARIABLES
     [Header("Components")]
     public NavMeshAgent navAgent;
     public UnitManager um;
@@ -27,8 +27,6 @@ public abstract class UnitMovement : MonoBehaviour
     [Header("Area costs")]
     public const float BaseCost = 2f;
     public const float CostWeight = 1f;
-
-
 
     //INITIALIZE
     public virtual void Initialize()
@@ -80,8 +78,12 @@ public abstract class UnitMovement : MonoBehaviour
     {
         if(navAgent != null)
         {
-            return navAgent.remainingDistance > 0f || navAgent.pathPending;
+            if(navAgent.remainingDistance >= navAgent.stoppingDistance + 0.01f)
+            {
+                return true;
+            }
         }
+        
         return false;
     }
     public bool IsRotating()

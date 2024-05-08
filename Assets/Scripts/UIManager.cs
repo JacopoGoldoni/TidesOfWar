@@ -282,7 +282,7 @@ public class UIManager : MonoBehaviour
     
         for(int i = 0; i < n; i++)
         {
-            Formation f = new Line(cameraManagerRef.selectedOfficers[i].pawns.Count);
+            Formation f = new Line(cameraManagerRef.selectedOfficers[i].RegimentSize);
             cameraManagerRef.selectedOfficers[i].SetFormation(
                 f
                 );
@@ -294,7 +294,7 @@ public class UIManager : MonoBehaviour
 
         for (int i = 0; i < n; i++)
         {
-            Formation f = new Column(cameraManagerRef.selectedOfficers[i].pawns.Count);
+            Formation f = new Column(cameraManagerRef.selectedOfficers[i].RegimentSize);
             cameraManagerRef.selectedOfficers[i].SetFormation(
                 f
                 );

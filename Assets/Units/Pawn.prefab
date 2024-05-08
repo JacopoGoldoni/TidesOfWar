@@ -131,8 +131,8 @@ MonoBehaviour:
   um: {fileID: 0}
   direction: {x: 0, y: 0, z: 0}
   rotationVector: {x: 0, y: 0, z: 0}
-  unitState: 0
-  MovementSpeed: 2
+  MovementPoints: []
+  MovementSpeed: 3
   RotationSpeed: 10
   MovementThreashold: 0.1
   RotationThreashold: 0.1

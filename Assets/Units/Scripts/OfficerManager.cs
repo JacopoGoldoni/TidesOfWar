@@ -9,17 +9,16 @@ using UnityEngine.AI;
 public class OfficerManager : UnitManager, IVisitable
 {
     //STATS
-    [SerializeField] BaseStats UnitTemplate;
-    public Stats Stats { get; private set; }
+    [SerializeField] UnitTemplate unitTemplate;
+    public Stats stats { get; private set; }
     public void Accept(IVisitor visitor) => visitor.Visit(this);
 
+    //PANWS
+    [Header("Pawns")]
+    public GameObject PawnPrefab;
+    public List<PawnManager> pawns = new List<PawnManager>();
 
     public int RegimentNumber;
-
-    public GameObject PawnPrefab;
-
-    [HideInInspector] public List<PawnManager> pawns = new List<PawnManager>();
-    
 
     [Header("Regiment formation")]
     public int RegimentSize = 120;
@@ -39,39 +38,54 @@ public class OfficerManager : UnitManager, IVisitable
     private bool _formationChanged = false;
     public float Range = 20f;
 
-    [Header("Regiment weapons")]
-    public int Ammo = 50;
-    public int MaxAmmo = 50;
+    [Header("Regiment combact")]
+    public float Precision { get { return stats.Precision; } }
+    public int Ammo;
+    public int MaxAmmo { get { return unitTemplate.MaxAmmo; } }
+
+    [Header("Regiment movement")]
+    public float Speed { get { return stats.Speed; } }
+    public const float RunMultiplier = 1.5f;
+
+    [Header("Abilities")]
+    public bool MultipleLineFire { get { return unitTemplate.MultipleFire; } }
+    public bool Fortification { get { return unitTemplate.Fortification; } }
+    public bool SquareFormation { get { return unitTemplate.SquareFormation; } }
+    public bool Skirmish { get { return unitTemplate.Skirmish; } }
 
     [Header("Regiment state")]
     public bool FireAll = true;
-    public bool MultipleLineFire = false;
-    private OfficerManager targetRegiment = null;
+    public OfficerManager targetRegiment = null;
     private FiniteStateMachine OfficerStateMachine;
     public string stateName;
-    public uint Morale = 100;
-    public uint FleeThreashold = 25;
+    public int Morale = 100;
+    public int FleeThreashold = 25;
 
     [Header("Debug")]
     public bool ShowSightLines = false;
     public bool ShowFormation = false;
 
+    //INITIALIZE
     private void Awake()
     {
-        Stats = new Stats(new StatsMediator(), UnitTemplate);
-    }
+        Initialize();
 
-    // Start is called before the first frame update
+        //INITIALIZE STATS
+        stats = new Stats(new StatsMediator(), unitTemplate);
+
+        um.MovementSpeed = Speed;
+        RegimentSize = unitTemplate.RegimentSize;
+        Ammo = MaxAmmo;
+        Morale = unitTemplate.BaseMorale;
+        Range = unitTemplate.Range;
+    }
     void Start()
     {
-        Initialize();
         InitializeFormation();
 
-
-        SpawnRegimentSpawns();
+        SpawnRegimentPawns();
     }
-
-    private void SpawnRegimentSpawns()
+    private void SpawnRegimentPawns()
     {
         for (int i = 0; i < RegimentSize; i++)
         {
@@ -103,13 +117,19 @@ public class OfficerManager : UnitManager, IVisitable
     }
     private void InitializeFormation()
     {
-        RegimentFormation = new Line(RegimentSize);
+        RegimentFormation = new Line((int)RegimentSize);
     }
 
-    // Update is called once per frame
+
+    //UPDATES
     void Update()
     {
-        targetRegiment = EnemyInRange(Range);
+        if(GetState().name != "Fleeing")
+        {
+            targetRegiment = EnemyInRange(Range);
+        }
+
+        CalculateMorale();
 
         //STATE MACHINE
         OfficerStateMachine.Update();
@@ -119,10 +139,9 @@ public class OfficerManager : UnitManager, IVisitable
         //UPDATE TIMER
         UpdateTimers();
     }
-
     private void UpdateTimers()
     {
-        Stats.Mediator.Update(Time.deltaTime);
+        //Stats.Mediator.Update(Time.deltaTime);
     }
 
 
@@ -137,48 +156,143 @@ public class OfficerManager : UnitManager, IVisitable
             m.SetInt("_Hightlight", 0);
         }
     }
-
     private void SpawnPawn(Vector3 pos)
     {
         GameObject pawn = Instantiate(PawnPrefab);
         pawn.transform.position = pos;
 
-        PawnManager pm = pawn.GetComponent<PawnManager>();
+        PawnManager pawnManager = pawn.GetComponent<PawnManager>();
+        PawnMovement pawnMovememnt = pawnManager.GetComponent<PawnMovement>();
 
-        pawns.Add(pm);
-        pm.masterOfficer = this;
-        pm.ID = pawns.Count - 1;
-        pm.faction = faction;
+        pawns.Add(pawnManager);
+        pawnManager.masterOfficer = this;
+        pawnManager.ID = pawns.Count - 1;
+        pawnManager.faction = faction;
 
-        pm.name = "Regiment" + RegimentNumber.ToString() + "_" + pm.ID;
+        pawnMovememnt.MovementSpeed = Speed + 1;
 
-        pm.Initialize();
+        pawnManager.name = "Regiment" + RegimentNumber.ToString() + "_" + pawnManager.ID;
+
+        pawnManager.Initialize();
     }
+    public void SendOrder(bool add, Vector2 pos, Quaternion rot)
+    {
+        if(add)
+        {
+            um.AddDestination(pos, rot);
+        }
+        else
+        {
+            um.SetDestination(pos, rot);
+        }
+    }
+    private void CalculateMorale()
+    {
+        int n = 0;
 
+        foreach(PawnManager p in pawns)
+        {
+            if(p == null)
+            {
+                n++;
+            }
+        }
+
+        float s = (float)(pawns.Count - n) / (float)pawns.Count;
+
+        Morale = (int)(s * 100f);
+    }
+    
     //FORMATION MANAGEMENT
     private void CheckFormation()
     {
-        pawns.RemoveAll(item => item == null);
+        //PAWNS DIED
+        List<int> indexes = new List<int>();
 
-        if(RegimentSize != pawns.Count)
+        int i = 0;
+        foreach (PawnManager pm in pawns)
         {
-            RegimentSize = pawns.Count;
-
-            string t = GetFormationType();
-
-            switch(t)
+            if (pawns[i] == null && GetPawnRank(i) == 1)
             {
-                case "Line":
-                    RegimentFormation = new Line(RegimentSize);
+                indexes.Add(i);
+            }
+
+            i++;
+        }
+
+        if(indexes.Count == 0)
+        {
+            return;
+        }
+
+        if(RegimentSize - indexes.Count < RegimentFormation.Lines)
+        {
+            return;
+        }
+
+        _formationChanged = true;
+        int Lines = RegimentFormation.Lines;
+
+        foreach (int l in indexes)
+        {
+            int k = 0;
+            int n = 1;
+            while (true)
+            {
+                int s = (k % 2) * ((k+1) / 2) + (-1) * ((k+1) % 2) * (k / 2);
+                int m = l + n * Lines + s;
+
+                if (m >= pawns.Count) { 
+                    for(int z = RegimentFormation.Lines; z < pawns.Count; z ++)
+                    {
+                        if (pawns[z] != null)
+                        {
+                            pawns[l] = pawns[z];
+                            pawns[l].ID = l;
+                            pawns[z] = null;
+                            break;
+                        }
+                    }
+                }
+
+                if ((k + l % Lines) >= Lines)
+                {
+                    k = 0;
+                    s = (k % 2) * ((k + 1) / 2) + (-1) * ((k + 1) % 2) * (k / 2);
+                    n++;
+                }
+
+                m = l + n * Lines + s;
+                if (m >= pawns.Count) {
+                    for (int z = RegimentFormation.Lines; z < pawns.Count; z++)
+                    {
+                        if (pawns[z] != null)
+                        {
+                            pawns[l] = pawns[z];
+                            pawns[l].ID = l;
+                            pawns[z] = null;
+                            break;
+                        }
+                    }
                     break;
-                case "Column":
-                    RegimentFormation = new Column(RegimentSize);
+                }
+
+                if (pawns[m] != null)
+                {
+                    pawns[l] = pawns[m];
+                    pawns[l].ID = l;
+                    pawns[m] = null;
                     break;
-                default:
-                    RegimentFormation = new Line(RegimentSize);
-                    break;
+                }
+                else
+                {
+                    k++;
+                }
             }
         }
+
+        //pawns.RemoveAll(item => item == null);
+        //RegimentSize = pawns.Count;
     }
     public void SetFormation(Formation formation)
     {
@@ -186,8 +300,9 @@ public class OfficerManager : UnitManager, IVisitable
     }
     public void SendFormation()
     {
-        for (int i = 0; i < pawns.Count; i++)
+        for (int i = 0; i < RegimentSize; i++)
         {
+            if (pawns[i] != null)
             pawns[i].MoveTo(
                 GetFormationCoords(i) + Utility.V3toV2(transform.position),
                 um.CurrentRotation()
@@ -212,11 +327,13 @@ public class OfficerManager : UnitManager, IVisitable
     {
         foreach(PawnManager pm in pawns)
         {
-            if(pm.um.IsMoving())
+            if(pm != null)
             {
-                return false;
+                if (pm.um.IsMoving() && pm.um.IsRotating())
+                {
+                    return false;
+                }
             }
-            
         }
         return true;
     }
@@ -232,11 +349,12 @@ public class OfficerManager : UnitManager, IVisitable
     //FIRE MANAGEMENT
     public void SendFireMessage()
     {
-        for (int i = 0; i < pawns.Count; i++)
+        for (int i = 0; i < RegimentSize; i++)
         {
             if(GetPawnRank(i) == 1)
             {
                 //FIRE ONLY FIRST RANK
+                if (pawns[i] != null)
                 pawns[i].CallFire();
             }
         }
@@ -244,26 +362,30 @@ public class OfficerManager : UnitManager, IVisitable
     }
     public void SendRelaodMessage()
     {
-        for (int i = 0; i < pawns.Count; i++)
+        for (int i = 0; i < RegimentSize; i++)
         {
             if (GetPawnRank(i) == 1)
             {
                 //FIRE ONLY FIRST RANK
-                pawns[i].CallReload();
+                if (pawns[i] != null)
+                    pawns[i].CallReload();
             }
         }
         Ammo -= 1;
     }
     public bool CheckLoadedStatus()
     {
+        bool a = false;
+
         //TRUE IF ALL LOADED, FALSE IF AT LEAST ONE IS NOT LOADED
-        for (int i = 0; i < pawns.Count; i++)
+        for (int i = 0; i < RegimentSize; i++)
         {
+            //CHECK ONLY FIRST RANK
             if (GetPawnRank(i) == 1)
             {
                 if (pawns[i] != null)
                 {
-                    //CHECK ONLY FIRST RANK
+                    a = true;
                     if (!pawns[i].Loaded)
                     {
                         return false;
@@ -271,12 +393,12 @@ public class OfficerManager : UnitManager, IVisitable
                 }
             }
         }
-        return true;
+        return a;
     }
     public bool CheckUnLoadedStatus()
     {
         //TRUE IF ALL UNLOADED, FALSE IF AT LEAST ONE IS LOADED
-        for (int i = 0; i < pawns.Count; i++)
+        for (int i = 0; i < RegimentSize; i++)
         {
             if (GetPawnRank(i) == 1)
             {
@@ -310,18 +432,17 @@ public class OfficerManager : UnitManager, IVisitable
         //IDLE
         State Idle = new State(
                 "Idle",
-                null,
-                null,
                 () => {
                     CheckFormation();
-
-                    if (um.MovementPoints.Count != 0 || _formationChanged)
+                    if (_formationChanged)
                     {
+                        SendOrder(false, Utility.V3toV2(transform.position), transform.rotation);
                         SendFormation();
-                        um.SetDestination(Utility.V3toV2(transform.position), transform.rotation);
                         _formationChanged = false;
                     }
-                }
+                },
+                null,
+                null
             );
         officerStates.Add(Idle);
         //MOVING
@@ -330,6 +451,10 @@ public class OfficerManager : UnitManager, IVisitable
                 null,
                 null,
                 () => {
+                    //MOVEMENT BEHAVIOUR
+                    ((OfficerMovement)um).UpdateMovement();
+
+                    //PAWN MOVEMENT
                     SendFormation();
                 }
             );
@@ -358,12 +483,17 @@ public class OfficerManager : UnitManager, IVisitable
         //FLEE
         State Fleeing = new State(
                 "Fleeing",
-                () => { 
-                    um.SetDestination(Utility.V3toV2(transform.position), transform.rotation);
+                () => {
+
+                    Vector3 fleePos = (transform.position - targetRegiment.transform.position).normalized + transform.position;
+                    Quaternion fleeRot = Quaternion.LookRotation((transform.position - targetRegiment.transform.position).normalized, Vector3.up);
+
+                    um.SetDestination(Utility.V3toV2(fleePos), fleeRot);
                 },
                 null,
                 () => 
                 {
+                    ((OfficerMovement)um).UpdateMovement();
                     SendFormation();
                 }
             );
@@ -371,7 +501,7 @@ public class OfficerManager : UnitManager, IVisitable
 
 
         //TRANSITIONS
-        //ANY -> FLEEING
+            //ANY -> FLEEING
         Transition AnyFleeing = new Transition(
                 anyState,
                 Fleeing,
@@ -384,12 +514,12 @@ public class OfficerManager : UnitManager, IVisitable
                 }
             );
         officerTransitions.Add(AnyFleeing);
-        //IDLE -> MOVING
+            //IDLE -> MOVING
         Transition IdleMoving = new Transition(
                 Idle,
                 Moving,
                 () => {
-                    if (um.MovementPoints.Count != 0 || !ArePawnIdle())
+                    if (um.MovementPoints.Count != 0)
                     {
                         return true;
                     }
@@ -402,7 +532,7 @@ public class OfficerManager : UnitManager, IVisitable
                 Moving,
                 Idle,
                 () => {
-                    if (um.MovementPoints.Count == 0 && ArePawnIdle())
+                    if (um.MovementPoints.Count == 0)
                     {
                         return true;
                     }
@@ -428,7 +558,7 @@ public class OfficerManager : UnitManager, IVisitable
                 Firing,
                 Reloading,
                 () => {
-                    if (CheckUnLoadedStatus())
+                    if (CheckUnLoadedStatus() && um.MovementPoints.Count == 0)
                     {
                         return true;
                     }

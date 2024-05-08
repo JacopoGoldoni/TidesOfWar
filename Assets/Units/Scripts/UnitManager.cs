@@ -8,11 +8,11 @@ public abstract class UnitManager : MonoBehaviour
     public Factions faction = Factions.France;
 
     //Components
-    public MeshRenderer ms;
-    public Material m;
-    public UnitMovement um;
+    [HideInInspector] public MeshRenderer ms;
+    [HideInInspector] public Material m;
+    [HideInInspector] public UnitMovement um;
 
-    //Esthetic
+    [Header("Esthetics")]
     public Mesh UnitMesh;
     public Material UnitMaterial;
 

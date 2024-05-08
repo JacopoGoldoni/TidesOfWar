@@ -107,7 +107,7 @@ CapsuleCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.15
   m_Height: 0.55
@@ -131,18 +131,20 @@ MonoBehaviour:
   um: {fileID: 0}
   UnitMesh: {fileID: 0}
   UnitMaterial: {fileID: 2100000, guid: ef561f36c67d42c4dbea3f3a2082e033, type: 2}
-  baseStats: {fileID: 0}
+  UnitTemplate: {fileID: 0}
   RegimentNumber: 0
   PawnPrefab: {fileID: 1997580412286425343, guid: b8496d99f613dc542aa07b81cf37d467,
     type: 3}
-  RegimentSize: 42
   pawns: []
+  RegimentSize: 42
   Range: 20
   Ammo: 50
   MaxAmmo: 50
   FireAll: 1
   MultipleLineFire: 0
   stateName: 
+  Morale: 100
+  FleeThreashold: 25
   ShowSightLines: 0
   ShowFormation: 0
 --- !u!114 &6628204919935442711
@@ -161,11 +163,12 @@ MonoBehaviour:
   um: {fileID: 0}
   direction: {x: 0, y: 0, z: 0}
   rotationVector: {x: 0, y: 0, z: 0}
-  unitState: 0
+  MovementPoints: []
   MovementSpeed: 2
   RotationSpeed: 10
   MovementThreashold: 1
   RotationThreashold: 0.1
+  HasChangedOrder: 0
 --- !u!195 &7364063635592165145
 NavMeshAgent:
   m_ObjectHideFlags: 0
