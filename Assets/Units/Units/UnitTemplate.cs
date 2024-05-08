@@ -16,7 +16,6 @@ public class UnitTemplate : ScriptableObject
 
     [Header("STATS")]
     public int BaseMorale;
-    public int Range;
     public int Precision;
     public int Speed;
     public int MaxAmmo;

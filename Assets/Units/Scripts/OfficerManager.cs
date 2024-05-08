@@ -10,6 +10,7 @@ public class OfficerManager : UnitManager, IVisitable
 {
     //STATS
     [SerializeField] UnitTemplate unitTemplate;
+    [SerializeField] WeaponClass weaponTemplate;
     public Stats stats { get; private set; }
     public void Accept(IVisitor visitor) => visitor.Visit(this);
 
@@ -39,7 +40,7 @@ public class OfficerManager : UnitManager, IVisitable
     public float Range = 20f;
 
     [Header("Regiment combact")]
-    public float Precision { get { return stats.Precision; } }
+    public float Precision { get { return stats.Precision * weaponTemplate.Precision; } }
     public int Ammo;
     public int MaxAmmo { get { return unitTemplate.MaxAmmo; } }
 
@@ -77,7 +78,7 @@ public class OfficerManager : UnitManager, IVisitable
         RegimentSize = unitTemplate.RegimentSize;
         Ammo = MaxAmmo;
         Morale = unitTemplate.BaseMorale;
-        Range = unitTemplate.Range;
+        Range = weaponTemplate.Range;
     }
     void Start()
     {
@@ -85,14 +86,7 @@ public class OfficerManager : UnitManager, IVisitable
 
         SpawnRegimentPawns();
     }
-    private void SpawnRegimentPawns()
-    {
-        for (int i = 0; i < RegimentSize; i++)
-        {
-            Vector2 v2 = GetFormationCoords(i);
-            SpawnPawn(Utility.V2toV3(v2) + transform.position);
-        }
-    }
+
     public override void Initialize()
     {
         ms = GetComponent<MeshRenderer>();
@@ -120,6 +114,33 @@ public class OfficerManager : UnitManager, IVisitable
         RegimentFormation = new Line((int)RegimentSize);
     }
 
+    private void SpawnRegimentPawns()
+    {
+        for (int i = 0; i < RegimentSize; i++)
+        {
+            Vector2 v2 = GetFormationCoords(i);
+            SpawnPawn(Utility.V2toV3(v2) + transform.position);
+        }
+    }
+    private void SpawnPawn(Vector3 pos)
+    {
+        GameObject pawn = Instantiate(PawnPrefab);
+        pawn.transform.position = pos;
+
+        PawnManager pawnManager = pawn.GetComponent<PawnManager>();
+        PawnMovement pawnMovememnt = pawnManager.GetComponent<PawnMovement>();
+
+        pawns.Add(pawnManager);
+        pawnManager.masterOfficer = this;
+        pawnManager.ID = pawns.Count - 1;
+        pawnManager.faction = faction;
+
+        pawnMovememnt.MovementSpeed = Speed + 1;
+
+        pawnManager.name = "Regiment" + RegimentNumber.ToString() + "_" + pawnManager.ID;
+
+        pawnManager.Initialize();
+    }
 
     //UPDATES
     void Update()
@@ -144,7 +165,6 @@ public class OfficerManager : UnitManager, IVisitable
         //Stats.Mediator.Update(Time.deltaTime);
     }
 
-
     public void Highlight(bool highlight)
     {
         if(highlight)
@@ -155,25 +175,6 @@ public class OfficerManager : UnitManager, IVisitable
         {
             m.SetInt("_Hightlight", 0);
         }
-    }
-    private void SpawnPawn(Vector3 pos)
-    {
-        GameObject pawn = Instantiate(PawnPrefab);
-        pawn.transform.position = pos;
-
-        PawnManager pawnManager = pawn.GetComponent<PawnManager>();
-        PawnMovement pawnMovememnt = pawnManager.GetComponent<PawnMovement>();
-
-        pawns.Add(pawnManager);
-        pawnManager.masterOfficer = this;
-        pawnManager.ID = pawns.Count - 1;
-        pawnManager.faction = faction;
-
-        pawnMovememnt.MovementSpeed = Speed + 1;
-
-        pawnManager.name = "Regiment" + RegimentNumber.ToString() + "_" + pawnManager.ID;
-
-        pawnManager.Initialize();
     }
     public void SendOrder(bool add, Vector2 pos, Quaternion rot)
     {

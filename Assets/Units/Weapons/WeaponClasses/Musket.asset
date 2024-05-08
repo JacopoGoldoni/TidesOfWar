@@ -9,10 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
-  m_Name: CharlevilleMusket
-  m_EditorClassIdentifier: Assembly-CSharp::RifleClass
-  name: Charleville musket
-  Precision: 0
-  Reload: 0
-  Weaight: 0
+  m_Script: {fileID: 11500000, guid: be5268cefbae1f94ba2282a1cc58e0f5, type: 3}
+  m_Name: Musket
+  m_EditorClassIdentifier: 
+  weaponName: Musket
+  weaponType: 0
+  weaponSprite: {fileID: 0}
+  weaponMesh: {fileID: 0}
+  ReloadTime: 10
+  Precision: 1
+  Range: 40
+  Cost: 0

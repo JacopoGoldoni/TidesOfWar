@@ -369,13 +369,19 @@ PrefabInstance:
         type: 3}
       propertyPath: unitTemplate
       value: 
-      objectReference: {fileID: 11400000, guid: 6070203ac32ec7f499070e62c0e723bb,
+      objectReference: {fileID: 11400000, guid: 320ce0433b6cdfa4e9dd81bb82a0c5e5,
         type: 2}
     - target: {fileID: 494819290991335157, guid: 992e891c3975e994aaddbef655bcf49b,
         type: 3}
       propertyPath: RegimentNumber
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 494819290991335157, guid: 992e891c3975e994aaddbef655bcf49b,
+        type: 3}
+      propertyPath: weaponTemplate
+      value: 
+      objectReference: {fileID: 11400000, guid: 2b9422f2ea95a1d4297ac8007042241e,
+        type: 2}
     - target: {fileID: 1622135471481153879, guid: 992e891c3975e994aaddbef655bcf49b,
         type: 3}
       propertyPath: m_Name
@@ -409,7 +415,7 @@ PrefabInstance:
     - target: {fileID: 2146294188776469485, guid: 992e891c3975e994aaddbef655bcf49b,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 2146294188776469485, guid: 992e891c3975e994aaddbef655bcf49b,
         type: 3}
@@ -419,7 +425,7 @@ PrefabInstance:
     - target: {fileID: 2146294188776469485, guid: 992e891c3975e994aaddbef655bcf49b,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 2146294188776469485, guid: 992e891c3975e994aaddbef655bcf49b,
         type: 3}
@@ -434,7 +440,7 @@ PrefabInstance:
     - target: {fileID: 2146294188776469485, guid: 992e891c3975e994aaddbef655bcf49b,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: 90
       objectReference: {fileID: 0}
     - target: {fileID: 2146294188776469485, guid: 992e891c3975e994aaddbef655bcf49b,
         type: 3}
@@ -603,6 +609,12 @@ PrefabInstance:
       propertyPath: ShowSightLines
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 494819290991335157, guid: 992e891c3975e994aaddbef655bcf49b,
+        type: 3}
+      propertyPath: weaponTemplate
+      value: 
+      objectReference: {fileID: 11400000, guid: 2b9422f2ea95a1d4297ac8007042241e,
+        type: 2}
     - target: {fileID: 1622135471481153879, guid: 992e891c3975e994aaddbef655bcf49b,
         type: 3}
       propertyPath: m_Name
@@ -631,7 +643,7 @@ PrefabInstance:
     - target: {fileID: 2146294188776469485, guid: 992e891c3975e994aaddbef655bcf49b,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 2146294188776469485, guid: 992e891c3975e994aaddbef655bcf49b,
         type: 3}
@@ -641,7 +653,7 @@ PrefabInstance:
     - target: {fileID: 2146294188776469485, guid: 992e891c3975e994aaddbef655bcf49b,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 1
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 2146294188776469485, guid: 992e891c3975e994aaddbef655bcf49b,
         type: 3}
@@ -656,7 +668,7 @@ PrefabInstance:
     - target: {fileID: 2146294188776469485, guid: 992e891c3975e994aaddbef655bcf49b,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 180
+      value: 90
       objectReference: {fileID: 0}
     - target: {fileID: 2146294188776469485, guid: 992e891c3975e994aaddbef655bcf49b,
         type: 3}

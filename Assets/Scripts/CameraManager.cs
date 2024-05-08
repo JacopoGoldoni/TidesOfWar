@@ -35,6 +35,8 @@ public class CameraManager : MonoBehaviour
     Vector3 OrderPoint3 = new Vector3(0, 0, 0);
     bool ShowArrow = false;
 
+    int UILayer;
+
     //NOTIFICATION
     EventBinding<NotificationEvent> notificationBinding;
 
@@ -58,6 +60,8 @@ public class CameraManager : MonoBehaviour
 
     private void Start()
     {
+        UILayer = LayerMask.NameToLayer("UI");
+
         camera = Utility.Camera;
         uimanager = GetComponent<UIManager>();
 
@@ -84,7 +88,7 @@ public class CameraManager : MonoBehaviour
             {
                 TraceForOrientation();
 
-                SendOrder();
+                SendMovementOrder();
             }
             //Deselect all with E
             if(Input.GetKey(KeyCode.E))
@@ -160,7 +164,7 @@ public class CameraManager : MonoBehaviour
         selectedOfficers.Clear();
     }
 
-    private void SendOrder()
+    private void SendMovementOrder()
     {
         Vector2 Orientation = Utility.V3toV2(OrderPoint2 - OrderPoint).normalized;
 
@@ -170,7 +174,9 @@ public class CameraManager : MonoBehaviour
 
             float space = 1f;
 
-            Vector2 pos = new Vector2(OrderPoint.x, OrderPoint.z) + UtilityMath.RotateVector2(Orientation) * (((float)i - (float)(selectedOfficers.Count - 1) * 0.5f) * (unit.RegimentFormation.Lines / 2f + space));
+            Vector2 pos = 
+                new Vector2(OrderPoint.x, OrderPoint.z) + 
+                UtilityMath.RotateVector2(Orientation) * (((float)i - (float)(selectedOfficers.Count - 1) * 0.5f) * (unit.RegimentFormation.Lines / 2f + space));
 
             Quaternion rot = Quaternion.LookRotation(Utility.V2toV3(Orientation), Vector3.up);
 
@@ -182,6 +188,24 @@ public class CameraManager : MonoBehaviour
             ProjectAll();
 
             ShowArrow = false;
+        }
+    }
+    public void SendAttackOrder(GameObject target)
+    {
+        foreach(OfficerManager o in selectedOfficers)
+        {
+            Vector2 pos;
+            if ((o.transform.position - target.transform.position).magnitude >= o.Range * 0.75f)
+            {
+                pos = Utility.V3toV2(target.transform.position + (o.transform.position - target.transform.position).normalized * o.Range * 0.75f);
+            }
+            else
+            {
+                pos = o.transform.position;
+            }
+            Quaternion rot = Quaternion.LookRotation((target.transform.position - o.transform.position).normalized, Vector3.up);
+
+            o.SendOrder(false, pos, rot);
         }
     }
 

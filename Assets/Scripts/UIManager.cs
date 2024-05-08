@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
+using System.Runtime.CompilerServices;
 
 public class UIManager : MonoBehaviour
 {
@@ -29,6 +30,7 @@ public class UIManager : MonoBehaviour
     //FLAG VARIABLES
     //(target, flag)
     List<(GameObject, GameObject)> regimentFlags = new List<(GameObject, GameObject)>();
+
 
     // Start is called before the first frame update
     void Start()
@@ -153,6 +155,8 @@ public class UIManager : MonoBehaviour
         GameObject RegimentFlag = new GameObject();
         RegimentFlag.name = "Regiment flag";
         RegimentFlag.layer = 5;
+
+        RegimentFlag.AddComponent<RegimentFlagManager>();
 
         Factions regimentFaction = target.GetComponent<OfficerManager>().faction;
 
@@ -341,5 +345,19 @@ public class UIManager : MonoBehaviour
 
         RectTransform rectTransform = CommandTab.GetComponent<RectTransform>();
         rectTransform.sizeDelta = new Vector2(n * 100, 100);
+    }
+
+    public void OnFlagRClicked(RegimentFlagManager regimentFlagManager)
+    {
+        GameObject flagSender = regimentFlagManager.gameObject;
+
+        foreach ((GameObject, GameObject) a in regimentFlags)
+        {
+            if(a.Item2 == flagSender.gameObject)
+            {
+                cameraManagerRef.SendAttackOrder(a.Item1);
+                break;
+            }
+        }
     }
 }

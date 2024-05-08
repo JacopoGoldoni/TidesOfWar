@@ -9,9 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
-  m_Name: FrenchSaber
-  m_EditorClassIdentifier: Assembly-CSharp::MeleeClass
-  name: French saber
-  Damage: 0
-  Charge: 0
+  m_Script: {fileID: 11500000, guid: be5268cefbae1f94ba2282a1cc58e0f5, type: 3}
+  m_Name: Saber
+  m_EditorClassIdentifier: 
+  weaponName: Saber
+  weaponType: 2
+  weaponSprite: {fileID: 0}
+  weaponMesh: {fileID: 0}
+  ReloadTime: 0
+  Precision: 0
+  Range: 0
+  Cost: 0

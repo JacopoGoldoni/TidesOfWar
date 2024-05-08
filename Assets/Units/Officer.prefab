@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 2146294188776469485}
   - component: {fileID: 3055393985314864200}
   - component: {fileID: 973349187672230018}
-  - component: {fileID: 5842740523605785328}
   - component: {fileID: 494819290991335157}
   - component: {fileID: 6628204919935442711}
   - component: {fileID: 7364063635592165145}
@@ -90,29 +89,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &5842740523605785328
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1622135471481153879}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 0
-  serializedVersion: 2
-  m_Radius: 0.15
-  m_Height: 0.55
-  m_Direction: 1
-  m_Center: {x: 0, y: 0.065, z: 0}
 --- !u!114 &494819290991335157
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -131,17 +107,17 @@ MonoBehaviour:
   um: {fileID: 0}
   UnitMesh: {fileID: 0}
   UnitMaterial: {fileID: 2100000, guid: ef561f36c67d42c4dbea3f3a2082e033, type: 2}
-  UnitTemplate: {fileID: 0}
-  RegimentNumber: 0
+  unitTemplate: {fileID: 0}
+  weaponTemplate: {fileID: 0}
   PawnPrefab: {fileID: 1997580412286425343, guid: b8496d99f613dc542aa07b81cf37d467,
     type: 3}
   pawns: []
+  RegimentNumber: 0
   RegimentSize: 42
   Range: 20
   Ammo: 50
-  MaxAmmo: 50
   FireAll: 1
-  MultipleLineFire: 0
+  targetRegiment: {fileID: 0}
   stateName: 
   Morale: 100
   FleeThreashold: 25
