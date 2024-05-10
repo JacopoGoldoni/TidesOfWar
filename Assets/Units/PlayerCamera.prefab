@@ -314,4 +314,4 @@ MonoBehaviour:
   horizontalRotationSpeed: 40
   verticalRotationSpeed: 40
   minHeight: 0.5
-  maxHeight: 40
+  maxHeight: 100

@@ -8,11 +8,16 @@ using UnityEngine.AI;
 
 public class OfficerManager : UnitManager, IVisitable
 {
+    //COMPONENTS
+    LineRenderer lineRenderer;
+
     //STATS
     [SerializeField] UnitTemplate unitTemplate;
     [SerializeField] WeaponClass weaponTemplate;
     public Stats stats { get; private set; }
     public void Accept(IVisitor visitor) => visitor.Visit(this);
+
+    public bool drawPathLine = false;
 
     //PANWS
     [Header("Pawns")]
@@ -92,6 +97,8 @@ public class OfficerManager : UnitManager, IVisitable
         ms = GetComponent<MeshRenderer>();
         um = GetComponent<OfficerMovement>();
 
+        lineRenderer = GetComponent<LineRenderer>();
+
         m = Instantiate(UnitMaterial);
 
         if (Utility.Camera.GetComponent<CameraManager>().faction == faction)
@@ -159,10 +166,35 @@ public class OfficerManager : UnitManager, IVisitable
 
         //UPDATE TIMER
         UpdateTimers();
+
+        DrawPathLine();
     }
     private void UpdateTimers()
     {
         //Stats.Mediator.Update(Time.deltaTime);
+    }
+
+    private void DrawPathLine()
+    {
+        lineRenderer.enabled = drawPathLine;
+
+        if(drawPathLine)
+        {
+            NavMeshAgent na = um.navAgent;
+
+            lineRenderer.positionCount = na.path.corners.Length;
+            lineRenderer.SetPosition(0, transform.position);
+
+            if(na.path.corners.Length < 2)
+            {
+                return;
+            }
+
+            for(int i = 1; i < na.path.corners.Length; i++)
+            {
+                lineRenderer.SetPosition(i, na.path.corners[i] + Vector3.up * 0.5f);
+            }
+        }
     }
 
     public void Highlight(bool highlight)

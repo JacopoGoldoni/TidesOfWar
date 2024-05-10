@@ -13,7 +13,6 @@ public class CameraManager : MonoBehaviour
     public List<OfficerManager> selectedOfficers = new List<OfficerManager>();
 
     //3D UI ELEMENTS
-    List<GameObject> projectionDests = new List<GameObject>();
     List<GameObject> projectionSights = new List<GameObject>();
 
     //SIGHTS VARIABLES
@@ -252,17 +251,8 @@ public class CameraManager : MonoBehaviour
 
             foreach (OfficerManager o in selectedOfficers)
             {
-                //PROJECT DESTINATIONS IF ANY ORDER IS GIVEN
-                if (o.um.MovementPoints.Count != 0)
-                {
-                    GameObject projectionDest = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    projectionDest.GetComponent<MeshRenderer>().material = OlogramMaterial;
-                    projectionDest.GetComponent<Collider>().enabled = false;
-
-                    projectionDest.transform.position = o.um.MovementPoints[0].pos;
-
-                    projectionDests.Add(projectionDest);
-                }
+                //DRAW PATH LINES
+                o.drawPathLine = true;
 
                 ProjectSight(o);
             }
@@ -305,12 +295,10 @@ public class CameraManager : MonoBehaviour
     }
     private void DeleteAllProjections()
     {
-        //DESTINATIONS
-        foreach(GameObject p in projectionDests)
+        foreach(OfficerManager o in GameUtility.FindAllRegiments())
         {
-            Destroy(p);
+            o.drawPathLine = false;
         }
-        projectionDests.Clear();
 
         //SIGHTS
         foreach (GameObject p in projectionSights)

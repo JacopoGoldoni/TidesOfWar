@@ -154,7 +154,7 @@ MonoBehaviour:
   um: {fileID: 0}
   UnitMesh: {fileID: 0}
   UnitMaterial: {fileID: 0}
-  yourMaterial: {fileID: 2100000, guid: 2136bb957162a8446b0f8bd2ed644df3, type: 2}
+  pawnMaterial: {fileID: 2100000, guid: 2136bb957162a8446b0f8bd2ed644df3, type: 2}
   masterOfficer: {fileID: 0}
   ID: 0
   Loaded: 1

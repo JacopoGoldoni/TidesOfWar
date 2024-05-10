@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class PawnManager : UnitManager
 {
-    public Material yourMaterial;
+    public Material pawnMaterial;
 
     public OfficerManager masterOfficer;
 
@@ -37,7 +37,21 @@ public class PawnManager : UnitManager
         audioData = GetComponent<AudioSource>();
         particleSystem = GetComponentInChildren<ParticleSystem>();
 
-        ms.material = yourMaterial;
+        Material m = Instantiate(pawnMaterial);
+
+        if (Utility.Camera.GetComponent<CameraManager>().faction == faction)
+        {
+            m.SetColor("_Color", Color.green);
+        }
+        else
+        {
+            m.SetColor("_Color", Color.red);
+        }
+
+        ms.material = m;
+
+
+
 
         rifle = transform.GetChild(0).gameObject;
 

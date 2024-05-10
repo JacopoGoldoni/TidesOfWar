@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
 using System.Runtime.CompilerServices;
+using Unity.VisualScripting;
 
 public class UIManager : MonoBehaviour
 {
@@ -15,7 +16,7 @@ public class UIManager : MonoBehaviour
     GameObject CommandTab;
     GameObject NotificationTab;
 
-    List<GameObject> regimentCards = new List<GameObject>();
+    List<(OfficerManager, GameObject)> regimentCards = new List<(OfficerManager, GameObject)>();
 
     //UI ELEMENTS PREFAB
     public GameObject RegimentCardPrefab;
@@ -30,7 +31,11 @@ public class UIManager : MonoBehaviour
     //FLAG VARIABLES
     //(target, flag)
     List<(GameObject, GameObject)> regimentFlags = new List<(GameObject, GameObject)>();
-
+    [Header("Flag variables")]
+    public float baseFlagScale = 0.5f;
+    public float transitionDistanceFlag = 20f;
+    public float transitionStrenghtFlag = 1f;
+    public float flagTransparency = 0.5f;
 
     // Start is called before the first frame update
     void Start()
@@ -45,8 +50,37 @@ public class UIManager : MonoBehaviour
         {
             if(Utility.IsInView(o.Item1))
             {
-                o.Item2.transform.position = Utility.Camera.WorldToScreenPoint(o.Item1.transform.position + Vector3.up * 1f);
+                o.Item2.SetActive(true);
+
+                float scale = 1f;
+
+                float d = (o.Item1.transform.position - transform.position).magnitude;
+
+                if (d < transitionDistanceFlag * 2f)
+                {
+                    scale =
+                        baseFlagScale +
+                        0.5f * UtilityMath.Sigmoid(
+                            transitionStrenghtFlag * (o.Item1.transform.position - transform.position).magnitude - transitionDistanceFlag
+                            );
+                }
+
+                o.Item2.GetComponent<RectTransform>().position = Utility.Camera.WorldToScreenPoint(o.Item1.transform.position + Vector3.up * 1f);
+                
+                RectTransform r = o.Item2.GetComponent<RectTransform>();
+                Sprite s = o.Item2.GetComponent<Image>().sprite;
+
+                r.sizeDelta = scale * s.texture.Size() / 10f;
             }
+            else
+            {
+                o.Item2.SetActive(false);
+            }
+        }
+
+        foreach((OfficerManager, GameObject) r in regimentCards)
+        {
+            r.Item2.GetComponent<RegimentCardManager>().SetAmmoSlider(r.Item1.Ammo, r.Item1.MaxAmmo);
         }
     }
 
@@ -164,7 +198,7 @@ public class UIManager : MonoBehaviour
 
         Image image = RegimentFlag.AddComponent<Image>();
         image.sprite = sprite;
-        image.color = new Color(1f, 1f, 1f, 0.5f);
+        image.color = new Color(1f, 1f, 1f, flagTransparency);
         image.transform.parent = UI.transform;
 
         RectTransform rectTransform1 = RegimentFlag.GetComponent<RectTransform>();
@@ -240,7 +274,7 @@ public class UIManager : MonoBehaviour
         regimentCardManager.SetAmmoSlider(regiment.Ammo, regiment.MaxAmmo);
         regimentCardManager.Initialize(regiment.faction);
 
-        regimentCards.Add(RegimentCard);
+        regimentCards.Add((regiment, RegimentCard));
 
         //Displacement
         regimentCardHolder.GetComponent<RectTransform>().sizeDelta = new Vector2(regimentCards.Count * 100 + 10, 110);
@@ -254,7 +288,7 @@ public class UIManager : MonoBehaviour
         {
             if(child.name == "RegimentCard_" + regimentN)
             {
-                regimentCards.Remove(child.gameObject);
+                regimentCards.Remove(regimentCards.Find(a => a.Item2 == child));
                 Destroy(child.gameObject);
                 break;
             }
