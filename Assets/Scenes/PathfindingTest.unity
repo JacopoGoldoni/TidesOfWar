@@ -224,7 +224,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 10, y: 10, z: 10}
+  m_LocalScale: {x: 20, y: 20, z: 20}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -553,7 +553,7 @@ Transform:
   m_GameObject: {fileID: 338280976}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 37.8, y: 0.36, z: 18.5}
+  m_LocalPosition: {x: 62, y: 0.36, z: 58.2}
   m_LocalScale: {x: 1, y: 1, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -993,7 +993,7 @@ Transform:
   m_GameObject: {fileID: 854753916}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 25.6, y: 0.36, z: 26.4}
+  m_LocalPosition: {x: 49.8, y: 0.36, z: 66.1}
   m_LocalScale: {x: 1, y: 1, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1480,7 +1480,7 @@ Transform:
   m_GameObject: {fileID: 1496543155}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 14.1, y: 0.36, z: 20}
+  m_LocalPosition: {x: 38.3, y: 0.36, z: 59.7}
   m_LocalScale: {x: 1, y: 1, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1698,7 +1698,7 @@ Transform:
   m_GameObject: {fileID: 1608648028}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 25.5, y: 0.36, z: 10.3}
+  m_LocalPosition: {x: 49.699997, y: 0.36, z: 50}
   m_LocalScale: {x: 1, y: 1, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2051,6 +2051,16 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5394780246718189889, guid: 3823c1e2af760374b986b193d71abe8f,
+        type: 3}
+      propertyPath: verticalRotationSpeed
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 5394780246718189889, guid: 3823c1e2af760374b986b193d71abe8f,
+        type: 3}
+      propertyPath: horizontalRotationSpeed
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 5394780246718189914, guid: 3823c1e2af760374b986b193d71abe8f,
         type: 3}
       propertyPath: m_Name
