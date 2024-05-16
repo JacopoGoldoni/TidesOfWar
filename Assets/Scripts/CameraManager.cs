@@ -138,7 +138,7 @@ public class CameraManager : MonoBehaviour
         selectedOfficers.Add(t);
         t.Highlight(true);
 
-        uimanager.AddRegimentCard(t);
+        uimanager.CommandTabCheck();
     }
     public void DeselectUnit(Transform target)
     {
@@ -146,7 +146,7 @@ public class CameraManager : MonoBehaviour
         selectedOfficers.Remove(t);
         t.Highlight(false);
 
-        uimanager.RemoveRegimentCard(t.RegimentNumber);
+        uimanager.CommandTabCheck();
     }
     public void DeselectAllUnit()
     {
@@ -159,9 +159,8 @@ public class CameraManager : MonoBehaviour
             }
         }
 
-        uimanager.RemoveAllRegimentCard();
-
         selectedOfficers.Clear();
+        uimanager.CommandTabCheck();
     }
 
     private void SendMovementOrder()

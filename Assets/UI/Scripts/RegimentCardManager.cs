@@ -23,10 +23,6 @@ public class RegimentCardManager : MonoBehaviour
         cardImage = GetComponent<Image>();
 
         SetImage(GFXUtility.GetFlag(faction));
-        
-        cardText.alignment = TextAnchor.LowerCenter;
-        cardText.text = "-Placeholder-";
-        //cardText.font = Resources.GetBuiltinResource(typeof(Font), "Arial.ttf") as Font;
     }
 
     public void SetImage(Sprite sprite)

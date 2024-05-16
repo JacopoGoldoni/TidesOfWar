@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using UnityEngine;
 
 public class WarMachine
@@ -28,12 +29,13 @@ public class WarMachine
     //HLTP
     private class HighLevelTacticalProcesessor
     {
+        List<FriendlySensor> friendlySensors = new List<FriendlySensor>();
+        List<HostileSensor> hostileSensors = new List<HostileSensor>();
         public List<TacticAction> PlanHighLevelTactic(List<Sensor> sensors)
         {
             List<TacticAction> plan = new List<TacticAction>();
 
             //Split sensors
-            List<FriendlySensor> friendlySensors = new List<FriendlySensor>();
             foreach(Sensor s in sensors)
             {
                 if(s.GetType() == typeof(FriendlySensor))
@@ -41,7 +43,6 @@ public class WarMachine
                     friendlySensors.Add((FriendlySensor)s);
                 }
             }
-            List<HostileSensor> hostileSensors = new List<HostileSensor>();
             foreach (Sensor s in sensors)
             {
                 if (s.GetType() == typeof(HostileSensor))
@@ -51,7 +52,15 @@ public class WarMachine
             }
 
             //LOGIC
-                //Attack nearest enemy
+            //Attack nearest enemy
+            plan = AttackNearest();
+
+            return plan;
+        }
+
+        List<TacticAction> AttackNearest()
+        {
+            List<TacticAction> orders = new List<TacticAction>();
             foreach (FriendlySensor s in friendlySensors)
             {
                 AttackEnemy order = new AttackEnemy();
@@ -59,10 +68,10 @@ public class WarMachine
 
                 float currentDistance = float.MaxValue;
                 int currentEnemyID = 0;
-                foreach(HostileSensor h in hostileSensors)
+                foreach (HostileSensor h in hostileSensors)
                 {
                     float distance = (s.pos - h.pos).magnitude;
-                    if(distance < currentDistance)
+                    if (distance < currentDistance)
                     {
                         currentDistance = distance;
                         currentEnemyID = h.unitID;
@@ -70,10 +79,9 @@ public class WarMachine
                 }
                 order.enemyID = currentEnemyID;
 
-                plan.Add(order);
+                orders.Add(order);
             }
-
-            return plan;
+            return orders;
         }
     }
     private HighLevelTacticalProcesessor HLTP = new HighLevelTacticalProcesessor();

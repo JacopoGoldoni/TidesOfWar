@@ -90,11 +90,20 @@ public class UIManager : MonoBehaviour
 
         //UI BUILDERS
         Canvas_Builder();
-        RegimentCardHolder_Builder();
+
         CommandTab_Builder();
         PopulateCommandTab();
         NotificationTab_Builder();
 
+        RegimentCardHolder_Builder();
+        foreach(OfficerManager of in GameUtility.GetAllRegiments())
+        {
+            if(of.faction == cameraManagerRef.faction)
+            {
+                AddRegimentCard(of);
+            }
+        }
+        
         foreach (OfficerManager of in GameUtility.GetAllRegiments())
         {
             (GameObject, GameObject) tf;
@@ -136,9 +145,9 @@ public class UIManager : MonoBehaviour
         image.transform.parent = UI.transform;
 
         RectTransform rectTransform1 = RegimentCardHolder.GetComponent<RectTransform>();
-        rectTransform1.pivot = new Vector2(0.5f, 0.5f);
-        rectTransform1.anchoredPosition = new Vector2(0, -340);
-        rectTransform1.sizeDelta = new Vector2(100, 100);
+        rectTransform1.pivot = new Vector2(0.5f, 0f);
+        rectTransform1.anchoredPosition = new Vector2(0, -600);
+        rectTransform1.sizeDelta = new Vector2(100, 150);
 
         HorizontalLayoutGroup horizontalLayoutGroup = RegimentCardHolder.AddComponent<HorizontalLayoutGroup>();
         horizontalLayoutGroup.spacing = 5;
@@ -147,7 +156,7 @@ public class UIManager : MonoBehaviour
 
         regimentCardHolder = RegimentCardHolder;
 
-        regimentCardHolder.SetActive(false);
+        regimentCardHolder.SetActive(true);
     }
     private void OrderButton_Build(string name, Sprite sprite, UnityAction buttonEvent)
     {
@@ -179,7 +188,7 @@ public class UIManager : MonoBehaviour
 
         RectTransform rectTransform1 = CommandTab.GetComponent<RectTransform>();
         rectTransform1.pivot = new Vector2(0.5f, 0.5f);
-        rectTransform1.anchoredPosition = new Vector2(0, -450);
+        rectTransform1.anchoredPosition = new Vector2(0, -380);
         rectTransform1.sizeDelta = new Vector2(100, 100);
 
         CommandTab.SetActive(false);
@@ -277,10 +286,10 @@ public class UIManager : MonoBehaviour
         regimentCards.Add((regiment, RegimentCard));
 
         //Displacement
-        regimentCardHolder.GetComponent<RectTransform>().sizeDelta = new Vector2(regimentCards.Count * 100 + 10, 110);
+        Vector2 cardSize = RegimentCardPrefab.GetComponent<RectTransform>().sizeDelta;
+        regimentCardHolder.GetComponent<RectTransform>().sizeDelta = new Vector2(regimentCards.Count * cardSize.x + 10, cardSize.y + 10);
 
         RegimentCardHolderCheck();
-        CommandTabCheck();
     }
     public void RemoveRegimentCard(int regimentN)
     {
@@ -320,10 +329,10 @@ public class UIManager : MonoBehaviour
     
         for(int i = 0; i < n; i++)
         {
-            Formation f = new Line(cameraManagerRef.selectedOfficers[i].RegimentSize);
-            cameraManagerRef.selectedOfficers[i].SetFormation(
-                f
-                );
+            OfficerManager of = cameraManagerRef.selectedOfficers[i];
+            Formation f = new Line(of.RegimentSize);
+            of.SetFormation(f);
+            of.SendOrder(false, Utility.V3toV2( of.transform.position ), of.transform.rotation);
         }
     }
     public void SendColumnFormation()
@@ -332,10 +341,10 @@ public class UIManager : MonoBehaviour
 
         for (int i = 0; i < n; i++)
         {
-            Formation f = new Column(cameraManagerRef.selectedOfficers[i].RegimentSize);
-            cameraManagerRef.selectedOfficers[i].SetFormation(
-                f
-                );
+            OfficerManager of = cameraManagerRef.selectedOfficers[i];
+            Formation f = new Column(of.RegimentSize);
+            of.SetFormation(f);
+            of.SendOrder(false, Utility.V3toV2(of.transform.position), of.transform.rotation);
         }
     }
     public void SendStopOrder()
@@ -350,9 +359,9 @@ public class UIManager : MonoBehaviour
     }
 
     //COMMAND TAB MANAGEMENT
-    private void CommandTabCheck()
+    public void CommandTabCheck()
     {
-        if (regimentCards.Count > 0)
+        if (cameraManagerRef.selectedOfficers.Count > 0)
         {
             CommandTab.SetActive(true);
         }

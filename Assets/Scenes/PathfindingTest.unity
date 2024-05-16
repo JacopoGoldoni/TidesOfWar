@@ -374,7 +374,7 @@ PrefabInstance:
     - target: {fileID: 494819290991335157, guid: 992e891c3975e994aaddbef655bcf49b,
         type: 3}
       propertyPath: RegimentNumber
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 494819290991335157, guid: 992e891c3975e994aaddbef655bcf49b,
         type: 3}
@@ -531,7 +531,7 @@ PrefabInstance:
     - target: {fileID: 494819290991335157, guid: 992e891c3975e994aaddbef655bcf49b,
         type: 3}
       propertyPath: RegimentNumber
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 494819290991335157, guid: 992e891c3975e994aaddbef655bcf49b,
         type: 3}

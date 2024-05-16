@@ -18,7 +18,7 @@ public class Match_AI : MonoBehaviour
 
     WarMachine WM;
 
-    CountdownTimer strategyTimer = new CountdownTimer(30f);
+    CountdownTimer strategyTimer = new CountdownTimer(5f);
 
     private void OnEnable()
     {
@@ -27,8 +27,9 @@ public class Match_AI : MonoBehaviour
         EventBus<AIEvent>.Register(AIBinding);
 
         strategyTimer.OnTimerStop = () => {
+            Debug.Log("Request plan calculation");
             RequestPlan();
-            strategyTimer.Reset();
+            strategyTimer.Start();
         };
     }
 
@@ -42,6 +43,11 @@ public class Match_AI : MonoBehaviour
         strategyTimer.Start();
 
         RequestPlan();
+    }
+
+    private void Update()
+    {
+        strategyTimer.Tick(Time.deltaTime);
     }
 
     private void RequestPlan()
