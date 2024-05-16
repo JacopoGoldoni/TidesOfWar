@@ -3,8 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.Build.Pipeline.Interfaces;
 using UnityEngine;
-using UnityEngine.Purchasing;
-using UnityEngine.UIElements;
 
 public class Match_AI : MonoBehaviour
 {
@@ -13,38 +11,74 @@ public class Match_AI : MonoBehaviour
 
     public List<Group> groups = new List<Group>();
 
-    public Vector2 pos;
-
     public Factions faction;
 
     //AI EVENT BUS
     EventBinding<AIEvent> AIBinding;
+
+    WarMachine WM;
+
+    CountdownTimer strategyTimer = new CountdownTimer(30f);
 
     private void OnEnable()
     {
         //BIND AI BUS
         AIBinding = new EventBinding<AIEvent>(() => { return; });
         EventBus<AIEvent>.Register(AIBinding);
+
+        strategyTimer.OnTimerStop = () => {
+            RequestPlan();
+            strategyTimer.Reset();
+        };
     }
 
     private void Start()
     {
+        //INITIALIZE
         GetRegiments();
 
-        SubdvideGroups(3);
+        WM = new WarMachine();
 
-        MoveToLine(0, new Vector2(0, 0), Quaternion.LookRotation(Vector3.right, Vector3.up));
-        MoveToLine(1, new Vector2(-4, 10), Quaternion.LookRotation(Vector3.right, Vector3.up));
-        MoveToLine(2, new Vector2(-8, 5), Quaternion.LookRotation(Vector3.right, Vector3.up));
+        strategyTimer.Start();
 
-        ExecuteOrder(0);
-        ExecuteOrder(1);
-        ExecuteOrder(2);
+        RequestPlan();
+    }
+
+    private void RequestPlan()
+    {
+        PassSensorsToWM();
+
+        List<TacticAction> orders = WM.Plan();
+
+        foreach (TacticAction order in orders)
+        {
+            ExecuteOrder(order);
+        }
+    }
+    private void PassSensorsToWM()
+    {
+        WM.ClearSensors();
+        //Controlled unit informations
+        foreach (OfficerManager c in controlledRegiments)
+        {
+            int ID = controlledRegiments.IndexOf(c);
+            WM.PopulateSensors(
+                new FriendlySensor(ID, 0, Utility.V3toV2(c.transform.position), c.RegimentSize)
+                );
+        }
+        //Enemy unit informations
+        foreach (OfficerManager e in enemyRegiments)
+        {
+            int ID = enemyRegiments.IndexOf(e);
+            WM.PopulateSensors(
+                new HostileSensor(ID, 0, Utility.V3toV2(e.transform.position), e.RegimentSize)
+                );
+        }
     }
 
     private void GetRegiments()
     {
-        foreach(OfficerManager o in GameUtility.FindAllRegiments())
+        foreach(OfficerManager o in GameUtility.GetAllRegiments())
         {
             if(o.faction == faction)
             {
@@ -77,23 +111,6 @@ public class Match_AI : MonoBehaviour
 
     }
 
-    private OfficerManager GetNearestEnemy(OfficerManager target)
-    {
-        OfficerManager current = null;
-        float distance = float.MaxValue;
-
-        foreach(OfficerManager o in enemyRegiments)
-        {
-            float d = (target.transform.position - o.transform.position).magnitude;
-            if(d < distance)
-            {
-                current = o;
-                distance = d;
-            }
-        }
-
-        return current;
-    }
     private OfficerManager GetRegimentByID(int ID)
     {
         return controlledRegiments.Find(c => c.RegimentNumber == ID);
@@ -101,21 +118,30 @@ public class Match_AI : MonoBehaviour
 
     //ACTIONS
     delegate void Order(OfficerManager o);
-    private void DoAll(Order or)
+    private void ExecuteOrder(TacticAction order)
     {
-        controlledRegiments.ForEach(o => { or(o); });
-    }
-    private void ExecuteOrder(int groupN)
-    {
-        Group group = groups[groupN];
+        OfficerManager unit;
 
-        for( int i = 0; i < group.regimentIDs.Length; i++)
+        switch (order)
         {
-            OfficerManager unit = controlledRegiments.Find(g => g.RegimentNumber == group.regimentIDs[i]);
+            case MoveTo:
+                MoveTo o1 = (MoveTo)order;
+                unit = controlledRegiments[o1.unitID];
+                unit.SendOrder(false, o1.pos, o1.dir);
+                break;
 
+            case FaceTarget:
+                FaceTarget o2 = (FaceTarget)order;
+                unit = controlledRegiments[o2.unitID];
+                unit.SendOrder(false, Utility.V3toV2(unit.transform.position), o2.dir);
+                break;
 
-            //SEND ORDER
-            unit.SendOrder(false, group.regimentPosition[i], group.regimentRotation[i]);
+            case AttackEnemy:
+                AttackEnemy o3 = (AttackEnemy)order;
+                unit = controlledRegiments[o3.unitID];
+                OfficerManager target = enemyRegiments[o3.enemyID];
+                Attack(unit, target);
+                break;
         }
     }
 
@@ -137,22 +163,6 @@ public class Match_AI : MonoBehaviour
             group.regimentRotation[i] = rot;
         }
     }
-    private void AttackNearest(OfficerManager o)
-    {
-        Vector2 pos;
-        OfficerManager target = GetNearestEnemy(o);
-        if ((o.transform.position - target.transform.position).magnitude >= o.Range * 0.75f)
-        {
-            pos = Utility.V3toV2(target.transform.position + (o.transform.position - target.transform.position).normalized * o.Range * 0.75f);
-        }
-        else
-        {
-            pos = o.transform.position;
-        }
-        Quaternion rot = Quaternion.LookRotation((target.transform.position - o.transform.position).normalized, Vector3.up);
-
-        o.SendOrder(false, pos, rot);
-    }
     private void Attack(OfficerManager o, OfficerManager target)
     {
         Vector2 pos;
@@ -167,10 +177,6 @@ public class Match_AI : MonoBehaviour
         Quaternion rot = Quaternion.LookRotation((target.transform.position - o.transform.position).normalized, Vector3.up);
 
         o.SendOrder(false, pos, rot);
-    }
-    private void Fallback(OfficerManager o)
-    {
-        o.SendOrder(false, pos, Quaternion.LookRotation(Utility.V2toV3( pos - Utility.V3toV2( o.transform.position)), Vector3.up));
     }
 
 }

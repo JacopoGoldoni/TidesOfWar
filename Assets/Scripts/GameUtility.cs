@@ -8,7 +8,7 @@ public static class GameUtility
 {
     private static List<OfficerManager> regimentsRef;
 
-    public static List<OfficerManager> FindAllRegiments()
+    public static List<OfficerManager> GetAllRegiments()
     {
         if(regimentsRef == null || regimentsRef.Count == 0)
         {
@@ -16,5 +16,20 @@ public static class GameUtility
         }
 
         return regimentsRef;
+    }
+
+    public static void RegisterRegiment(OfficerManager om)
+    {
+        regimentsRef.Add(om);
+    }
+
+    public static OfficerManager GetRegimentByID(int ID)
+    {
+        return regimentsRef[ID];
+    }
+
+    public static int GetIDOfRegiment(OfficerManager om)
+    {
+        return regimentsRef.IndexOf(om);
     }
 }

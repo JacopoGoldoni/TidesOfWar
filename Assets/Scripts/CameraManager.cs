@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
 using Den.Tools.GUI.Popup;
 using System;
+using System.Linq;
 
 public class CameraManager : MonoBehaviour
 {
@@ -295,13 +296,14 @@ public class CameraManager : MonoBehaviour
     }
     private void DeleteAllProjections()
     {
-        foreach(OfficerManager o in GameUtility.FindAllRegiments())
+        foreach(OfficerManager o in GameUtility.GetAllRegiments())
         {
             o.drawPathLine = false;
         }
 
         //SIGHTS
-        foreach (GameObject p in projectionSights)
+        List<GameObject> _projectionSights = projectionSights.ToList<GameObject>();
+        foreach (GameObject p in _projectionSights)
         {
             string pNumber = p.name.Split('_')[0];
             

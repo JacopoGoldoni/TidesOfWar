@@ -115,6 +115,7 @@ MonoBehaviour:
     type: 3}
   pawns: []
   RegimentNumber: 0
+  RegimentName: 
   RegimentSize: 42
   Range: 20
   Ammo: 50
@@ -122,7 +123,7 @@ MonoBehaviour:
   targetRegiment: {fileID: 0}
   stateName: 
   Morale: 100
-  FleeThreashold: 25
+  FleeThreashold: 35
   ShowSightLines: 0
   ShowFormation: 0
 --- !u!114 &6628204919935442711

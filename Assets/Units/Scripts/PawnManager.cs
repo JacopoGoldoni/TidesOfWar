@@ -50,9 +50,6 @@ public class PawnManager : UnitManager
 
         ms.material = m;
 
-
-
-
         rifle = transform.GetChild(0).gameObject;
 
         fireRange = masterOfficer.Range;

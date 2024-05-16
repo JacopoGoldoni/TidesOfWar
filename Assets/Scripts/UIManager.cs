@@ -95,7 +95,7 @@ public class UIManager : MonoBehaviour
         PopulateCommandTab();
         NotificationTab_Builder();
 
-        foreach (OfficerManager of in GameUtility.FindAllRegiments())
+        foreach (OfficerManager of in GameUtility.GetAllRegiments())
         {
             (GameObject, GameObject) tf;
             tf.Item1 = of.gameObject;

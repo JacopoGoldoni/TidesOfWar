@@ -18,8 +18,7 @@ MonoBehaviour:
   PawnMesh: {fileID: 0}
   RegimentIcon: {fileID: 0}
   BaseMorale: 100
-  Range: 20
-  Precision: 8
+  Precision: 12
   Speed: 2
   MaxAmmo: 50
   MeleeAttack: 0

@@ -19,12 +19,13 @@ public class OfficerManager : UnitManager, IVisitable
 
     public bool drawPathLine = false;
 
-    //PANWS
     [Header("Pawns")]
     public GameObject PawnPrefab;
     public List<PawnManager> pawns = new List<PawnManager>();
 
+    [Header("Regiment identifier")]
     public int RegimentNumber;
+    public string RegimentName;
 
     [Header("Regiment formation")]
     public int RegimentSize = 120;
@@ -64,7 +65,7 @@ public class OfficerManager : UnitManager, IVisitable
     public OfficerManager targetRegiment = null;
     private FiniteStateMachine OfficerStateMachine;
     public string stateName;
-    public int Morale = 100;
+    public int Morale;
     public int FleeThreashold = 25;
 
     [Header("Debug")]
@@ -94,6 +95,7 @@ public class OfficerManager : UnitManager, IVisitable
 
     public override void Initialize()
     {
+
         ms = GetComponent<MeshRenderer>();
         um = GetComponent<OfficerMovement>();
 
@@ -133,6 +135,7 @@ public class OfficerManager : UnitManager, IVisitable
     {
         GameObject pawn = Instantiate(PawnPrefab);
         pawn.transform.position = pos;
+        pawn.transform.rotation = transform.rotation;
 
         PawnManager pawnManager = pawn.GetComponent<PawnManager>();
         PawnMovement pawnMovememnt = pawnManager.GetComponent<PawnMovement>();
@@ -233,7 +236,7 @@ public class OfficerManager : UnitManager, IVisitable
 
         float s = (float)(pawns.Count - n) / (float)pawns.Count;
 
-        Morale = (int)(s * 100f);
+        Morale = (int)(s * unitTemplate.BaseMorale);
     }
     
     //FORMATION MANAGEMENT
@@ -653,7 +656,7 @@ public class OfficerManager : UnitManager, IVisitable
             Debug.DrawLine(Start, Start + Utility.V2toV3(a), Color.red, 0f, true);
             Debug.DrawLine(Start, Start + Utility.V2toV3(b), Color.red, 0f, true);
         }
-        List<OfficerManager> Units = GameUtility.FindAllRegiments();
+        List<OfficerManager> Units = GameUtility.GetAllRegiments();
 
         foreach(OfficerManager of in Units)
         {
