@@ -10,14 +10,23 @@ public class MainMenuManager : MonoBehaviour
 {
     public GameObject UI;
 
-    public AudioMixer audioMixer;
+    [Header("Panels")]
+    public GameObject buttonPanel;
+    public GameObject settingsPanel;
+    public GameObject graphicPanel;
+    public GameObject audioPanel;
+
+    [Header("Graphic settings")]
     public Dropdown resolutionDropdown;
     public Dropdown qualityDropdown;
     public Dropdown textureDropdown;
     public Dropdown aaDropdown;
+    Resolution[] resolutions;
+
+    [Header("Graphic settings")]
+    public AudioMixer audioMixer;
     public Slider volumeSlider;
     float currentVolume;
-    Resolution[] resolutions;
 
     // Start is called before the first frame update
     void Start()
@@ -59,9 +68,39 @@ public class MainMenuManager : MonoBehaviour
     {
 
     }
+    public void OpenMain()
+    {
+        buttonPanel.SetActive(true);
+        settingsPanel.SetActive(false);
+        graphicPanel.SetActive(false);
+        audioPanel.SetActive(false);
+
+    }
 
     public void OpenSettings()
     {
+        buttonPanel.SetActive(false);
+        settingsPanel.SetActive(true);
+        graphicPanel.SetActive(false);
+        audioPanel.SetActive(false);
+
+    }
+
+    public void OpenGraphicSettings()
+    {
+        buttonPanel.SetActive(false);
+        settingsPanel.SetActive(false);
+        graphicPanel.SetActive(true);
+        audioPanel.SetActive(false);
+
+    }
+
+    public void OpenAudioSettings()
+    {
+        buttonPanel.SetActive(false);
+        settingsPanel.SetActive(false);
+        graphicPanel.SetActive(false);
+        audioPanel.SetActive(true);
 
     }
 
