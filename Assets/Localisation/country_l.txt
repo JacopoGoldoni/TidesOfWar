@@ -1,0 +1,4 @@
+l_english:
+  FRA: France
+  FRA_DEF: France
+  FRA_ADJ: French
