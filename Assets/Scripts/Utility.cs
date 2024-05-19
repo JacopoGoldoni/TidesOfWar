@@ -94,4 +94,12 @@ public static class GFXUtility
         Sprite sprite = Resources.Load<Sprite>(flagLocation);
         return sprite;
     }
+
+    public static Sprite GetFlag(string TAG)
+    {
+        string flagLocation = "GFX/" + TAG;
+
+        Sprite sprite = Resources.Load<Sprite>(flagLocation);
+        return sprite;
+    }
 }

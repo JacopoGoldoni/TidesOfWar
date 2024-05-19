@@ -10,6 +10,11 @@ public class MainMenuManager : MonoBehaviour
 {
     public GameObject UI;
 
+    [Header("Sections")]
+    public GameObject Main;
+    public GameObject Single;
+    public GameObject Multi;
+
     [Header("Panels")]
     public GameObject buttonPanel;
     public GameObject settingsPanel;
@@ -34,12 +39,6 @@ public class MainMenuManager : MonoBehaviour
         Initialize();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     private void Initialize()
     {
         resolutions = Screen.resolutions;
@@ -57,19 +56,30 @@ public class MainMenuManager : MonoBehaviour
             }
         }
         resolutionDropdown.AddOptions(dropOptions);
+
+        OpenMain();
     }
 
     public void OpenSinglePlayer()
     {
-
+        Main.SetActive(false);
+        Single.SetActive(true);
+        Multi.SetActive(false);
     }
 
     public void OpenMultiplayer()
     {
-
+        Main.SetActive(false);
+        Single.SetActive(false);
+        Multi.SetActive(true);
     }
+
     public void OpenMain()
     {
+        Main.SetActive(true);
+        Single.SetActive(false);
+        Multi.SetActive(false);
+
         buttonPanel.SetActive(true);
         settingsPanel.SetActive(false);
         graphicPanel.SetActive(false);

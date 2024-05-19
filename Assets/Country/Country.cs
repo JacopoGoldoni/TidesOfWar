@@ -4,11 +4,10 @@ using UnityEngine;
 
 public class Country
 {
-    string tag;
+    string TAG = "FRA";
 
-    public string GetName()
+    public Sprite GetFlag()
     {
-        
-        return "";
+        return GFXUtility.GetFlag(TAG);
     }
 }
