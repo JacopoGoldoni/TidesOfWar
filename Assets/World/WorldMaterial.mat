@@ -206,7 +206,7 @@ Material:
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
     - _Surface: 0
-    - _Threashold_A: 2.2
+    - _Threashold_A: 1.85
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:

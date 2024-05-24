@@ -67,7 +67,7 @@ public class WorldMapCameraMovement : MonoBehaviour
         x = transform.position.x;
         z = transform.position.z;
 
-        transform.position = new Vector3(Mathf.Clamp(x, 0f, 500f) ,y ,Mathf.Clamp(z, 0f, 250f));
+        //transform.position = new Vector3(Mathf.Clamp(x, 0f, 500f) ,y ,Mathf.Clamp(z, 0f, 250f));
     }
     private void Elevation()
     {

@@ -9,23 +9,23 @@ using UnityEngine.AI;
 public class WorldGenerator : MonoBehaviour
 {
     [Header("World settings")]
-    public int heightmapResolution = 512;
-    public int detailResolution = 1024;
-    public int detailResolutionPerPatch = 8;
-    public int controlTextureResolution = 512;
-    public int baseTextureResolution = 1024;
-    public Vector2 tileAmount = Vector2.one;
+    public int chunkHeightmapResolution = 512;
+    //public int detailResolution = 1024;
+    //public int detailResolutionPerPatch = 8;
+    //public int controlTextureResolution = 512;
+    //public int baseTextureResolution = 1024;
 
-    public float width = 1000;
-    public float lenght = 1000;
-    public float height = 600;
+    public int width = 1000;
+    public int lenght = 1000;
+    public int height = 600;
+    public Vector2Int chunks = new Vector2Int(1, 1);
 
     public float heightContrast = 0.5f;
     public float heightStrenght = 1f;
 
     private string path = string.Empty;
 
-    public Texture2D worldHeightMap;
+    public Texture2D[] worldHeightMaps;
     public Material worldMaterial;
 
     private NavMeshSurface navMeshSurface;
@@ -41,7 +41,7 @@ public class WorldGenerator : MonoBehaviour
     {
         BuildTerrain();
 
-        navMeshSurface.BuildNavMesh();
+        //navMeshSurface.BuildNavMesh();
     }
 
     // Update is called once per frame
@@ -55,43 +55,42 @@ public class WorldGenerator : MonoBehaviour
         GameObject WorldTerrain = new GameObject("World Terrain");
         WorldTerrain.transform.position = new Vector3(0, 0, 0);
 
-        for (int x = 1; x <= tileAmount.x; x++)
+        for (int x = 0; x < chunks.x; x++)
         {
-            for (int y = 1; y <= tileAmount.y; y++)
+            for (int y = 0; y < chunks.y; y++)
             {
+
                 TerrainData chunkTerrainData = new TerrainData();
 
-                string name = "Chunk_" + x + "-" + y;
+                string name = "Chunk_" + x + "_" + y;
 
-                chunkTerrainData.size = new Vector3(width, height, lenght);
+                chunkTerrainData.size = new Vector3(width / chunks.x, height, lenght / chunks.y);
 
-                chunkTerrainData.baseMapResolution = baseTextureResolution;
-                chunkTerrainData.heightmapResolution = heightmapResolution;
-                chunkTerrainData.alphamapResolution = controlTextureResolution;
-                chunkTerrainData.SetDetailResolution(detailResolution, detailResolutionPerPatch);
+                chunkTerrainData.baseMapResolution = chunkHeightmapResolution;
+                chunkTerrainData.heightmapResolution = chunkHeightmapResolution;
+                //chunkTerrainData.alphamapResolution = controlTextureResolution;
+                //chunkTerrainData.SetDetailResolution(detailResolution, detailResolutionPerPatch);
 
-                //NO CHUNCK SLICING YET
-                float[,] chunksHeights = new float[heightmapResolution, heightmapResolution];
-                for(int i = 0; i < heightmapResolution; i++)
+                //GET CHUNK HEIGHTMAP
+                float[,] chunkHeights = new float[chunkHeightmapResolution + 1, chunkHeightmapResolution + 1];
+                int chunkIndex = x + y * chunks.x;
+                Texture2D chunkMap = worldHeightMaps[chunkIndex];
+                for (int i = 0; i <= chunkHeightmapResolution; i++)
                 {
-                    for (int j = 0; j < heightmapResolution; j++)
+                    for (int j = 0; j <= chunkHeightmapResolution; j++)
                     {
-                        if(i >= worldHeightMap.width || j >= worldHeightMap.height)
-                        {
-                            continue;
-                        }
-                        chunksHeights[j, i] = Mathf.Pow(worldHeightMap.GetPixel(i * 2, j).grayscale, heightContrast) * heightStrenght;
+                        chunkHeights[j, i] = Mathf.Pow(chunkMap.GetPixel(i, j).grayscale, heightContrast) * heightStrenght;
                     }
                 }
 
-                chunkTerrainData.SetHeights(0, 0, chunksHeights);
+                chunkTerrainData.SetHeights(0, 0, chunkHeights);
 
                 chunkTerrainData.name = name;
                 GameObject chunkTerrain = (GameObject)Terrain.CreateTerrainGameObject(chunkTerrainData);
 
                 chunkTerrain.name = name;
                 chunkTerrain.transform.parent = WorldTerrain.transform;
-                chunkTerrain.transform.position = new Vector3(lenght * (x - 1), 0, width * (y - 1));
+                chunkTerrain.transform.position = new Vector3(chunkTerrainData.size.x * x, 0, chunkTerrainData.size.z * y);
 
                 chunkTerrain.GetComponent<Terrain>().materialTemplate = worldMaterial;
 
