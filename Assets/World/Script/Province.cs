@@ -11,6 +11,8 @@ public class Province
 
     public string OWNER_TAG;
 
+    public bool isCostal;
+
     public int POPULATION;
     public int ORDER;
     public int DEVELOPMENT;
@@ -73,10 +75,8 @@ public class Province
 public enum ProvinceType
 {
     plain,
-    town,
     city,
     hill,
     mountain,
-    costal,
     desert
 }

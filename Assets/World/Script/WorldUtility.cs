@@ -122,6 +122,10 @@ public static class WorldUtility
         }
         return null;
     }
+    public static int GetProvincesCount()
+    {
+        return provinces.Length;
+    }
     public static Province GetProvinceByID(int ID)
     {
         return provinces[ID];

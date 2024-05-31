@@ -94,6 +94,17 @@ public class WorldGenerator : MonoBehaviour
             }
         }
     }
+    private void PlaceCities()
+    {
+        for(int i = 0; i < WorldUtility.GetProvincesCount(); i++)
+        {
+            Province p = WorldUtility.GetProvinceByID(i);
+            if(p.PROVINCE_TYPE == ProvinceType.city)
+            {
+                //TODO place city object
+            }
+        }
+    }
     private void ValidatePath()
     {
         if (savePath == string.Empty) savePath = "TiledTerrain/TerrainData/";

@@ -14,6 +14,7 @@ public class WorldEvent
     struct Option
     {
         public string name;
+        public string description;
         public Action OnSelect;
     }
     Option[] options;
