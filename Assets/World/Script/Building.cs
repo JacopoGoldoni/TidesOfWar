@@ -5,24 +5,28 @@ using UnityEngine;
 public class Building
 {
     public string name;
-    public int level = 1;
 
     public float maxDurability;
-    public float durability;
 
-    public Building(string name, int level, float maxDurability)
+    public Building(string name, float maxDurability)
     {
-        this.level = level;
         this.name = name;
         this.maxDurability = maxDurability;
-        this.durability = maxDurability;
     }
 }
 
-public class Barrack : Building
+public class BuildingSlot
 {
-    public Barrack() : base("barrack", 1, 100)
-    {
+    public float durability;
+    public int level;
 
+    public int buildingID;
+
+    public BuildingSlot(int level, int buildingID)
+    {
+        this.level = level;
+        this.buildingID = buildingID;
+
+        //TODO TAKE BUILDING INFO FOR INITIAL DURABILITY
     }
 }

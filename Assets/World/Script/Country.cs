@@ -10,10 +10,12 @@ public class Country
     public bool isSubject = false;
     public string overlord_TAG;
 
-    public Country() { }
-    public Country(string TAG)
+    public GovernmentType governmentType;
+
+    public Country(string TAG, int scenarioID)
     {
         this.TAG = TAG;
+        //TODO: GET ALL INFORMATIONS BY SCENARIO TEMPLATE
     }
 
     public Sprite GetFlag()

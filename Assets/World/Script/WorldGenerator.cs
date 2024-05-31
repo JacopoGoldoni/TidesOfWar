@@ -9,45 +9,36 @@ using UnityEngine.AI;
 public class WorldGenerator : MonoBehaviour
 {
     [Header("World settings")]
-    public int chunkHeightmapResolution = 512;
-    //public int detailResolution = 1024;
-    //public int detailResolutionPerPatch = 8;
-    //public int controlTextureResolution = 512;
-    //public int baseTextureResolution = 1024;
-
     public int width = 1000;
     public int lenght = 1000;
     public int height = 600;
     public Vector2Int chunks = new Vector2Int(1, 1);
 
+    [Header("Texture settings")]
+    public int chunkHeightmapResolution = 512;
+    //public int detailResolution = 1024;
+    //public int detailResolutionPerPatch = 8;
+    //public int controlTextureResolution = 512;
+    //public int baseTextureResolution = 1024;
+    
+
     public float heightContrast = 0.5f;
     public float heightStrenght = 1f;
 
-    private string path = string.Empty;
+    private string savePath = string.Empty;
 
     public Texture2D[] worldHeightMaps;
     public Material worldMaterial;
 
-    private NavMeshSurface navMeshSurface;
+    private List<Roads> roads = new List<Roads>();
 
-    private void Awake()
-    {
-        navMeshSurface = gameObject.AddComponent<NavMeshSurface>();
-        navMeshSurface.agentTypeID = 1;
-    }
-
-    // Start is called before the first frame update
-    void Start()
+    public void BuildWorld()
     {
         BuildTerrain();
 
-        //navMeshSurface.BuildNavMesh();
-    }
+        NavMeshSurface navMeshSurface = GetComponent<NavMeshSurface>();
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        navMeshSurface.BuildNavMesh();
     }
 
     private void BuildTerrain()
@@ -89,20 +80,21 @@ public class WorldGenerator : MonoBehaviour
                 GameObject chunkTerrain = (GameObject)Terrain.CreateTerrainGameObject(chunkTerrainData);
 
                 chunkTerrain.name = name;
+                chunkTerrain.layer = 8;
                 chunkTerrain.transform.parent = WorldTerrain.transform;
                 chunkTerrain.transform.position = new Vector3(chunkTerrainData.size.x * x, 0, chunkTerrainData.size.z * y);
 
                 chunkTerrain.GetComponent<Terrain>().materialTemplate = worldMaterial;
 
-                AssetDatabase.CreateAsset(chunkTerrainData, "Assets/" + path + name + ".asset");
+                AssetDatabase.CreateAsset(chunkTerrainData, "Assets/" + savePath + name + ".asset");
             }
         }
     }
     private void ValidatePath()
     {
-        if (path == string.Empty) path = "TiledTerrain/TerrainData/";
+        if (savePath == string.Empty) savePath = "TiledTerrain/TerrainData/";
 
-        string pathToCheck = Application.dataPath + "/" + path;
+        string pathToCheck = Application.dataPath + "/" + savePath;
         if (Directory.Exists(pathToCheck) == false)
         {
             Directory.CreateDirectory(pathToCheck);

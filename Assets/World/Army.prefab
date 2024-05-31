@@ -122,6 +122,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a242913550252846a4d2c2ef6986d87, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ID: 0
+  TAG: FRA
+  armyName: 
+  destination: {x: 0, y: 0}
+  direction: {x: 0, y: 0}
 --- !u!136 &9008957623952135019
 CapsuleCollider:
   m_ObjectHideFlags: 0

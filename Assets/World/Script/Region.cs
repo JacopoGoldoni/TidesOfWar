@@ -1,11 +1,13 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.AddressableAssets.HostingServices;
 using UnityEngine;
 
+[Serializable]
 public class Region 
 {
-    readonly public int ID;
+    readonly public int regionID;
     public int[] provincesID;
 
     public string OWNER_TAG;
@@ -14,6 +16,11 @@ public class Region
 
     public Region(int regionID)
     {
-        this.ID = regionID;
+        this.regionID = regionID;
+    }
+
+    public void InitializeRegion(int scenarioI)
+    {
+        //WIP
     }
 }

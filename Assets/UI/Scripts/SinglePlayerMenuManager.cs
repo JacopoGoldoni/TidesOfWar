@@ -35,7 +35,7 @@ public class SinglePlayerMenuManager : MonoBehaviour
 
             countryCard.transform.parent = countryListPanel.transform;
 
-            countryCard.GetComponent<CountryCardManager>().Initialize(TAG);
+            countryCard.GetComponent<CountryCardManager>().Initialize(TAG, 0);
         }
     }
 }

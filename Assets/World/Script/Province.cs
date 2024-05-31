@@ -5,20 +5,21 @@ using UnityEngine;
 
 public class Province
 {
-    readonly public int ID;
     public int regionID;
+    public readonly Color colorCode;
 
     public string OWNER_TAG;
+
     public int POPULATION;
     public int ORDER;
     public int DEVELOPMENT;
     public ProvinceType PROVINCE_TYPE;
 
-    public List<Building> BUILDINGS;
+    //public List<Building> BUILDINGS;
 
-    public Province(int ID)
+    public Province(Color colorCode)
     {
-        this.ID = ID;
+        this.colorCode = colorCode;
     }
 
     public void Update()
@@ -50,10 +51,11 @@ public class Province
 
     public void AddBuilding(Building b)
     {
-        BUILDINGS.Add(b);
+        //BUILDINGS.Add(b);
     }
     public void RemoveBuilding(string name)
     {
+        /*
         foreach (Building b in BUILDINGS)
         {
             if(b.name == name)
@@ -62,6 +64,7 @@ public class Province
                 return;
             }
         }
+        */
     }
 }
 

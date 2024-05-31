@@ -1,15 +1,22 @@
 using Newtonsoft.Json.Serialization;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.ShaderKeywordFilter;
 using UnityEngine;
 using UnityEngine.AI;
 
 public class ArmyManager : MonoBehaviour
 {
+    [Header("Army infos")]
     public int ID;
     public string TAG = "FRA";
+    public string armyName;
 
     NavMeshAgent agent;
+
+    [Header("Movement")]
+    public Vector2 destination;
+    public Vector2 direction;
 
     private void Awake()
     {
@@ -19,17 +26,36 @@ public class ArmyManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        destination = Utility.V3toV2(transform.position);
+        direction = Utility.V3toV2(transform.forward);
+    }
+    private void PositionArmy()
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position + Vector3.up * 10f, -1 * transform.up, out hit, Mathf.Infinity, 1 << 8))
+        {
+            NavMeshHit nmh;
+            NavMesh.SamplePosition(hit.point, out nmh, Mathf.Infinity, NavMesh.AllAreas);
+
+            transform.position = nmh.position;
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if(!agent.isOnNavMesh)
+        {
+            PositionArmy();
+        }
     }
 
-    public void MoveTo(Vector2 v2)
+    public void MoveTo(Vector3 dest)
     {
-        agent.destination = Utility.V2toV3(v2);
+        destination = Utility.V3toV2(dest);
+
+        Debug.Log(dest);
+
+        agent.destination = dest;
     }
 }

@@ -116,4 +116,9 @@ public static class UtilityMath
         }
         return x;
     }
+
+    public static Vector2 RandomPointInDisc(float Radius)
+    {
+        return Random.insideUnitCircle * Radius;
+    }
 }

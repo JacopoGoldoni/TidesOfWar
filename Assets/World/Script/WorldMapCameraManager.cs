@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.InputSystem;
 
 public class WorldMapCameraManager : MonoBehaviour
@@ -14,6 +15,7 @@ public class WorldMapCameraManager : MonoBehaviour
     //COMPONENTS
     Camera camera;
     WorldUIManager worldUIManager;
+    LineRenderer lineRenderer;
 
 
     int UILayer;
@@ -24,25 +26,71 @@ public class WorldMapCameraManager : MonoBehaviour
 
         camera = Utility.Camera;
         worldUIManager = GetComponent<WorldUIManager>();
+        lineRenderer = GetComponent<LineRenderer>();
+
+        Initialize_UI();
     }
+
+    private void Initialize_UI()
+    {
+        worldUIManager.CloseRegionTab();
+        worldUIManager.CloseBuildingTab();
+    }
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             Ray ray = GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
+
             if (Physics.Raycast(ray, out hit))
             {
-                SelectArmy(hit.transform);
+                if(hit.transform.gameObject.GetComponent<ArmyManager>())
+                {
+                    SelectArmy(hit.transform);
+                }
+                else
+                {
+                    Vector2 mapUV = WorldUtility.GetWorldUV(hit.point);
+                    
+                    Debug.Log("<color=#"+ ColorUtility.ToHtmlStringRGB(WorldUtility.GetWorldColor(mapUV)) + ">" + WorldUtility.GetWorldColor(mapUV) + "</color>");
+
+                    //worldUIManager.OpenRegionTab();
+                }
             }
         }
         if (Input.GetKeyDown(KeyCode.Mouse1))
         {
             SendMovementOrder(TraceForDestination());
         }
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            selectedArmies.Clear();
+        }
+
+        //TODO DRAW MOVEMENT PREVIEW
+        if(selectedArmies.Count != 0)
+        {
+            Ray ray = GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+            if (Physics.Raycast(ray, out hit))
+            {
+                NavMeshPath navMeshPath = new NavMeshPath();
+                NavMesh.CalculatePath(selectedArmies[0].transform.position, hit.point, NavMesh.AllAreas, navMeshPath);
+
+                lineRenderer.enabled = true;
+
+                lineRenderer.positionCount = navMeshPath.corners.Length;
+                lineRenderer.SetPositions(navMeshPath.corners);
+            }
+        }
+        else
+        {
+            worldUIManager.ClearArmyCard();
+            lineRenderer.enabled = false;
+        }
     }
-
-
 
     public void SelectArmy(Transform target)
     {
@@ -77,21 +125,36 @@ public class WorldMapCameraManager : MonoBehaviour
             worldUIManager.AddArmyCard(a.ID);
         }
     }
-    private Vector2 TraceForDestination()
+    private Vector3 TraceForDestination()
     {
         Ray ray = GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
-        if (Physics.Raycast(ray, out hit))
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity))
         {
             return hit.point;
         }
-        return Vector2.zero;
+        return Vector3.zero;
     }
-    private void SendMovementOrder(Vector2 v2)
+    private void SendMovementOrder(Vector3 v3)
     {
         for(int i = 0; i < selectedArmies.Count; i++)
         {
-            selectedArmies[i].MoveTo(v2);
+            if(i == 0)
+            {
+                selectedArmies[i].MoveTo(v3);
+            }
+            else
+            {
+                NavMeshHit hit;
+                NavMesh.SamplePosition( 
+                    Utility.V2toV3(UtilityMath.RandomPointInDisc(2f)) + v3, 
+                    out hit, 
+                    Mathf.Infinity, 
+                    NavMesh.AllAreas
+                    );
+
+                selectedArmies[i].MoveTo(hit.position);
+            }
         }
     }
 }

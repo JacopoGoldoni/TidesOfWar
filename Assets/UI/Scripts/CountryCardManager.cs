@@ -8,9 +8,9 @@ public class CountryCardManager : MonoBehaviour
 
     public Image image;
 
-    public void Initialize(string TAG)
+    public void Initialize(string TAG, int scenarioID)
     {
-        cardCountry = new Country(TAG);
+        cardCountry = new Country(TAG, scenarioID);
 
         image.sprite = cardCountry.GetFlag();
     }

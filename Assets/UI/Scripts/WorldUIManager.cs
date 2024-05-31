@@ -8,14 +8,19 @@ public class WorldUIManager : MonoBehaviour
     public GameObject selectedArmiesTab;
     List<GameObject> selectedArmiesCards = new List<GameObject>();
 
-    //UI PREFAB
+    [Header("UI prefab")]
     public GameObject armyCard;
+
+    [Header("UI references")]
+    public GameObject regionTab;
+    public GameObject buildingTab;
 
     private void Awake()
     {
         UI = GameObject.Find("UI");
     }
 
+    //ARMY CARD
     public void AddArmyCard(int armyID)
     {
         GameObject go = Instantiate(armyCard);
@@ -55,11 +60,30 @@ public class WorldUIManager : MonoBehaviour
 
         UpdateArmyTab();
     }
-
     public void UpdateArmyTab()
     {
         RectTransform rt = selectedArmiesTab.GetComponent<RectTransform>();
 
         rt.sizeDelta = new Vector2(selectedArmiesCards.Count * 100f + 10f, 210);
+    }
+
+    //REGION TAB
+    public void OpenRegionTab()
+    {
+        regionTab.SetActive(true);
+    }
+    public void CloseRegionTab()
+    {
+        regionTab.SetActive(false);
+    }
+
+    //BUILDING TAB
+    public void OpenBuildingTab()
+    {
+        buildingTab.SetActive(true);
+    }
+    public void CloseBuildingTab()
+    {
+        buildingTab.SetActive(false);
     }
 }
