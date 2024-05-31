@@ -1,0 +1,9 @@
+{
+	"name": "Castelo Branco",
+	"ID": 11,
+	"color": {
+		"r": 99,
+		"g": 103,
+		"b": 237
+	}
+}

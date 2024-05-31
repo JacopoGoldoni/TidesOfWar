@@ -20,7 +20,7 @@ public class WorldManager : MonoBehaviour
         WorldUtility.LoadRasterizedMap();
 
         //LOAD WORLD ENTITIES
-        //WorldUtility.LoadProvinces();
+        WorldUtility.LoadProvinces();
         //WorldUtility.LoadRegions();
         //WorldUtility.LoadCountries();
 

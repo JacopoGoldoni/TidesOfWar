@@ -9,6 +9,7 @@ using UnityEngine.AI;
 public class WorldGenerator : MonoBehaviour
 {
     [Header("World settings")]
+    public bool active = true;
     public int width = 1000;
     public int lenght = 1000;
     public int height = 600;
@@ -34,11 +35,14 @@ public class WorldGenerator : MonoBehaviour
 
     public void BuildWorld()
     {
-        BuildTerrain();
+        if(active)
+        {
+            BuildTerrain();
 
-        NavMeshSurface navMeshSurface = GetComponent<NavMeshSurface>();
+            NavMeshSurface navMeshSurface = GetComponent<NavMeshSurface>();
 
-        navMeshSurface.BuildNavMesh();
+            navMeshSurface.BuildNavMesh();
+        }
     }
 
     private void BuildTerrain()

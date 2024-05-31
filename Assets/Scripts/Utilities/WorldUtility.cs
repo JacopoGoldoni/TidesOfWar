@@ -16,16 +16,16 @@ public static class WorldUtility
     static Texture2D rasterizedMap;
 
     //PATHS
-    static string rasterizedMapPath = "Assets/Resources/RasterizedMap_Europe.tif";
-    static string provincePath = "/JSON/Provinces/";
-    static string regionPath = "/JSON/Regions/";
-    static string countryPath = "/JSON/Countries/";
-    static string buildingPath = "/JSON/Buildings/palette.Contains()";
+    static string rasterizedMapPath = "RasterizedMap_Europe";
+    static string provincePath = "JSON/Provinces/";
+    static string regionPath = "JSON/Regions/";
+    static string countryPath = "JSON/Countries/";
+    static string buildingPath = "JSON/Buildings/";
 
     //LOADERS
     public static void LoadRasterizedMap()
     {
-        rasterizedMap = Resources.Load<Texture2D>("RasterizedMap_Europe");
+        rasterizedMap = Resources.Load<Texture2D>(rasterizedMapPath);
         if(rasterizedMap != null)
         {
             Debug.Log("Rasterized map loaded");
@@ -33,16 +33,25 @@ public static class WorldUtility
     }
     public static void LoadProvinces()
     {
-        TextAsset[] provinceAssets = Resources.LoadAll<TextAsset>(Application.dataPath + provincePath);
-        
+        TextAsset[] provinceAssets = Resources.LoadAll<TextAsset>(provincePath);
+
+        if(provinceAssets.Length == 0) { return; }
+
         provinces = new Province[provinceAssets.Length];
+
+        Debug.Log(provinceAssets.Length + " provinces found.");
 
         for(int i = 0; i < provinceAssets.Length; i++)
         {
             ProvinceInfo provinceInfo = JsonUtility.FromJson<ProvinceInfo>(provinceAssets[i].text);
 
-            Province province = new Province(provinceInfo.color);
-            
+            Province province = new Province(provinceInfo.name ,provinceInfo.color);
+
+            Debug.Log("Province added:\n" + 
+                "Name: " + provinceInfo.name + "\n" + 
+                "ID: " + provinceInfo.ID + "\n" +
+                "ColorCode: " + provinceInfo.color);
+
             provinces[i] = province;
         }
     }
@@ -116,6 +125,17 @@ public static class WorldUtility
     public static Province GetProvinceByID(int ID)
     {
         return provinces[ID];
+    }
+    public static Province GetProvinceByColorCode(Color colorCode)
+    {
+        for(int i = 0; i < provinces.Length; i++)
+        {
+            if (provinces[i].colorCode == colorCode)
+            {
+                return provinces[i];
+            }
+        }
+        return null;
     }
 
     public static Province[] GetProvincesInRegion(int ID)

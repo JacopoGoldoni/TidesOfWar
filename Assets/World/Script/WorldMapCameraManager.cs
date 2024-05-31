@@ -53,8 +53,12 @@ public class WorldMapCameraManager : MonoBehaviour
                 else
                 {
                     Vector2 mapUV = WorldUtility.GetWorldUV(hit.point);
-                    
-                    Debug.Log("<color=#"+ ColorUtility.ToHtmlStringRGB(WorldUtility.GetWorldColor(mapUV)) + ">" + WorldUtility.GetWorldColor(mapUV) + "</color>");
+                    Color regionColorCode = WorldUtility.GetWorldColor(mapUV);
+
+                    Debug.Log("<color=#"+ ColorUtility.ToHtmlStringRGB(WorldUtility.GetWorldColor(mapUV)) + ">" +
+                        WorldUtility.GetWorldColor(mapUV) + "</color>");
+
+                    Debug.Log(WorldUtility.GetProvinceByColorCode(regionColorCode).name);
 
                     //worldUIManager.OpenRegionTab();
                 }

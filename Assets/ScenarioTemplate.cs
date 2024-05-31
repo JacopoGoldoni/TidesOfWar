@@ -37,6 +37,7 @@ public class ScenarioData
 [Serializable]
 public struct ProvinceInfo
 {
+    public string name;
     public int ID;
     public Color color;
     //public bool hasCity;

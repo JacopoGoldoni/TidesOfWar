@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class Province
 {
+    public string name;
     public int regionID;
     public readonly Color colorCode;
 
@@ -17,8 +18,9 @@ public class Province
 
     //public List<Building> BUILDINGS;
 
-    public Province(Color colorCode)
+    public Province(string name, Color colorCode)
     {
+        this.name = name;
         this.colorCode = colorCode;
     }
 
