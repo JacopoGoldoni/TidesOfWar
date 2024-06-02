@@ -7,16 +7,16 @@ using UnityEngine;
 [Serializable]
 public class Region 
 {
-    readonly public int regionID;
+    public string name;
     public int[] provincesID;
 
     public string OWNER_TAG;
     public string CORE_TAG;
     public string[] CLAIM_TAG;
 
-    public Region(int regionID)
+    public Region(string name)
     {
-        this.regionID = regionID;
+        this.name = name;
     }
 
     public void InitializeRegion(int scenarioI)

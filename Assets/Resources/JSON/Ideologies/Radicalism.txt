@@ -1,0 +1,4 @@
+{
+	"name": "Radicalism",
+	"LR": 0.5
+}

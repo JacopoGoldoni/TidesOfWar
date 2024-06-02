@@ -1,0 +1,4 @@
+{
+	"name": "Costitutional monarchysm",
+	"LR": -0.25
+}

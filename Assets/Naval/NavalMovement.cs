@@ -4,34 +4,41 @@ using UnityEngine;
 
 public class NavalMovement : MonoBehaviour
 {
-    float speed;
-    public float MaxSpeed;
-
-    //0,1,2,3
-    public int speedMode;
-
-    public float windFactor;
-    public float engineFactor;
-
-    private float CalculateWind(Vector2 wind)
-    {
-        float w = Vector2.Dot(wind, Utility.V3toV2( transform.forward ));
-        w = Mathf.Clamp01(w);
-
-        return w;
-    }
-
-    private void UpdateMovement()
-    {
-        float acc = speedMode * (MaxSpeed - speed) * windFactor * CalculateWind(new Vector2(0f, 0f));
-
-        speed += acc * Time.deltaTime;
-
-        transform.position += transform.forward * speed * Time.deltaTime;
-    }
+    float mass;
+    Vector2 velocity;
+    float max_force;
+    float max_speed;
 
     private void Update()
     {
         UpdateMovement();
+    }
+    private void UpdateMovement()
+    {
+        transform.position += Utility.V2toV3(velocity) * Time.deltaTime;
+    }
+    private void ApplySteering(Vector2 steering)
+    {
+        velocity += steering * Time.deltaTime;
+
+        transform.rotation = Quaternion.LookRotation(velocity.normalized ,Vector3.up);
+    }
+
+    //MOVEMENT ORDER
+    public void Seek(Vector2 target)
+    {
+        Vector2 desired_velocity = (target - Utility.V3toV2(transform.position)).normalized * max_speed;
+
+        Vector2 steering = desired_velocity - velocity;
+
+        ApplySteering(steering);
+    }
+    public void Flee(Vector2 target)
+    {
+        Vector2 desired_velocity = (Utility.V3toV2(transform.position) - target).normalized * max_speed;
+
+        Vector2 steering = desired_velocity - velocity;
+
+        ApplySteering(steering);
     }
 }

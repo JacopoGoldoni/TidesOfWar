@@ -8,9 +8,9 @@ public static class WorldUtility
 {
     //DATA LISTS
     static Province[] provinces;
-    static List<Region> regions = new List<Region>();
-    static List<Country> countries = new List<Country>();
-    static List<Building> buildings = new List<Building>();
+    static Region[] regions;
+    static Country[] countries;
+    static Building[] buildings;
 
     //MAPS
     static Texture2D rasterizedMap;
@@ -21,6 +21,7 @@ public static class WorldUtility
     static string regionPath = "JSON/Regions/";
     static string countryPath = "JSON/Countries/";
     static string buildingPath = "JSON/Buildings/";
+    static string ideologyPath = "JSON/Ideologies/";
 
     //LOADERS
     public static void LoadRasterizedMap()
@@ -52,37 +53,60 @@ public static class WorldUtility
                 "ID: " + provinceInfo.ID + "\n" +
                 "ColorCode: " + provinceInfo.color);
 
-            provinces[i] = province;
+            provinces[provinceInfo.ID] = province;
         }
     }
     public static void LoadRegions()
     {
-        TextAsset[] regionAssets = Resources.LoadAll<TextAsset>(Application.dataPath + regionPath);
+        TextAsset[] regionAssets = Resources.LoadAll<TextAsset>(regionPath);
+
+        if (regionAssets.Length == 0) { return; }
+
+        regions = new Region[regionAssets.Length];
+
+        Debug.Log(regionAssets.Length + " regions found.");
 
         for (int i = 0; i < regionAssets.Length; i++)
         {
-            Region region = JsonUtility.FromJson<Region>(regionAssets[i].text);
-            regions.Add(region);
+            RegionInfo regionInfo = JsonUtility.FromJson<RegionInfo>(regionAssets[i].text);
+
+            Region region = new Region(regionInfo.name);
+
+            Debug.Log("Region added:\n" +
+                "Name: " + regionInfo.name + "\n" +
+                "ID: " + regionInfo.ID);
+
+            for(int j = 0; j < regionInfo.provinces.Length; j++)
+            {
+                int provinceID = regionInfo.provinces[j];
+
+                GetProvinceByID(provinceID).regionID = regionInfo.ID;
+            }
+
+            regions[regionInfo.ID] = region;
         }
     }
     public static void LoadCountries()
     {
-        TextAsset[] countryAssets = Resources.LoadAll<TextAsset>(Application.dataPath + countryPath);
+        TextAsset[] countryAssets = Resources.LoadAll<TextAsset>(provincePath);
+
+        if (countryAssets.Length == 0) { return; }
+
+        countries = new Country[countryAssets.Length];
+
+        Debug.Log(countryAssets.Length + " coutnries found.");
 
         for (int i = 0; i < countryAssets.Length; i++)
         {
-            Country country = JsonUtility.FromJson<Country>(countryAssets[i].text);
-            countries.Add(country);
-        }
-    }
-    public static void LoadBuildings()
-    {
-        TextAsset[] buildingsAssets = Resources.LoadAll<TextAsset>(Application.dataPath + buildingPath);
+            CountryInfo countryInfo = JsonUtility.FromJson<CountryInfo>(countryAssets[i].text);
 
-        for (int i = 0; i < buildingsAssets.Length; i++)
-        {
-            Building building = JsonUtility.FromJson<Building>(buildingsAssets[i].text);
-            buildings.Add(building);
+            Country country = new Country(countryInfo.TAG);
+
+            Debug.Log("Country added:\n" +
+                "Name: " + countryInfo.name + "\n" +
+                "TAG: " + countryInfo.TAG + "\n");
+
+            countries[i] = country;
         }
     }
 
@@ -113,14 +137,7 @@ public static class WorldUtility
     }
     public static Region GetRegionByID(int ID)
     {
-        foreach (Region r in regions)
-        {
-            if (r.regionID == ID)
-            {
-                return r;
-            }
-        }
-        return null;
+        return regions[ID];
     }
     public static int GetProvincesCount()
     {

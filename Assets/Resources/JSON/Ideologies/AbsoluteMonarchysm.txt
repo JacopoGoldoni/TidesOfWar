@@ -1,0 +1,4 @@
+{
+	"name": "Absolute monarchysm",
+	"LR": -1
+}

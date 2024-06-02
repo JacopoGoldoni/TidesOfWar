@@ -1,0 +1,4 @@
+{
+	"name": "Socialism",
+	"LR": 1
+}

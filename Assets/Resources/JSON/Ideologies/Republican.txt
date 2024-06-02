@@ -1,0 +1,4 @@
+{
+	"name": "Republicanism",
+	"LR": 0.25
+}

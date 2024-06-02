@@ -12,10 +12,9 @@ public class Country
 
     public GovernmentType governmentType;
 
-    public Country(string TAG, int scenarioID)
+    public Country(string TAG)
     {
         this.TAG = TAG;
-        //TODO: GET ALL INFORMATIONS BY SCENARIO TEMPLATE
     }
 
     public Sprite GetFlag()

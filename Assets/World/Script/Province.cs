@@ -6,8 +6,9 @@ using UnityEngine;
 public class Province
 {
     public string name;
-    public int regionID;
     public readonly Color colorCode;
+
+    public int regionID;
 
     public string OWNER_TAG;
 

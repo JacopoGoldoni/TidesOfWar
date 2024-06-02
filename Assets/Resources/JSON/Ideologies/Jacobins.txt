@@ -1,0 +1,4 @@
+{
+	"name": "Jacobins",
+	"LR": 0.75
+}

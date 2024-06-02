@@ -10,7 +10,7 @@ public class CountryCardManager : MonoBehaviour
 
     public void Initialize(string TAG, int scenarioID)
     {
-        cardCountry = new Country(TAG, scenarioID);
+        cardCountry = new Country(TAG);
 
         image.sprite = cardCountry.GetFlag();
     }

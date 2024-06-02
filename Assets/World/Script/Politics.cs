@@ -5,14 +5,15 @@ using UnityEngine;
 public class Party
 {
     public string name;
-    public int[] ideologies;
+    public int ideologies;
 
     public float popularity;
 }
 
 public class Ideology
 {
-    string name;
+    public string name;
+    public float LR;
 }
 
 public enum GovernmentType
