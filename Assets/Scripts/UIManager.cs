@@ -11,17 +11,26 @@ public class UIManager : MonoBehaviour
 {
     CameraManager cameraManagerRef;
 
-    GameObject UI;
-    GameObject regimentCardHolder;
-    GameObject CommandTab;
+    [Header("UI elements")]
+    public GameObject UI;
+    public GameObject companyCardHolder;
+    public GameObject battalionCardHolder;
+    public GameObject CompanyCommandTab;
+    public GameObject BattalionCommandTab;
+    public GameObject companyFlagParent;
+    public GameObject battalionFlagParent;
     GameObject NotificationTab;
 
-    List<(OfficerManager, GameObject)> regimentCards = new List<(OfficerManager, GameObject)>();
+    //CARDS
+    List<(OfficerManager, GameObject)> companyCards = new List<(OfficerManager, GameObject)>();
+    List<(CaptainManager, GameObject)> battalionCards = new List<(CaptainManager, GameObject)>();
 
-    //UI ELEMENTS PREFAB
-    public GameObject RegimentCardPrefab;
+    [Header("UI prefsbs")]
+    public GameObject CompanyCardPrefab;
+    public GameObject BattalionCardPrefab;
     public GameObject OrderButtonPrefab;
     public GameObject NotificationTabPrefab;
+
 
     //COMMAND EVENT
     private UnityAction LineAction;
@@ -29,13 +38,14 @@ public class UIManager : MonoBehaviour
     private UnityAction StopAction;
 
     //FLAG VARIABLES
-    //(target, flag)
-    List<(GameObject, GameObject)> regimentFlags = new List<(GameObject, GameObject)>();
+    List<(GameObject, GameObject)> companyFlags = new List<(GameObject, GameObject)>();     //(target, flag)
+    List<(GameObject, GameObject)> battalionFlags = new List<(GameObject, GameObject)>();   //(target, flag)
     [Header("Flag variables")]
     public float baseFlagScale = 0.5f;
     public float transitionDistanceFlag = 20f;
     public float transitionStrenghtFlag = 1f;
-    public float flagTransparency = 0.5f;
+    public float flagCompanyTransparency = 0.5f;
+    public float flagBattalionTransparency = 0.5f;
 
     // Start is called before the first frame update
     void Start()
@@ -45,8 +55,8 @@ public class UIManager : MonoBehaviour
 
     private void Update()
     {
-        //UPDATE FLAG POSITIONS
-        foreach((GameObject, GameObject) o in regimentFlags)
+        //UPDATE FLAG COMPANY POSITIONS
+        foreach((GameObject, GameObject) o in companyFlags)
         {
             if(Utility.IsInView(o.Item1))
             {
@@ -78,9 +88,43 @@ public class UIManager : MonoBehaviour
             }
         }
 
-        foreach((OfficerManager, GameObject) r in regimentCards)
+        //UPDATE FLAG BATTALION POSITIONS
+        foreach ((GameObject, GameObject) o in battalionFlags)
         {
-            r.Item2.GetComponent<RegimentCardManager>().SetAmmoSlider(r.Item1.Ammo, r.Item1.MaxAmmo);
+            if (Utility.IsInView(o.Item1))
+            {
+                o.Item2.SetActive(true);
+
+                float scale = 1f;
+
+                float d = (o.Item1.transform.position - transform.position).magnitude;
+
+                if (d < transitionDistanceFlag * 2f)
+                {
+                    scale =
+                        baseFlagScale +
+                        0.5f * UtilityMath.Sigmoid(
+                            transitionStrenghtFlag * (o.Item1.transform.position - transform.position).magnitude - transitionDistanceFlag
+                            );
+                }
+
+                o.Item2.GetComponent<RectTransform>().position = Utility.Camera.WorldToScreenPoint(o.Item1.transform.position + Vector3.up * 1f);
+
+                RectTransform r = o.Item2.GetComponent<RectTransform>();
+                Sprite s = o.Item2.GetComponent<Image>().sprite;
+
+                r.sizeDelta = scale * s.texture.Size() / 10f;
+            }
+            else
+            {
+                o.Item2.SetActive(false);
+            }
+        }
+
+        //UPDATE COMPANY CARD INFOS
+        foreach ((OfficerManager, GameObject) r in companyCards)
+        {
+            r.Item2.GetComponent<CompanyCardManager>().SetAmmoSlider(r.Item1.Ammo, r.Item1.MaxAmmo);
         }
     }
 
@@ -88,77 +132,13 @@ public class UIManager : MonoBehaviour
     {
         cameraManagerRef = GetComponent<CameraManager>();
 
-        //UI BUILDERS
-        Canvas_Builder();
-
-        CommandTab_Builder();
-        PopulateCommandTab();
+        PopulateCompanyCommandTab();
+        PopulateBattalionCommandTab();
         NotificationTab_Builder();
-
-        RegimentCardHolder_Builder();
-        foreach(OfficerManager of in GameUtility.GetAllRegiments())
-        {
-            if(of.faction == cameraManagerRef.faction)
-            {
-                AddRegimentCard(of);
-            }
-        }
-        
-        foreach (OfficerManager of in GameUtility.GetAllRegiments())
-        {
-            (GameObject, GameObject) tf;
-            tf.Item1 = of.gameObject;
-            tf.Item2 = RegimentFlag_Builder(of.gameObject);
-
-            regimentFlags.Add(tf);
-        }
     }
 
     //UI BUILDERS
-    private void Canvas_Builder()
-    {
-        UI = new GameObject();
-        UI.name = "UI";
-        UI.layer = 5;
-
-        RectTransform rectTransform = UI.AddComponent<RectTransform>();
-
-        Canvas canvas = UI.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.targetDisplay = 0;
-
-        CanvasScaler canvasScaler = UI.AddComponent<CanvasScaler>();
-        canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
-        canvasScaler.scaleFactor = 1;
-        canvasScaler.referencePixelsPerUnit = 100;
-
-        GraphicRaycaster graphicRaycaster = UI.AddComponent<GraphicRaycaster>();
-    }
-    private void RegimentCardHolder_Builder()
-    {
-        GameObject RegimentCardHolder = new GameObject();
-        RegimentCardHolder.name = "RegimentCardHolder";
-        RegimentCardHolder.layer = 5;
-
-        Image image = RegimentCardHolder.AddComponent<Image>();
-        image.color = new Color(0, 0, 0, 0.5f);
-        image.transform.parent = UI.transform;
-
-        RectTransform rectTransform1 = RegimentCardHolder.GetComponent<RectTransform>();
-        rectTransform1.pivot = new Vector2(0.5f, 0f);
-        rectTransform1.anchoredPosition = new Vector2(0, -600);
-        rectTransform1.sizeDelta = new Vector2(100, 150);
-
-        HorizontalLayoutGroup horizontalLayoutGroup = RegimentCardHolder.AddComponent<HorizontalLayoutGroup>();
-        horizontalLayoutGroup.spacing = 5;
-        horizontalLayoutGroup.childAlignment = TextAnchor.MiddleCenter;
-        horizontalLayoutGroup.padding = new RectOffset(5,5,5,5);
-
-        regimentCardHolder = RegimentCardHolder;
-
-        regimentCardHolder.SetActive(true);
-    }
-    private void OrderButton_Build(string name, Sprite sprite, UnityAction buttonEvent)
+    private GameObject OrderButton_Build(string name, Sprite sprite, UnityAction buttonEvent)
     {
         GameObject OrderButton = Instantiate(OrderButtonPrefab);
         OrderButton.name = "CommandButton_" + name;
@@ -166,34 +146,27 @@ public class UIManager : MonoBehaviour
 
         OrderButton.GetComponent<Image>().sprite = sprite;
 
-        OrderButton.transform.parent = CommandTab.transform;
-
         //ASSIGN BUTTON ONCLICK CALL
         OrderButton.GetComponent<Button>().onClick.AddListener(buttonEvent);
+
+        return OrderButton;
     }
-    private void CommandTab_Builder()
+    private void NotificationTab_Builder()
     {
-        CommandTab = new GameObject();
-        CommandTab.name = "Command Tab";
-        CommandTab.layer = 5;
+        GameObject notificationtab = Instantiate(NotificationTabPrefab);
+        notificationtab.name = "Notification Tab";
+        notificationtab.layer = 5;
 
-        HorizontalLayoutGroup horizontalLayoutGroup = CommandTab.AddComponent<HorizontalLayoutGroup>();
-        horizontalLayoutGroup.spacing = 5;
-        horizontalLayoutGroup.childAlignment = TextAnchor.MiddleCenter;
-        horizontalLayoutGroup.padding = new RectOffset(5, 5, 5, 5);
+        notificationtab.transform.parent = UI.transform;
 
-        Image image = CommandTab.AddComponent<Image>();
-        image.color = new Color(0, 0, 0, 0.5f);
-        image.transform.parent = UI.transform;
+        RectTransform rectTransform = notificationtab.GetComponent<RectTransform>();
+        rectTransform.anchoredPosition = new Vector2(0, -300);
 
-        RectTransform rectTransform1 = CommandTab.GetComponent<RectTransform>();
-        rectTransform1.pivot = new Vector2(0.5f, 0.5f);
-        rectTransform1.anchoredPosition = new Vector2(0, -380);
-        rectTransform1.sizeDelta = new Vector2(100, 100);
-
-        CommandTab.SetActive(false);
+        NotificationTab = notificationtab;
     }
-    private GameObject RegimentFlag_Builder(GameObject target)
+
+    //FLAG MANAGEMENT
+    private GameObject CompanyFlag_Builder(GameObject target)
     {
         GameObject RegimentFlag = new GameObject();
         RegimentFlag.name = "Regiment flag";
@@ -207,17 +180,18 @@ public class UIManager : MonoBehaviour
 
         Image image = RegimentFlag.AddComponent<Image>();
         image.sprite = sprite;
-        image.color = new Color(1f, 1f, 1f, flagTransparency);
+        image.color = new Color(1f, 1f, 1f, flagCompanyTransparency);
         image.transform.parent = UI.transform;
 
         RectTransform rectTransform1 = RegimentFlag.GetComponent<RectTransform>();
         rectTransform1.pivot = new Vector2(0.5f, 0.5f);
         rectTransform1.sizeDelta = new Vector2(sprite.texture.width, sprite.texture.height) / 10f;
+        rectTransform1.parent = companyFlagParent.transform;
 
-        if(regimentFaction == Utility.Camera.GetComponent<CameraManager>().faction)
+        if (regimentFaction == Utility.Camera.GetComponent<CameraManager>().faction)
         {
             Button flagButton = RegimentFlag.AddComponent<Button>();
-            flagButton.onClick.AddListener(() => FlagAction(target.transform));
+            flagButton.onClick.AddListener(() => CompanyFlagAction(target.transform));
         }
 
 
@@ -225,168 +199,314 @@ public class UIManager : MonoBehaviour
 
         return RegimentFlag;
     }
-    private void NotificationTab_Builder()
+    private GameObject BattalionFlag_Builder(GameObject target)
     {
-        GameObject notificationtab = Instantiate(NotificationTabPrefab);
-        notificationtab.name = "Notification Tab";
-        notificationtab.layer = 5;
+        GameObject BattalionFlag = new GameObject();
+        BattalionFlag.name = "Battalion flag";
+        BattalionFlag.layer = 5;
 
-        notificationtab.transform.parent = UI.transform;
+        BattalionFlag.AddComponent<RegimentFlagManager>();
 
-        RectTransform rectTransform = notificationtab.GetComponent<RectTransform>();
-        rectTransform.anchoredPosition = new Vector2(0, -300); 
+        Factions battalionFaction = target.GetComponent<CaptainManager>().faction;
 
-        NotificationTab = notificationtab;
-    }
+        Sprite sprite = GFXUtility.GetFlag(battalionFaction);
 
-    private void FlagAction(Transform target)
-    {
-        if(Input.GetKey(KeyCode.LeftShift))
+        Image image = BattalionFlag.AddComponent<Image>();
+        image.sprite = sprite;
+        image.color = new Color(1f, 1f, 1f, flagBattalionTransparency);
+        image.transform.parent = UI.transform;
+
+        RectTransform rectTransform1 = BattalionFlag.GetComponent<RectTransform>();
+        rectTransform1.pivot = new Vector2(0.5f, 0.5f);
+        rectTransform1.sizeDelta = new Vector2(sprite.texture.width, sprite.texture.height) / 10f;
+        rectTransform1.parent = battalionFlagParent.transform;
+
+        if (battalionFaction == Utility.Camera.GetComponent<CameraManager>().faction)
         {
-            if (!cameraManagerRef.selectedOfficers.Contains(target.GetComponent<OfficerManager>()))
+            Button flagButton = BattalionFlag.AddComponent<Button>();
+            flagButton.onClick.AddListener(() => BattalionFlagAction(target.transform));
+        }
+
+
+        BattalionFlag.transform.position = Utility.Camera.WorldToScreenPoint(target.transform.position + Vector3.up * 1f);
+
+        return BattalionFlag;
+    }
+    private void CompanyFlagAction(Transform target)
+    {
+        //SELECT COMPANY
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            if (!cameraManagerRef.selectedCompanies.Contains(target.GetComponent<OfficerManager>()))
             {
-                cameraManagerRef.SelectUnit(target.transform);
+                cameraManagerRef.SelectCompany(target.transform);
             }
             else
             {
-                cameraManagerRef.DeselectUnit(target.transform);
+                cameraManagerRef.DeselectCompany(target.transform);
             }
         }
         else
         {
-            cameraManagerRef.DeselectAllUnit();
-            cameraManagerRef.SelectUnit(target.transform);
+            cameraManagerRef.DeselectAllCompanies();
+            cameraManagerRef.SelectCompany(target.transform);
         }
     }
-
-    //REGIMENT CARD HOLDER MANAGEMENT
-    private void RegimentCardHolderCheck()
+    private void BattalionFlagAction(Transform target)
     {
-        if (regimentCards.Count > 0)
+        //SELECT BATTALION
+        if (Input.GetKey(KeyCode.LeftShift))
         {
-            regimentCardHolder.SetActive(true);
+            if (!cameraManagerRef.selectedCompanies.Contains(target.GetComponent<OfficerManager>()))
+            {
+                cameraManagerRef.SelectBattalion(target.transform);
+            }
+            else
+            {
+                cameraManagerRef.DeselectBattalion(target.transform);
+            }
         }
         else
         {
-            regimentCardHolder.SetActive(false);
+            cameraManagerRef.DeselectAllBattalions();
+            cameraManagerRef.SelectBattalion(target.transform);
         }
     }
-    public void AddRegimentCard(OfficerManager regiment)
+    public void AppendCompanyFlag(OfficerManager of)
     {
-        GameObject RegimentCard = Instantiate(RegimentCardPrefab);
-        RegimentCard.name = "RegimentCard_" + regiment.RegimentNumber.ToString();
-        RegimentCard.layer = 5;
+        (GameObject, GameObject) tf;
+        tf.Item1 = of.gameObject;
+        tf.Item2 = CompanyFlag_Builder(of.gameObject);
+        companyFlags.Add(tf);
+    }
+    public void AppendBattalionFlag(CaptainManager ca)
+    {
+        (GameObject, GameObject) tf;
+        tf.Item1 = ca.gameObject;
+        tf.Item2 = BattalionFlag_Builder(ca.gameObject);
+        battalionFlags.Add(tf);
+    }
 
-        RegimentCard.transform.parent = regimentCardHolder.transform;
+    //COMPANY CARD HOLDER MANAGEMENT
+    private void CompanyCardHolderCheck()
+    {
+        if (companyCards.Count > 0)
+        {
+            companyCardHolder.SetActive(true);
+        }
+        else
+        {
+            companyCardHolder.SetActive(false);
+        }
+    }
+    public void AddCompanyCard(OfficerManager company)
+    {
+        GameObject CompanyCard = Instantiate(CompanyCardPrefab);
+        CompanyCard.name = "CompanyCard_" + company.companyNumber.ToString();
+        CompanyCard.layer = 5;
 
-        RegimentCardManager regimentCardManager = RegimentCard.GetComponent<RegimentCardManager>();
-        regimentCardManager.SetAmmoSlider(regiment.Ammo, regiment.MaxAmmo);
-        regimentCardManager.Initialize(regiment.faction);
+        CompanyCard.transform.parent = companyCardHolder.transform;
 
-        regimentCards.Add((regiment, RegimentCard));
+        CompanyCardManager companyCardManager = CompanyCard.GetComponent<CompanyCardManager>();
+        companyCardManager.SetAmmoSlider(company.Ammo, company.MaxAmmo);
+        companyCardManager.Initialize(company.faction);
+
+        companyCards.Add((company, CompanyCard));
 
         //Displacement
-        Vector2 cardSize = RegimentCardPrefab.GetComponent<RectTransform>().sizeDelta;
-        regimentCardHolder.GetComponent<RectTransform>().sizeDelta = new Vector2(regimentCards.Count * cardSize.x + 10, cardSize.y + 10);
+        Vector2 cardSize = CompanyCardPrefab.GetComponent<RectTransform>().sizeDelta;
+        companyCardHolder.GetComponent<RectTransform>().sizeDelta = new Vector2(companyCards.Count * cardSize.x + 10, cardSize.y + 10);
 
-        RegimentCardHolderCheck();
+        CompanyCardHolderCheck();
     }
-    public void RemoveRegimentCard(int regimentN)
+    public void RemoveCompanyCard(int regimentN)
     {
-        foreach (Transform child in regimentCardHolder.transform)
+        foreach (Transform child in companyCardHolder.transform)
         {
             if(child.name == "RegimentCard_" + regimentN)
             {
-                regimentCards.Remove(regimentCards.Find(a => a.Item2 == child));
+                companyCards.Remove(companyCards.Find(a => a.Item2 == child));
                 Destroy(child.gameObject);
                 break;
             }
         }
 
         //Displacement
-        regimentCardHolder.GetComponent<RectTransform>().sizeDelta = new Vector2(regimentCards.Count * 100 + 10, 110);
+        companyCardHolder.GetComponent<RectTransform>().sizeDelta = new Vector2(companyCards.Count * 100 + 10, 110);
 
-        RegimentCardHolderCheck();
-        CommandTabCheck();
+        CompanyCardHolderCheck();
+        CompanyCommandTabCheck();
     }
-    public void RemoveAllRegimentCard()
+    public void RemoveAllCompanyCard()
     {
-        foreach (Transform child in regimentCardHolder.transform)
+        foreach (Transform child in companyCardHolder.transform)
         {
             Destroy(child.gameObject);
         }
 
-        regimentCards.Clear();
+        companyCards.Clear();
 
-        RegimentCardHolderCheck();
-        CommandTabCheck();
+        CompanyCardHolderCheck();
+        CompanyCommandTabCheck();
     }
     
+    //COMPANY CARD HOLDER MANAGEMENT
+    private void BattalionCardHolderCheck()
+    {
+        if (companyCards.Count > 0)
+        {
+            battalionCardHolder.SetActive(true);
+        }
+        else
+        {
+            battalionCardHolder.SetActive(false);
+        }
+    }
+    public void AddBattalionCard(CaptainManager battalion)
+    {
+        GameObject BattalionCard = Instantiate(BattalionCardPrefab);
+        BattalionCard.name = "BattalionCard_" + battalion.battalionNumber.ToString();
+        BattalionCard.layer = 5;
+
+        BattalionCard.transform.parent = battalionCardHolder.transform;
+
+        CompanyCardManager battalionCardManager = BattalionCard.GetComponent<CompanyCardManager>();
+        battalionCardManager.Initialize(battalion.faction);
+
+        battalionCards.Add((battalion, BattalionCard));
+
+        //Displacement
+        Vector2 cardSize = BattalionCardPrefab.GetComponent<RectTransform>().sizeDelta;
+        battalionCardHolder.GetComponent<RectTransform>().sizeDelta = new Vector2(battalionCards.Count * cardSize.x + 10, cardSize.y + 10);
+
+        CompanyCardHolderCheck();
+    }
+    public void RemoveBattalionCard(int battalionN)
+    {
+        foreach (Transform child in battalionCardHolder.transform)
+        {
+            if (child.name == "BattalionCard_" + battalionN)
+            {
+                battalionCards.Remove(battalionCards.Find(a => a.Item2 == child));
+                Destroy(child.gameObject);
+                break;
+            }
+        }
+
+        //Displacement
+        battalionCardHolder.GetComponent<RectTransform>().sizeDelta = new Vector2(battalionCards.Count * 100 + 10, 110);
+
+        BattalionCardHolderCheck();
+        CompanyCommandTabCheck();
+    }
+    public void RemoveAllBattalionCard()
+    {
+        foreach (Transform child in battalionCardHolder.transform)
+        {
+            Destroy(child.gameObject);
+        }
+
+        battalionCards.Clear();
+
+        BattalionCardHolderCheck();
+        CompanyCommandTabCheck();
+    }
+
     //BUTTON FUNCTIONS
     public void SendLineFormation()
     {
-        int n = cameraManagerRef.selectedOfficers.Count;
+        int n = cameraManagerRef.selectedCompanies.Count;
     
         for(int i = 0; i < n; i++)
         {
-            OfficerManager of = cameraManagerRef.selectedOfficers[i];
-            Formation f = new Line(of.RegimentSize);
+            OfficerManager of = cameraManagerRef.selectedCompanies[i];
+            Formation f = new Line(of.companySize);
             of.SetFormation(f);
             of.SendOrder(false, Utility.V3toV2( of.transform.position ), of.transform.rotation);
         }
     }
     public void SendColumnFormation()
     {
-        int n = cameraManagerRef.selectedOfficers.Count;
+        int n = cameraManagerRef.selectedCompanies.Count;
 
         for (int i = 0; i < n; i++)
         {
-            OfficerManager of = cameraManagerRef.selectedOfficers[i];
-            Formation f = new Column(of.RegimentSize);
+            OfficerManager of = cameraManagerRef.selectedCompanies[i];
+            Formation f = new Column(of.companySize);
             of.SetFormation(f);
             of.SendOrder(false, Utility.V3toV2(of.transform.position), of.transform.rotation);
         }
     }
     public void SendStopOrder()
     {
-        int n = cameraManagerRef.selectedOfficers.Count;
+        int n = cameraManagerRef.selectedCompanies.Count;
 
         for (int i = 0; i < n; i++)
         {
-            OfficerManager om = cameraManagerRef.selectedOfficers[i];
+            OfficerManager om = cameraManagerRef.selectedCompanies[i];
             om.um.SetDestination(Utility.V3toV2( om.transform.position), om.transform.rotation);
         }
     }
 
     //COMMAND TAB MANAGEMENT
-    public void CommandTabCheck()
+    public void CompanyCommandTabCheck()
     {
-        if (cameraManagerRef.selectedOfficers.Count > 0)
+        if (cameraManagerRef.selectedCompanies.Count > 0)
         {
-            CommandTab.SetActive(true);
+            CompanyCommandTab.SetActive(true);
         }
         else
         {
-            CommandTab.SetActive(false);
+            CompanyCommandTab.SetActive(false);
         }
     }
-    private void PopulateCommandTab()
+    public void BattalionCommandTabCheck()
+    {
+        if (cameraManagerRef.selectedBattalions.Count > 0)
+        {
+            BattalionCommandTab.SetActive(true);
+        }
+        else
+        {
+            BattalionCommandTab.SetActive(false);
+        }
+    }
+    private void PopulateCompanyCommandTab()
     {
         Sprite LineSprite = Resources.Load<Sprite>("GFX/TOW_Line");
         LineAction += SendLineFormation;
-        OrderButton_Build("Line formation", LineSprite, LineAction);
+        OrderButton_Build("Line formation", LineSprite, LineAction).transform.parent = CompanyCommandTab.transform;
 
         Sprite ColumnSprite = Resources.Load<Sprite>("GFX/TOW_Column");
         ColumnAction += SendColumnFormation;
-        OrderButton_Build("Column formation", ColumnSprite, ColumnAction);
+        OrderButton_Build("Column formation", ColumnSprite, ColumnAction).transform.parent = CompanyCommandTab.transform;
 
         Sprite StopSprite = Resources.Load<Sprite>("GFX/TOW_Column");
         StopAction += SendStopOrder;
-        OrderButton_Build("Stop", StopSprite, StopAction);
+        OrderButton_Build("Stop", StopSprite, StopAction).transform.parent = CompanyCommandTab.transform;
 
-        int n = CommandTab.transform.childCount;
+        int n = CompanyCommandTab.transform.childCount;
 
-        RectTransform rectTransform = CommandTab.GetComponent<RectTransform>();
+        RectTransform rectTransform = CompanyCommandTab.GetComponent<RectTransform>();
+        rectTransform.sizeDelta = new Vector2(n * 100, 100);
+    }
+    private void PopulateBattalionCommandTab()
+    {
+        Sprite LineSprite = Resources.Load<Sprite>("GFX/TOW_Line");
+        LineAction += SendLineFormation;
+        OrderButton_Build("Line formation", LineSprite, LineAction).transform.parent = BattalionCommandTab.transform;
+
+        Sprite ColumnSprite = Resources.Load<Sprite>("GFX/TOW_Column");
+        ColumnAction += SendColumnFormation;
+        OrderButton_Build("Column formation", ColumnSprite, ColumnAction).transform.parent = BattalionCommandTab.transform;
+
+        Sprite StopSprite = Resources.Load<Sprite>("GFX/TOW_Column");
+        StopAction += SendStopOrder;
+        OrderButton_Build("Stop", StopSprite, StopAction).transform.parent = BattalionCommandTab.transform;
+
+        int n = BattalionCommandTab.transform.childCount;
+
+        RectTransform rectTransform = BattalionCommandTab.GetComponent<RectTransform>();
         rectTransform.sizeDelta = new Vector2(n * 100, 100);
     }
 
@@ -394,7 +514,7 @@ public class UIManager : MonoBehaviour
     {
         GameObject flagSender = regimentFlagManager.gameObject;
 
-        foreach ((GameObject, GameObject) a in regimentFlags)
+        foreach ((GameObject, GameObject) a in companyFlags)
         {
             if(a.Item2 == flagSender.gameObject)
             {

@@ -69,7 +69,7 @@ public class Match_AI : MonoBehaviour
         {
             int ID = controlledRegiments.IndexOf(c);
             WM.PopulateSensors(
-                new FriendlySensor(ID, 0, Utility.V3toV2(c.transform.position), c.RegimentSize)
+                new FriendlySensor(ID, 0, Utility.V3toV2(c.transform.position), c.companySize)
                 );
         }
         //Enemy unit informations
@@ -77,7 +77,7 @@ public class Match_AI : MonoBehaviour
         {
             int ID = enemyRegiments.IndexOf(e);
             WM.PopulateSensors(
-                new HostileSensor(ID, 0, Utility.V3toV2(e.transform.position), e.RegimentSize)
+                new HostileSensor(ID, 0, Utility.V3toV2(e.transform.position), e.companySize)
                 );
         }
     }
@@ -109,7 +109,7 @@ public class Match_AI : MonoBehaviour
 
             for (int j = 0; j < l / n; j++) 
             {
-                g.regimentIDs[j] = controlledRegiments[i * (l/n) + j].RegimentNumber;
+                g.regimentIDs[j] = controlledRegiments[i * (l/n) + j].companyNumber;
             }
 
             groups.Add(g);
@@ -119,7 +119,7 @@ public class Match_AI : MonoBehaviour
 
     private OfficerManager GetRegimentByID(int ID)
     {
-        return controlledRegiments.Find(c => c.RegimentNumber == ID);
+        return controlledRegiments.Find(c => c.companyNumber == ID);
     }
 
     //ACTIONS
@@ -157,13 +157,13 @@ public class Match_AI : MonoBehaviour
         Group group = groups[groupN];
         for (int i = 0; i < group.regimentIDs.Length; i++)
         {
-            OfficerManager unit = controlledRegiments.Find(r => r.RegimentNumber == group.regimentIDs[i]);
+            OfficerManager unit = controlledRegiments.Find(r => r.companyNumber == group.regimentIDs[i]);
 
             float space = 1f;
 
             Vector2 position =
                 pos +
-                Utility.V3toV2(rot * Vector3.right) * (((float)i - (float)(group.regimentIDs.Length - 1) * 0.5f) * (unit.RegimentFormation.Lines / 2f + space));
+                Utility.V3toV2(rot * Vector3.right) * (((float)i - (float)(group.regimentIDs.Length - 1) * 0.5f) * (unit.companyFormation.Lines / 2f + space));
 
             group.regimentPosition[i] = position;
             group.regimentRotation[i] = rot;

@@ -28,8 +28,6 @@ public class CameraMovement : MonoBehaviour
 
     float y;
 
-    OfficerManager selectedOfficial;
-
     private void Awake()
     {
         playerControls = new PlayerInputActions();
@@ -75,9 +73,10 @@ public class CameraMovement : MonoBehaviour
     {
         moveDirection = move.ReadValue<Vector2>();
 
-        Vector2 cameraDisplacement = new Vector2(0, 0);
-
-        cameraDisplacement = moveDirection.normalized * speed * Time.deltaTime;
+        Vector2 cameraDisplacement = 
+            moveDirection.normalized * 
+            speed * ( 0.1f + Mathf.Lerp(0f, 0.9f, (y - minHeight) / (maxHeight - minHeight)) ) * 
+            Time.deltaTime;
 
         Vector3 forward = new Vector3(transform.forward.x, 0, transform.forward.z).normalized;
 

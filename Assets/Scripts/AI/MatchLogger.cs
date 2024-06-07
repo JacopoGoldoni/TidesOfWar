@@ -24,7 +24,7 @@ public class MatchLogger : MonoBehaviour
                 if(trackedRegiments.Contains(om))
                 {
                     //ALREADY TRACKED
-                    if (om.targetRegiment == null)
+                    if (om.targetCompany == null)
                     {
                         trackedRegiments.Remove(om);
                     }
@@ -36,7 +36,7 @@ public class MatchLogger : MonoBehaviour
                 else
                 {
                     //NOT ALREADY TRACKED
-                    if (om.targetRegiment != null)
+                    if (om.targetCompany != null)
                     {
                         trackedRegiments.Add(om);
                     }

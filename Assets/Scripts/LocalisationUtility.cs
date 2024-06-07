@@ -4,7 +4,6 @@ using UnityEngine;
 using System.IO;
 using System;
 using System.Linq;
-using Den.Tools;
 
 public static class LocalisationUtility
 {

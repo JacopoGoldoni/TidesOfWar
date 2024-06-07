@@ -3,7 +3,7 @@ public enum StatType {MoraleStrenght, MeleeAttack, MeleeDefense , Precision, Spe
 public class Stats
 {
     readonly StatsMediator mediator;
-    readonly UnitTemplate baseStats;
+    readonly CompanyTemplate baseStats;
 
     public StatsMediator Mediator => mediator;
 
@@ -53,7 +53,7 @@ public class Stats
         }
     }
 
-    public Stats(StatsMediator mediator, UnitTemplate baseStats)
+    public Stats(StatsMediator mediator, CompanyTemplate baseStats)
     {
         this.mediator = mediator;
         this.baseStats = baseStats;

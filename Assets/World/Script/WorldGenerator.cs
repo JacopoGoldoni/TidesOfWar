@@ -26,12 +26,10 @@ public class WorldGenerator : MonoBehaviour
     public float heightContrast = 0.5f;
     public float heightStrenght = 1f;
 
-    private string savePath = string.Empty;
+    private string savePath = "World/TerrainData/";
 
     public Texture2D[] worldHeightMaps;
     public Material worldMaterial;
-
-    private List<Roads> roads = new List<Roads>();
 
     public void BuildWorld()
     {
@@ -81,7 +79,7 @@ public class WorldGenerator : MonoBehaviour
                 chunkTerrainData.SetHeights(0, 0, chunkHeights);
 
                 chunkTerrainData.name = name;
-                GameObject chunkTerrain = (GameObject)Terrain.CreateTerrainGameObject(chunkTerrainData);
+                GameObject chunkTerrain = Terrain.CreateTerrainGameObject(chunkTerrainData);
 
                 chunkTerrain.name = name;
                 chunkTerrain.layer = 8;

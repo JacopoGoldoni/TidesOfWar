@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
-using Den.Tools.GUI.Popup;
 using System;
 using System.Linq;
 
@@ -11,7 +10,8 @@ public class CameraManager : MonoBehaviour
 {
     public InputAction playerControls;
 
-    public List<OfficerManager> selectedOfficers = new List<OfficerManager>();
+    public List<OfficerManager> selectedCompanies = new List<OfficerManager>();
+    public List<CaptainManager> selectedBattalions = new List<CaptainManager>();
 
     //3D UI ELEMENTS
     List<GameObject> projectionSights = new List<GameObject>();
@@ -75,7 +75,7 @@ public class CameraManager : MonoBehaviour
     private void Update()
     {
         //If any unit is selected
-        if (selectedOfficers.Count != 0)
+        if (selectedCompanies.Count != 0 || selectedBattalions.Count != 0)
         {
             //Chose a destination
             if (Input.GetMouseButtonDown(1))
@@ -93,7 +93,8 @@ public class CameraManager : MonoBehaviour
             //Deselect all with E
             if(Input.GetKey(KeyCode.E))
             {
-                DeselectAllUnit();
+                DeselectAllCompanies();
+                DeselectAllBattalions();
             }
         }
 
@@ -132,50 +133,85 @@ public class CameraManager : MonoBehaviour
     }
 
     //UNIT SELECTION FUNCTIONS
-    public void SelectUnit(Transform target)
+    public void SelectCompany(Transform target)
     {
         OfficerManager t = target.GetComponent<OfficerManager>();
-        selectedOfficers.Add(t);
+        selectedCompanies.Add(t);
         t.Highlight(true);
 
-        uimanager.CommandTabCheck();
+        DeselectAllBattalions();
+
+        uimanager.CompanyCommandTabCheck();
     }
-    public void DeselectUnit(Transform target)
+    public void DeselectCompany(Transform target)
     {
         OfficerManager t = target.GetComponent<OfficerManager>();
-        selectedOfficers.Remove(t);
+        selectedCompanies.Remove(t);
         t.Highlight(false);
 
-        uimanager.CommandTabCheck();
+        uimanager.CompanyCommandTabCheck();
     }
-    public void DeselectAllUnit()
+    public void DeselectAllCompanies()
     {
         //Remove highlight to all units
-        if (selectedOfficers.Count != 0)
+        if (selectedCompanies.Count != 0)
         {
-            foreach(OfficerManager t in selectedOfficers)
+            foreach(OfficerManager t in selectedCompanies)
             {
                 t.Highlight(false);
             }
         }
 
-        selectedOfficers.Clear();
-        uimanager.CommandTabCheck();
+        selectedCompanies.Clear();
+        uimanager.CompanyCommandTabCheck();
+    }
+    public void SelectBattalion(Transform target)
+    {
+        CaptainManager t = target.GetComponent<CaptainManager>();
+        selectedBattalions.Add(t);
+        t.Highlight(true);
+
+        DeselectAllCompanies();
+
+        uimanager.BattalionCommandTabCheck();
+    }
+    public void DeselectBattalion(Transform target)
+    {
+        CaptainManager t = target.GetComponent<CaptainManager>();
+        selectedBattalions.Remove(t);
+        t.Highlight(false);
+
+        uimanager.BattalionCommandTabCheck();
+    }
+    public void DeselectAllBattalions()
+    {
+        //Remove highlight to all units
+        if (selectedBattalions.Count != 0)
+        {
+            foreach (CaptainManager t in selectedBattalions)
+            {
+                t.Highlight(false);
+            }
+        }
+
+        selectedBattalions.Clear();
+        uimanager.BattalionCommandTabCheck();
     }
 
+    //SEND ORDERS
     private void SendMovementOrder()
     {
         Vector2 Orientation = Utility.V3toV2(OrderPoint2 - OrderPoint).normalized;
 
-        for (int i = 0; i < selectedOfficers.Count; i++)
+        for (int i = 0; i < selectedCompanies.Count; i++)
         {
-            OfficerManager unit = selectedOfficers[i];
+            OfficerManager unit = selectedCompanies[i];
 
             float space = 1f;
 
             Vector2 pos = 
                 new Vector2(OrderPoint.x, OrderPoint.z) + 
-                UtilityMath.RotateVector2(Orientation) * (((float)i - (float)(selectedOfficers.Count - 1) * 0.5f) * (unit.RegimentFormation.Lines / 2f + space));
+                UtilityMath.RotateVector2(Orientation) * (((float)i - (float)(selectedCompanies.Count - 1) * 0.5f) * (unit.companyFormation.Lines / 2f + space));
 
             Quaternion rot = Quaternion.LookRotation(Utility.V2toV3(Orientation), Vector3.up);
 
@@ -191,7 +227,7 @@ public class CameraManager : MonoBehaviour
     }
     public void SendAttackOrder(GameObject target)
     {
-        foreach(OfficerManager o in selectedOfficers)
+        foreach(OfficerManager o in selectedCompanies)
         {
             Vector2 pos;
             if ((o.transform.position - target.transform.position).magnitude >= o.Range * 0.75f)
@@ -232,12 +268,12 @@ public class CameraManager : MonoBehaviour
     //PROJECTIONS
     private void ProjectAll()
     {
-        if(selectedOfficers.Count != 0)
+        if(selectedCompanies.Count != 0)
         {
             //CHECK SIGHT MESHES NEEDED
-            foreach(OfficerManager of in selectedOfficers)
+            foreach(OfficerManager of in selectedCompanies)
             {
-                int n = of.RegimentFormation.Lines;
+                int n = of.companyFormation.Lines;
 
                 if(!sizes.Contains(n * 0.5f))
                 {
@@ -249,7 +285,7 @@ public class CameraManager : MonoBehaviour
                 }
             }
 
-            foreach (OfficerManager o in selectedOfficers)
+            foreach (OfficerManager o in selectedCompanies)
             {
                 //DRAW PATH LINES
                 o.drawPathLine = true;
@@ -266,7 +302,7 @@ public class CameraManager : MonoBehaviour
         {
             string pNumber = p.name.Split('_')[0];
 
-            if (om.RegimentNumber == Int32.Parse(pNumber))
+            if (om.companyNumber == Int32.Parse(pNumber))
             {
                 hasSight = true;
                 break;
@@ -279,9 +315,9 @@ public class CameraManager : MonoBehaviour
             MeshFilter mf = projectionSight.AddComponent<MeshFilter>();
             MeshRenderer mr = projectionSight.AddComponent<MeshRenderer>();
 
-            projectionSight.name = om.RegimentNumber + "_Sight";
+            projectionSight.name = om.companyNumber + "_Sight";
 
-            int meshIndex = sizes.FindIndex(a => a == om.RegimentFormation.Lines / 2f);
+            int meshIndex = sizes.FindIndex(a => a == om.companyFormation.Lines / 2f);
             mf.mesh = sm[meshIndex];
 
             mr.material = OlogramMaterial2;
@@ -307,9 +343,9 @@ public class CameraManager : MonoBehaviour
             string pNumber = p.name.Split('_')[0];
             
             bool hasRegiment = false;
-            foreach (OfficerManager o in selectedOfficers)
+            foreach (OfficerManager o in selectedCompanies)
             {
-                if (o.RegimentNumber == Int32.Parse(pNumber))
+                if (o.companyNumber == Int32.Parse(pNumber))
                 {
                     hasRegiment = true;
                     break;
