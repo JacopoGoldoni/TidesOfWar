@@ -15,7 +15,7 @@ public class CaptainMovement : UnitMovement
 
     public override void Initialize()
     {
-        um = GetComponent<OfficerManager>();
+        um = GetComponent<CaptainManager>();
         navAgent = GetComponent<NavMeshAgent>();
     }
 
@@ -45,22 +45,7 @@ public class CaptainMovement : UnitMovement
             //NOT MOVING
             if (!IsRotating())
             {
-                //NOT ROTATING
-                if (((OfficerManager)um).ArePawnIdle())
-                {
-                    //ALL REGIMENT ARRIVED AT DESTINATION
-                    if (MovementPoints.Count > 1)
-                    {
-                        //PROCEED TO NEXT POINT
-                        MovementPoints.RemoveAt(0);
-                        HasChangedOrder = true;
-                    }
-                    else
-                    {
-                        //LAST ORDER
-                        MovementPoints.Clear();
-                    }
-                }
+                MovementPoints.Clear();
             }
             else
             {

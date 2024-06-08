@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(Image))]
-public class CompanyCardManager : MonoBehaviour
+public class BattalionCardManager : MonoBehaviour
 {
     public Image cardImage;
     public Slider ammoSlider;

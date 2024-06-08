@@ -203,27 +203,57 @@ public class CameraManager : MonoBehaviour
     {
         Vector2 Orientation = Utility.V3toV2(OrderPoint2 - OrderPoint).normalized;
 
-        for (int i = 0; i < selectedCompanies.Count; i++)
+        if(selectedCompanies.Count != 0)
         {
-            OfficerManager unit = selectedCompanies[i];
+            //COMPANY MOVEMENT ORDER
+            for (int i = 0; i < selectedCompanies.Count; i++)
+            {
+                OfficerManager unit = selectedCompanies[i];
 
-            float space = 1f;
+                float space = 1f;
 
-            Vector2 pos = 
-                new Vector2(OrderPoint.x, OrderPoint.z) + 
-                UtilityMath.RotateVector2(Orientation) * (((float)i - (float)(selectedCompanies.Count - 1) * 0.5f) * (unit.companyFormation.Lines / 2f + space));
+                Vector2 pos =
+                    new Vector2(OrderPoint.x, OrderPoint.z) +
+                    UtilityMath.RotateVector2(Orientation) * (((float)i - (float)(selectedCompanies.Count - 1) * 0.5f) * (unit.companyFormation.Lines / 2f + space));
 
-            Quaternion rot = Quaternion.LookRotation(Utility.V2toV3(Orientation), Vector3.up);
+                Quaternion rot = Quaternion.LookRotation(Utility.V2toV3(Orientation), Vector3.up);
 
-            //SEND ORDER
-            unit.SendOrder(Input.GetKey(KeyCode.LeftShift), pos, rot);
+                //SEND ORDER
+                unit.SendOrder(Input.GetKey(KeyCode.LeftShift), pos, rot);
 
-            //UPDATE PROJECTIONS
-            DeleteAllProjections();
-            ProjectAll();
+                //UPDATE PROJECTIONS
+                //DeleteAllProjections();
+                //ProjectAll();
 
-            ShowArrow = false;
+                ShowArrow = false;
+            }
         }
+        else
+        {
+            //BATTALION MOVEMENT ORDER
+            for (int i = 0; i < selectedBattalions.Count; i++)
+            {
+                CaptainManager unit = selectedBattalions[i];
+
+                float space = 1f;
+
+                Vector2 pos =
+                    new Vector2(OrderPoint.x, OrderPoint.z) +
+                    UtilityMath.RotateVector2(Orientation) * (((float)i - (float)(selectedCompanies.Count - 1) * 0.5f) * (unit.battalionFormation.Lines / 2f + space));
+
+                Quaternion rot = Quaternion.LookRotation(Utility.V2toV3(Orientation), Vector3.up);
+
+                //SEND ORDER
+                unit.SendOrder(Input.GetKey(KeyCode.LeftShift), pos, rot);
+
+                //UPDATE PROJECTIONS
+                //DeleteAllProjections();
+                //ProjectAll();
+
+                ShowArrow = false;
+            }
+        }
+
     }
     public void SendAttackOrder(GameObject target)
     {

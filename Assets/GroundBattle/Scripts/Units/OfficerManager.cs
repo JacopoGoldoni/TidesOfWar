@@ -241,6 +241,10 @@ public class OfficerManager : UnitManager, IVisitable
     }
     
     //FORMATION MANAGEMENT
+    public bool IsDetached()
+    {
+        return (masterCaptain == null);
+    }
     private void CheckFormation()
     {
         //PAWNS DIED

@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 using System.Runtime.CompilerServices;
 using Unity.VisualScripting;
+using System.Linq;
 
 public class UIManager : MonoBehaviour
 {
@@ -135,6 +136,9 @@ public class UIManager : MonoBehaviour
         PopulateCompanyCommandTab();
         PopulateBattalionCommandTab();
         NotificationTab_Builder();
+
+        CompanyCommandTabCheck();
+        BattalionCommandTabCheck();
     }
 
     //UI BUILDERS
@@ -370,7 +374,7 @@ public class UIManager : MonoBehaviour
 
         BattalionCard.transform.parent = battalionCardHolder.transform;
 
-        CompanyCardManager battalionCardManager = BattalionCard.GetComponent<CompanyCardManager>();
+        BattalionCardManager battalionCardManager = BattalionCard.GetComponent<BattalionCardManager>();
         battalionCardManager.Initialize(battalion.faction);
 
         battalionCards.Add((battalion, BattalionCard));
@@ -453,7 +457,14 @@ public class UIManager : MonoBehaviour
     {
         if (cameraManagerRef.selectedCompanies.Count > 0)
         {
-            CompanyCommandTab.SetActive(true);
+            if(cameraManagerRef.selectedCompanies.Any(c => c.IsDetached()))
+            {
+                CompanyCommandTab.SetActive(true);
+            }
+            else
+            {
+                CompanyCommandTab.SetActive(false);
+            }
         }
         else
         {

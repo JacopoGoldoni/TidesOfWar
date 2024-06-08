@@ -75,7 +75,7 @@ public class CaptainManager : UnitManager, IVisitable
     public override void Initialize()
     {
         ms = GetComponent<MeshRenderer>();
-        um = GetComponent<OfficerMovement>();
+        um = GetComponent<CaptainMovement>();
 
         lineRenderer = GetComponent<LineRenderer>();
 
@@ -191,23 +191,34 @@ public class CaptainManager : UnitManager, IVisitable
             m.SetInt("_Hightlight", 0);
         }
     }
-    public void SendMovementOrder(bool add, Vector2 pos, Quaternion rot)
+    public void SendOrder(bool add, Vector2 pos, Quaternion rot)
     {
-        //SEND MOVEMENT ORDER TO ALL COMPANIES
+        if (add)
+        {
+            um.AddDestination(pos, rot);
+        }
+        else
+        {
+            um.SetDestination(pos, rot);
+        }
     }
-    
+
     //FORMATION MANAGEMENT
-    private void CheckFormation()
-    {
-        
-    }
     public void SetFormation(Formation formation)
     {
         battalionFormation = formation;
     }
     public void SendFormation()
     {
-        
+        for (int i = 0; i < battalionSize; i++)
+        {
+            if (companies[i] != null)
+                companies[i].SendOrder(
+                    false,
+                    GetFormationCoords(i) + Utility.V3toV2(transform.position),
+                    um.CurrentRotation()
+                    );
+        }
     }
     public Vector2 GetFormationCoords(int ID)
     {
@@ -261,12 +272,19 @@ public class CaptainManager : UnitManager, IVisitable
         //IDLE
         State Idle = new State(
                 "Idle",
-                null,
+                () => {
+                    if (_formationChanged)
+                    {
+                        SendOrder(false, Utility.V3toV2(transform.position), transform.rotation);
+                        SendFormation();
+                        _formationChanged = false;
+                    }
+                },
                 null,
                 null
             );
         captainStates.Add(Idle);
-        //IDLE
+        //FLEEING
         State Fleeing = new State(
                 "Fleeing",
                 null,
@@ -274,6 +292,33 @@ public class CaptainManager : UnitManager, IVisitable
                 null
             );
         captainStates.Add(Fleeing);
+        //MOVING
+        State Moving = new State(
+                "Moving",
+                null,
+                null,
+                () => {
+                    //MOVEMENT BEHAVIOUR
+                    ((CaptainMovement)um).UpdateMovement();
+
+                    //COMPANY MOVEMENT
+                    SendFormation();
+                }
+            );
+        captainStates.Add(Moving);
+        //MOVING -> IDLE
+        Transition MovingIdle = new Transition(
+                Moving,
+                Idle,
+                () => {
+                    if (um.MovementPoints.Count == 0)
+                    {
+                        return true;
+                    }
+                    return false;
+                }
+            );
+        captainTransitions.Add(MovingIdle);
 
 
         //TRANSITIONS
@@ -285,6 +330,20 @@ public class CaptainManager : UnitManager, IVisitable
                     return false;
                 }
             );
+        captainTransitions.Add(AnyFleeing);
+        //IDLE -> MOVING
+        Transition IdleMoving = new Transition(
+                Idle,
+                Moving,
+                () => {
+                    if (um.MovementPoints.Count != 0)
+                    {
+                        return true;
+                    }
+                    return false;
+                }
+            );
+        captainTransitions.Add(IdleMoving);
 
 
         captainStateMachine.AddStates(captainStates);
@@ -299,8 +358,6 @@ public class CaptainManager : UnitManager, IVisitable
     //GIZMOS
     public void OnDrawGizmos()
     {
-
-
         if (ShowFormation)
             FormationGizmo();
     }
