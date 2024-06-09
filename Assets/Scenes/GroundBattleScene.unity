@@ -150,11 +150,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   active: 1
   resolution: 1000
-  worldSize: 50
+  worldSize: 256
   height: 10
   perlinNoiseStrenght: 1
-  perlinNoiseSize: 100
+  perlinNoiseSize: 20
   terrainMaterial: {fileID: 2100000, guid: aa51d4bf0ff2f2c48bac25c6441ee5c8, type: 2}
+  maxRiverNumber: 1
+  riverSize: 50
 --- !u!4 &457814795
 Transform:
   m_ObjectHideFlags: 0
