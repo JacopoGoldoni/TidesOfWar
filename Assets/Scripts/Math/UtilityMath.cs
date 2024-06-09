@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using UnityEditor.Profiling.Memory.Experimental;
 using UnityEngine;
 
@@ -120,5 +121,62 @@ public static class UtilityMath
     public static Vector2 RandomPointInDisc(float Radius)
     {
         return Random.insideUnitCircle * Radius;
+    }
+
+    public static bool BoxCollisionDetection(Bounds b1, Quaternion q1, Bounds b2, Quaternion q2)
+    {
+        float OuterRadius1 = Utility.V3toV2(b1.extents).magnitude;
+        float OuterRadius2 = Utility.V3toV2(b2.extents).magnitude;
+        float InnerRadius1 = Mathf.Min(b1.extents.x, b1.extents.z);
+        float InnerRadius2 = Mathf.Min(b2.extents.x, b2.extents.z);
+
+        float Distance = Utility.V3toV2(b1.center - b2.center).magnitude;
+
+        //ARE THE BOUNDS IN RANGE
+        if(Distance > OuterRadius1 + OuterRadius2)
+        {
+            return false;
+        }
+        if (Distance < InnerRadius1 + InnerRadius2)
+        {
+            return true;
+        }
+
+        //CHECK IF VERTICES ARE IN BOUNDS
+        for (int i = -1; i <= 1; i++)
+        {
+            for (int j = -1; j <= 1; j++)
+            {
+                if(i == 0 || j == 0)
+                {
+                    continue;
+                }
+                Vector3 v = new Vector3(i * b2.extents.x, 0, j * b2.extents.z);
+                Vector3 vert2 = b2.center + q2 * v;
+
+                if(b1.Contains(vert2))
+                {
+                    return true;
+                }
+            }
+        }
+        for (int i = -1; i <= 1; i++)
+        {
+            for (int j = -1; j <= 1; j++)
+            {
+                if (i == 0 || j == 0)
+                {
+                    continue;
+                }
+                Vector3 v = new Vector3(i * b1.extents.x, 0, j * b1.extents.z);
+                Vector3 vert1 = b1.center + q1 * v;
+
+                if (b2.Contains(vert1))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

@@ -15,35 +15,43 @@ public class GroundBattleTerrainManager : MonoBehaviour
     public float perlinNoiseStrenght = 1f;
     public float perlinNoiseSize = 1f;
 
-    private string savePath = "World/GroundBattle/TerrainData/";
+    private string savePath = "GroundBattle/TerrainData/";
 
     public Material terrainMaterial;
 
-    GameObject terrain;
+    GameObject terrainObject;
 
     private void Start()
     {
-        BuildTerrain();
+        if(active)
+        {
+            BuildTerrain();
+        }
     }
 
     private void BuildTerrain()
     {
         TerrainData terrainData = new TerrainData();
+
+        string name = "Terrain" + 0 + "_" + 0;
+
+        terrainData.baseMapResolution = worldSize + 1;
+        terrainData.heightmapResolution = worldSize + 1;
         terrainData.size = new Vector3(worldSize, height, worldSize);
 
-        terrainData.baseMapResolution = resolution;
-        terrainData.heightmapResolution = resolution;
+        //terrainData.baseMapResolution = resolution;
+        //terrainData.heightmapResolution = resolution;
         //chunkTerrainData.alphamapResolution = controlTextureResolution;
         //chunkTerrainData.SetDetailResolution(detailResolution, detailResolutionPerPatch);
 
         //GENERATE HEIGHTMAP
-        float[,] terrainHeights = new float[resolution + 1, resolution + 1];
-        for (int i = 0; i <= resolution; i++)
+        float[,] terrainHeights = new float[worldSize, worldSize];
+        for (int i = 0; i < worldSize; i++)
         {
-            for (int j = 0; j <= resolution; j++)
+            for (int j = 0; j < worldSize; j++)
             {
-                float xCoord = i / worldSize * perlinNoiseSize;
-                float yCoord = j / worldSize * perlinNoiseSize;
+                float xCoord = ((float)i / (float)worldSize) * perlinNoiseSize;
+                float yCoord = ((float)j / (float)worldSize) * perlinNoiseSize;
 
                 terrainHeights[i, j] = Mathf.PerlinNoise(xCoord, yCoord) * perlinNoiseStrenght;
             }
@@ -51,12 +59,13 @@ public class GroundBattleTerrainManager : MonoBehaviour
 
         terrainData.SetHeights(0, 0, terrainHeights);
 
-        terrain = Terrain.CreateTerrainGameObject(terrainData);
+        terrainObject = Terrain.CreateTerrainGameObject(terrainData);
 
-        terrain.layer = 8;
-        terrain.transform.position = new Vector3(0, 0, 0);
+        terrainObject.name = name;
+        terrainObject.layer = 8;
+        terrainObject.transform.position = new Vector3(0, 0, 0);
 
-        terrain.GetComponent<Terrain>().materialTemplate = terrainMaterial;
+        terrainObject.GetComponent<Terrain>().materialTemplate = terrainMaterial;
 
         AssetDatabase.CreateAsset(terrainData, "Assets/" + savePath + name + ".asset");
     }

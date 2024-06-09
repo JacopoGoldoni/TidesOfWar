@@ -209,12 +209,19 @@ public class CameraManager : MonoBehaviour
             for (int i = 0; i < selectedCompanies.Count; i++)
             {
                 OfficerManager unit = selectedCompanies[i];
+                
 
                 float space = 1f;
 
                 Vector2 pos =
                     new Vector2(OrderPoint.x, OrderPoint.z) +
                     UtilityMath.RotateVector2(Orientation) * (((float)i - (float)(selectedCompanies.Count - 1) * 0.5f) * (unit.companyFormation.Lines / 2f + space));
+
+
+                if (unit.IsObstructedAt(pos))
+                {
+                    continue;
+                }
 
                 Quaternion rot = Quaternion.LookRotation(Utility.V2toV3(Orientation), Vector3.up);
 
@@ -224,9 +231,9 @@ public class CameraManager : MonoBehaviour
                 //UPDATE PROJECTIONS
                 //DeleteAllProjections();
                 //ProjectAll();
-
-                ShowArrow = false;
             }
+
+            ShowArrow = false;
         }
         else
         {
@@ -253,7 +260,6 @@ public class CameraManager : MonoBehaviour
                 ShowArrow = false;
             }
         }
-
     }
     public void SendAttackOrder(GameObject target)
     {
@@ -361,7 +367,7 @@ public class CameraManager : MonoBehaviour
     }
     private void DeleteAllProjections()
     {
-        foreach(OfficerManager o in GameUtility.GetAllRegiments())
+        foreach(OfficerManager o in GameUtility.GetAllCompanies())
         {
             o.drawPathLine = false;
         }

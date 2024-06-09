@@ -16,6 +16,13 @@ public abstract class UnitManager : MonoBehaviour
     public Mesh UnitMesh;
     public Material UnitMaterial;
 
+    [Header("Behaviour")]
+    public bool Killable = false;
+
     //INITIALIZE
     public abstract void Initialize();
+    public virtual void Die()
+    {
+        Destroy(transform.gameObject);
+    }
 }

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -46,6 +47,7 @@ public class OfficerManager : UnitManager, IVisitable
     }
     private bool _formationChanged = false;
     public float Range = 20f;
+    public Bounds companyBounds;
 
     [Header("Company combact")]
     public float Precision { get { return stats.Precision * weaponTemplate.Precision; } }
@@ -122,6 +124,7 @@ public class OfficerManager : UnitManager, IVisitable
     private void InitializeFormation()
     {
         companyFormation = new Line((int)companySize);
+        companyBounds = CalculateCompanyBounds();
     }
 
     private void SpawnCompanyPawns()
@@ -239,7 +242,23 @@ public class OfficerManager : UnitManager, IVisitable
 
         Morale = (int)(s * companyTemplate.BaseMorale);
     }
-    
+    private Bounds CalculateCompanyBounds()
+    {
+        Vector3 p;
+        Vector3 s;
+
+        p = new Vector3(
+            0, 
+            0,
+            -1 * companyFormation.Ranks * companyFormation.b / 2);
+        s = new Vector3(
+            companyFormation.Lines * companyFormation.a,
+            1f,
+            companyFormation.Ranks * companyFormation.b);
+
+        return new Bounds(p, s);
+    }
+
     //FORMATION MANAGEMENT
     public bool IsDetached()
     {
@@ -335,6 +354,7 @@ public class OfficerManager : UnitManager, IVisitable
     public void SetFormation(Formation formation)
     {
         companyFormation = formation;
+        companyBounds = CalculateCompanyBounds();
     }
     public void SendFormation()
     {
@@ -382,6 +402,34 @@ public class OfficerManager : UnitManager, IVisitable
     public string GetFormationType()
     {
         return companyFormation.GetType().ToString();
+    }
+    public bool IsObstructedAt(Vector2 pos)
+    {
+        Vector3 o = transform.rotation * companyBounds.center;
+        Vector2 center = pos + Utility.V3toV2(o);
+
+        //CHECK IF INTERSECT WITH COMPANY
+        List<OfficerManager> allCompanies = GameUtility.GetAllCompanies();
+
+        foreach(OfficerManager om in allCompanies)
+        {
+            Vector3 o1 = om.transform.rotation * om.companyBounds.center;
+            Vector2 center1 = Utility.V3toV2(om.transform.position) + Utility.V3toV2(o1);
+
+            bool coll = UtilityMath.BoxCollisionDetection( 
+                new Bounds(Utility.V2toV3(center), companyBounds.size),
+                transform.rotation,
+                new Bounds(Utility.V2toV3(center1), om.companyBounds.size),
+                om.transform.rotation);
+
+
+            if(coll)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     //FIRE MANAGEMENT
@@ -658,7 +706,7 @@ public class OfficerManager : UnitManager, IVisitable
             Debug.DrawLine(Start, Start + Utility.V2toV3(a), Color.red, 0f, true);
             Debug.DrawLine(Start, Start + Utility.V2toV3(b), Color.red, 0f, true);
         }
-        List<OfficerManager> Units = GameUtility.GetAllRegiments();
+        List<OfficerManager> Units = GameUtility.GetAllCompanies();
 
         foreach(OfficerManager of in Units)
         {
@@ -687,7 +735,6 @@ public class OfficerManager : UnitManager, IVisitable
     //GIZMOS
     public void OnDrawGizmos()
     {
-
 
         if (ShowFormation)
             FormationGizmo();

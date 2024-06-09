@@ -84,7 +84,7 @@ public class Match_AI : MonoBehaviour
 
     private void GetRegiments()
     {
-        foreach(OfficerManager o in GameUtility.GetAllRegiments())
+        foreach(OfficerManager o in GameUtility.GetAllCompanies())
         {
             if(o.faction == faction)
             {

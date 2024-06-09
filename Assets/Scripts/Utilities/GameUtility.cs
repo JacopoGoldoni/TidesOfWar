@@ -8,7 +8,7 @@ public static class GameUtility
 {
     private static List<OfficerManager> regimentsRef;
 
-    public static List<OfficerManager> GetAllRegiments()
+    public static List<OfficerManager> GetAllCompanies()
     {
         if(regimentsRef == null || regimentsRef.Count == 0)
         {

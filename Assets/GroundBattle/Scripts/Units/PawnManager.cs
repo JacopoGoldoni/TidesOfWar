@@ -89,11 +89,6 @@ public class PawnManager : UnitManager
         }
     }
 
-    public void Die()
-    {
-        Destroy(transform.gameObject);
-    }
-
     //FIRE
     public void CallFire()
     {
@@ -139,8 +134,8 @@ public class PawnManager : UnitManager
         Debug.DrawRay(ray.origin, ray.direction * fireRange, Color.red, 2f);
         if (Physics.Raycast(ray, out hit))
         {
-            PawnManager pm = hit.transform.GetComponent<PawnManager>();
-            if(pm != null)
+            UnitManager pm = hit.transform.GetComponent<UnitManager>();
+            if(pm != null && pm.Killable)
             {
                 //KILL PAWN
                 pm.Die();
