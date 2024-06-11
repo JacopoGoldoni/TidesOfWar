@@ -6,6 +6,10 @@ using UnityEngine;
 
 public static class UtilityMath
 {
+    public static float SmoothFunction(float x)
+    {
+        return 3 * x*x - 2 * x*x*x;
+    }
     public static int Factorial(int x)
     {
         int f = 1;

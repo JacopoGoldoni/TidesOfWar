@@ -404,6 +404,28 @@ public class Matrix
 
         return P1;
     }
+    public static Matrix Rotation2D(float angle)
+    {
+        Matrix m = new Matrix(2,2);
+
+        m.values[0, 0] = Mathf.Cos(angle);
+        m.values[1, 0] = -1 * Mathf.Sin(angle);
+        m.values[0, 1] = Mathf.Sin(angle);
+        m.values[1, 1] = Mathf.Cos(angle);
+
+        return m;
+    }
+    public static Matrix Rotation2D()
+    {
+        Matrix m = new Matrix(2, 2);
+
+        m.values[0, 0] = 0f;
+        m.values[1, 0] = -1f;
+        m.values[0, 1] = 1f;
+        m.values[1, 1] = 0f;
+
+        return m;
+    }
     public static Matrix HermiteMatrix()
     {
         Matrix H = new Matrix(4, 4);

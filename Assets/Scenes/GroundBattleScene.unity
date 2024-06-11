@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 457814795}
   - component: {fileID: 457814792}
+  - component: {fileID: 457814796}
   m_Layer: 0
   m_Name: GroundBattleTerrain
   m_TagString: Untagged
@@ -149,14 +150,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   active: 1
-  resolution: 1000
-  worldSize: 256
-  height: 10
-  perlinNoiseStrenght: 1
-  perlinNoiseSize: 20
+  resolution: 256
+  grassDensity: 256
+  detailResolutionPerPatch: 256
+  worldSize: 1024
+  height: 20
+  perlinNoiseStrenght: 0.75
+  perlinNoiseSize: 4
   terrainMaterial: {fileID: 2100000, guid: aa51d4bf0ff2f2c48bac25c6441ee5c8, type: 2}
+  terrainLayers:
+  - {fileID: 8574412962073106934, guid: d7d3df53685c1044ca028fcd2522057c, type: 2}
+  - {fileID: 8574412962073106934, guid: eb04a2b202d24b3428a8ad92baf8747f, type: 2}
+  erosionIterations: 100000
   maxRiverNumber: 1
-  riverSize: 50
+  riverSize: 40
+  riverMaterial: {fileID: -876546973899608171, guid: 728f8898744e77048a7ff5529d0e4a59,
+    type: 3}
+  maxRoadSize: 0
+  minRoadSize: 0
+  treePrefabs:
+  - {fileID: 2527448994498276276, guid: 4fd75574b3c7436408d41f5126dd4415, type: 3}
+  - {fileID: 1454929710405921368, guid: 648601e338d98be4eab6a4ce8faeca83, type: 3}
+  treeDensity: 0.05
+  treeScale: 0.5
 --- !u!4 &457814795
 Transform:
   m_ObjectHideFlags: 0
@@ -172,6 +188,30 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &457814796
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 457814791}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5962ffe52da535e49aa3a91267c1cf5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  seed: 0
+  erosionRadius: 3
+  inertia: 0.05
+  sedimentCapacityFactor: 4
+  minSedimentCapacity: 0.01
+  erodeSpeed: 0.3
+  depositSpeed: 0.3
+  evaporateSpeed: 0.01
+  gravity: 4
+  maxDropletLifetime: 30
+  initialWaterVolume: 1
+  initialSpeed: 1
 --- !u!1001 &777155303
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -233,6 +273,26 @@ PrefabInstance:
     - target: {fileID: 6111064777408057533, guid: c56a254fb64b2ee4781f67bc3728b7bf,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6844939655780189126, guid: c56a254fb64b2ee4781f67bc3728b7bf,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7758203165628540573, guid: c56a254fb64b2ee4781f67bc3728b7bf,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7787429257848935476, guid: c56a254fb64b2ee4781f67bc3728b7bf,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7904480205626193083, guid: c56a254fb64b2ee4781f67bc3728b7bf,
+        type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
