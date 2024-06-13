@@ -154,25 +154,30 @@ MonoBehaviour:
   grassDensity: 256
   detailResolutionPerPatch: 256
   worldSize: 1024
-  height: 20
-  perlinNoiseStrenght: 0.75
-  perlinNoiseSize: 4
+  height: 40
+  perlinNoiseStrenght: 1
+  perlinNoiseScale: 5
+  octaves: 3
+  lacunarity: 2
+  persistence: 1.5
   terrainMaterial: {fileID: 2100000, guid: aa51d4bf0ff2f2c48bac25c6441ee5c8, type: 2}
   terrainLayers:
   - {fileID: 8574412962073106934, guid: d7d3df53685c1044ca028fcd2522057c, type: 2}
   - {fileID: 8574412962073106934, guid: eb04a2b202d24b3428a8ad92baf8747f, type: 2}
+  erode: 0
   erosionIterations: 100000
   maxRiverNumber: 1
-  riverSize: 40
+  riverSize: 20
   riverMaterial: {fileID: -876546973899608171, guid: 728f8898744e77048a7ff5529d0e4a59,
     type: 3}
   maxRoadSize: 0
   minRoadSize: 0
-  treePrefabs:
-  - {fileID: 2527448994498276276, guid: 4fd75574b3c7436408d41f5126dd4415, type: 3}
-  - {fileID: 1454929710405921368, guid: 648601e338d98be4eab6a4ce8faeca83, type: 3}
-  treeDensity: 0.05
-  treeScale: 0.5
+  maxTownCount: 0
+  minTownRadius: 0
+  maxTownRadius: 0
+  treeProfiles:
+  - {fileID: 11400000, guid: 0abfcbbaae79e68498cdb704547ad94d, type: 2}
+  - {fileID: 11400000, guid: 0edadd1bc977ca34981c96024fbbdda5, type: 2}
 --- !u!4 &457814795
 Transform:
   m_ObjectHideFlags: 0
@@ -224,6 +229,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: GroundBattleCamera
+      objectReference: {fileID: 0}
+    - target: {fileID: 5740641223937950900, guid: c56a254fb64b2ee4781f67bc3728b7bf,
+        type: 3}
+      propertyPath: m_BackGroundColor.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5740641223937950900, guid: c56a254fb64b2ee4781f67bc3728b7bf,
+        type: 3}
+      propertyPath: m_BackGroundColor.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5740641223937950900, guid: c56a254fb64b2ee4781f67bc3728b7bf,
+        type: 3}
+      propertyPath: m_BackGroundColor.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5740641223937950900, guid: c56a254fb64b2ee4781f67bc3728b7bf,
+        type: 3}
+      propertyPath: m_BackGroundColor.r
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6111064777408057533, guid: c56a254fb64b2ee4781f67bc3728b7bf,
         type: 3}
@@ -277,8 +302,33 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6844939655780189126, guid: c56a254fb64b2ee4781f67bc3728b7bf,
         type: 3}
+      propertyPath: speed
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 6844939655780189126, guid: c56a254fb64b2ee4781f67bc3728b7bf,
+        type: 3}
       propertyPath: m_Enabled
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6844939655780189126, guid: c56a254fb64b2ee4781f67bc3728b7bf,
+        type: 3}
+      propertyPath: maxHeight
+      value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 6844939655780189126, guid: c56a254fb64b2ee4781f67bc3728b7bf,
+        type: 3}
+      propertyPath: ElevationSpeed
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 6844939655780189126, guid: c56a254fb64b2ee4781f67bc3728b7bf,
+        type: 3}
+      propertyPath: verticalRotationSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6844939655780189126, guid: c56a254fb64b2ee4781f67bc3728b7bf,
+        type: 3}
+      propertyPath: horizontalRotationSpeed
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 7758203165628540573, guid: c56a254fb64b2ee4781f67bc3728b7bf,
         type: 3}

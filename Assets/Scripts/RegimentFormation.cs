@@ -83,7 +83,7 @@ public class Column : Formation
         name = "Column";
 
         //DEFAULT 4 LINES
-        SetSizeByLines(size, 3);
+        SetSizeByLines(size, 2);
     }
 
     public override Vector2 GetPos(int ID)
@@ -93,13 +93,26 @@ public class Column : Formation
         if (Lines == 1)
         {
             pos.x = 0;
+            pos.y = (ID) * b;
         }
         else
         {
-            pos.x = ((ID % Lines) - (float)(Lines-1) / 2f ) * a;
+            int n = ID / Ranks;
+            
+            pos.x = (n - (float)(Lines-1) / 2f ) * a;
+            
+            if(n % 2 == 0)
+            {
+                //UP
+                pos.y = (ID % Ranks) * b;
+            }
+            else
+            {
+                //DOWN
+                pos.y = (Ranks - (ID % Ranks + 1)) * b;
+            }
         }
 
-        pos.y = ((ID / Lines + 1)) * b;
 
         return pos;
     }

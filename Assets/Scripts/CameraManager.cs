@@ -40,6 +40,9 @@ public class CameraManager : MonoBehaviour
     //NOTIFICATION
     EventBinding<NotificationEvent> notificationBinding;
 
+    //TIME SCALES
+    public int timeScaleIndex = 1;
+    public float[] timeScales = { 0.5f, 1f, 2f, 4f };
 
     private void OnEnable()
     {
@@ -130,6 +133,24 @@ public class CameraManager : MonoBehaviour
                 duration = 2f
             });
         }
+        //HIDE OR SHOW UI
+        if(Input.GetKeyDown(KeyCode.H))
+        {
+            uimanager.ToggleUI();
+        }
+        //CHANGE TIMESCALE
+        if(Input.GetKeyDown(KeyCode.X))
+        {
+            timeScaleIndex++;
+            timeScaleIndex = Mathf.Clamp(timeScaleIndex,0, 3);
+            Time.timeScale = timeScales[timeScaleIndex];
+        }
+        else if(Input.GetKeyDown(KeyCode.Z))
+        {
+            timeScaleIndex--;
+            timeScaleIndex = Mathf.Clamp(timeScaleIndex, 0, 3);
+            Time.timeScale = timeScales[timeScaleIndex];
+        }
     }
 
     //UNIT SELECTION FUNCTIONS
@@ -142,6 +163,7 @@ public class CameraManager : MonoBehaviour
         DeselectAllBattalions();
 
         uimanager.CompanyCommandTabCheck();
+        uimanager.HighlightCompanyCard(t.companyNumber, true);
     }
     public void DeselectCompany(Transform target)
     {
@@ -150,6 +172,7 @@ public class CameraManager : MonoBehaviour
         t.Highlight(false);
 
         uimanager.CompanyCommandTabCheck();
+        uimanager.HighlightCompanyCard(t.companyNumber, false);
     }
     public void DeselectAllCompanies()
     {
@@ -159,6 +182,7 @@ public class CameraManager : MonoBehaviour
             foreach(OfficerManager t in selectedCompanies)
             {
                 t.Highlight(false);
+                uimanager.HighlightCompanyCard(t.companyNumber, false);
             }
         }
 
@@ -215,7 +239,9 @@ public class CameraManager : MonoBehaviour
 
                 Vector2 pos =
                     new Vector2(OrderPoint.x, OrderPoint.z) +
-                    UtilityMath.RotateVector2(Orientation) * (((float)i - (float)(selectedCompanies.Count - 1) * 0.5f) * (unit.companyFormation.Lines / 2f + space));
+                    UtilityMath.RotateVector2(Orientation) * 
+                    (((float)i - (float)(selectedCompanies.Count - 1) * 0.5f) * 
+                    (unit.GetCompanyWidth() / 2f + space));
 
 
                 if (unit.IsObstructedAt(pos))
@@ -242,11 +268,14 @@ public class CameraManager : MonoBehaviour
             {
                 CaptainManager unit = selectedBattalions[i];
 
-                float space = 1f;
+                float space = 2f;
+
 
                 Vector2 pos =
                     new Vector2(OrderPoint.x, OrderPoint.z) +
-                    UtilityMath.RotateVector2(Orientation) * (((float)i - (float)(selectedCompanies.Count - 1) * 0.5f) * (unit.battalionFormation.Lines / 2f + space));
+                    UtilityMath.RotateVector2(Orientation) * 
+                    (((float)i - (float)(selectedBattalions.Count - 1) * 0.5f) * 
+                    (unit.GetBattalionWidth(space) + space));
 
                 Quaternion rot = Quaternion.LookRotation(Utility.V2toV3(Orientation), Vector3.up);
 

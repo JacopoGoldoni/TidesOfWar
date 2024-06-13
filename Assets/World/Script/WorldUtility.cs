@@ -10,6 +10,8 @@ public static class WorldUtility
     static Region[] regions;
     static Country[] countries;
     static Building[] buildings;
+    static Law[] laws;
+    static Technology[] techs;
 
     //MAPS
     static Texture2D rasterizedMap;
@@ -21,6 +23,7 @@ public static class WorldUtility
     static string countryPath = "JSON/Countries/";
     static string buildingPath = "JSON/Buildings/";
     static string ideologyPath = "JSON/Ideologies/";
+    static string lawPath = "JSON/Laws/";
 
     //LOADERS
     public static void LoadRasterizedMap()
@@ -108,6 +111,28 @@ public static class WorldUtility
             countries[i] = country;
         }
     }
+    public static void LoadLaws()
+    {
+        TextAsset[] lawAssets = Resources.LoadAll<TextAsset>(lawPath);
+
+        if (lawAssets.Length == 0) { return; }
+
+        laws = new Law[lawAssets.Length];
+
+        Debug.Log(lawAssets.Length + " laws found.");
+
+        for (int i = 0; i < lawAssets.Length; i++)
+        {
+            LawInfo lawInfo = JsonUtility.FromJson<LawInfo>(lawAssets[i].text);
+
+            Law law = new Law();
+
+            Debug.Log("Country added:\n" +
+                "Name: " + lawInfo.name + "\n");
+
+            laws[i] = law;
+        }
+    }
 
     //GETTERS
     public static Country GetCountryByTAG(string TAG)
@@ -155,6 +180,26 @@ public static class WorldUtility
                 return provinces[i];
             }
         }
+        return null;
+    }
+    public static Law[] GetAllLaws()
+    {
+        return laws;
+    }
+    public static Technology[] GetAllTechs()
+    {
+        return techs;
+    }
+    public static Technology GetTechByID(int ID)
+    {
+        for(int i = 0; i < techs.Length; i++)
+        {
+            if (techs[i].techID == ID)
+            {
+                return techs[i];
+            }
+        }
+
         return null;
     }
 

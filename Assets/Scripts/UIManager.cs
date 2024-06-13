@@ -23,8 +23,8 @@ public class UIManager : MonoBehaviour
     GameObject NotificationTab;
 
     //CARDS
-    List<(OfficerManager, GameObject)> companyCards = new List<(OfficerManager, GameObject)>();
-    List<(CaptainManager, GameObject)> battalionCards = new List<(CaptainManager, GameObject)>();
+    List<(OfficerManager, CompanyCardManager)> companyCards = new List<(OfficerManager, CompanyCardManager)>();
+    List<(CaptainManager, BattalionCardManager)> battalionCards = new List<(CaptainManager, BattalionCardManager)>();
 
     [Header("UI prefsbs")]
     public GameObject CompanyCardPrefab;
@@ -123,9 +123,9 @@ public class UIManager : MonoBehaviour
         }
 
         //UPDATE COMPANY CARD INFOS
-        foreach ((OfficerManager, GameObject) r in companyCards)
+        foreach ((OfficerManager, CompanyCardManager) r in companyCards)
         {
-            r.Item2.GetComponent<CompanyCardManager>().SetAmmoSlider(r.Item1.Ammo, r.Item1.MaxAmmo);
+            r.Item2.SetAmmoSlider(r.Item1.Ammo, r.Item1.MaxAmmo);
         }
     }
 
@@ -167,6 +167,17 @@ public class UIManager : MonoBehaviour
         rectTransform.anchoredPosition = new Vector2(0, -300);
 
         NotificationTab = notificationtab;
+    }
+    public void ToggleUI()
+    {
+        if (UI.activeSelf)
+        {
+            UI.SetActive(false);
+        }
+        else
+        {
+            UI.SetActive(true);
+        }
     }
 
     //FLAG MANAGEMENT
@@ -315,7 +326,7 @@ public class UIManager : MonoBehaviour
         companyCardManager.SetAmmoSlider(company.Ammo, company.MaxAmmo);
         companyCardManager.Initialize(company.faction);
 
-        companyCards.Add((company, CompanyCard));
+        companyCards.Add((company, companyCardManager));
 
         //Displacement
         Vector2 cardSize = CompanyCardPrefab.GetComponent<RectTransform>().sizeDelta;
@@ -353,8 +364,19 @@ public class UIManager : MonoBehaviour
         CompanyCardHolderCheck();
         CompanyCommandTabCheck();
     }
-    
-    //COMPANY CARD HOLDER MANAGEMENT
+    public void HighlightCompanyCard(int companyID, bool highlight)
+    {
+        for(int i = 0; i < companyCards.Count; i++)
+        {
+            if(companyCards[i].Item1.companyNumber == companyID)
+            {
+                companyCards[i].Item2.HighLight(highlight);
+                return;
+            }
+        }
+    }
+
+    //BATTALION CARD HOLDER MANAGEMENT
     private void BattalionCardHolderCheck()
     {
         if (companyCards.Count > 0)
@@ -377,7 +399,7 @@ public class UIManager : MonoBehaviour
         BattalionCardManager battalionCardManager = BattalionCard.GetComponent<BattalionCardManager>();
         battalionCardManager.Initialize(battalion.faction);
 
-        battalionCards.Add((battalion, BattalionCard));
+        battalionCards.Add((battalion, battalionCardManager));
 
         //Displacement
         Vector2 cardSize = BattalionCardPrefab.GetComponent<RectTransform>().sizeDelta;
@@ -419,26 +441,79 @@ public class UIManager : MonoBehaviour
     //BUTTON FUNCTIONS
     public void SendLineFormation()
     {
-        int n = cameraManagerRef.selectedCompanies.Count;
-    
-        for(int i = 0; i < n; i++)
+        if(cameraManagerRef.selectedBattalions.Count != 0)
         {
-            OfficerManager of = cameraManagerRef.selectedCompanies[i];
-            Formation f = new Line(of.companySize);
-            of.SetFormation(f);
-            of.SendOrder(false, Utility.V3toV2( of.transform.position ), of.transform.rotation);
+            //BATTALION ORDER
+            int n = cameraManagerRef.selectedBattalions.Count;
+
+            for (int i = 0; i < n; i++)
+            {
+                CaptainManager cm = cameraManagerRef.selectedBattalions[i];
+                Formation f = new Line(cm.battallionSize);
+                f.SetSizeByRanks(cm.battallionSize, 1);
+                f.a = cm.companies[1].companyFormation.Lines * cm.companies[1].companyFormation.a + 1f;
+                f.b = 0;
+                cm.SetFormation(f);
+                cm.SendOrder(false, Utility.V3toV2(cm.transform.position), cm.transform.rotation);
+            }
+        }
+        else
+        {
+            //COMPANY ORDER
+            int n = cameraManagerRef.selectedCompanies.Count;
+
+            for (int i = 0; i < n; i++)
+            {
+                OfficerManager of = cameraManagerRef.selectedCompanies[i];
+                Formation f = new Line(of.companySize);
+                of.SetFormation(f);
+                of.SendOrder(false, Utility.V3toV2(of.transform.position), of.transform.rotation);
+            }
         }
     }
     public void SendColumnFormation()
     {
-        int n = cameraManagerRef.selectedCompanies.Count;
-
-        for (int i = 0; i < n; i++)
+        if (cameraManagerRef.selectedBattalions.Count != 0)
         {
-            OfficerManager of = cameraManagerRef.selectedCompanies[i];
-            Formation f = new Column(of.companySize);
-            of.SetFormation(f);
-            of.SendOrder(false, Utility.V3toV2(of.transform.position), of.transform.rotation);
+            //BATTALION ORDER
+            int n = cameraManagerRef.selectedBattalions.Count;
+
+            for (int i = 0; i < n; i++)
+            {
+                CaptainManager cm = cameraManagerRef.selectedBattalions[i];
+                Formation f = new Column(cm.battallionSize);
+                f.SetSizeByLines(cm.battallionSize, 2);
+
+                float width = 0;
+
+                //GET LARGEST COMPANY
+                for(int j = 0; j < cm.companies.Count;j++)
+                {
+                    float w = cm.companies[j].companyFormation.Lines * cm.companies[j].companyFormation.a;
+                    if(w > width)
+                    {
+                        width = w;
+                    }
+                }
+
+                f.a = width + 1f;
+                f.b = 5;
+                cm.SetFormation(f);
+                cm.SendOrder(false, Utility.V3toV2(cm.transform.position), cm.transform.rotation);
+            }
+        }
+        else
+        {
+            //COMPANY ORDER
+            int n = cameraManagerRef.selectedCompanies.Count;
+
+            for (int i = 0; i < n; i++)
+            {
+                OfficerManager of = cameraManagerRef.selectedCompanies[i];
+                Formation f = new Column(of.companySize);
+                of.SetFormation(f);
+                of.SendOrder(false, Utility.V3toV2(of.transform.position), of.transform.rotation);
+            }
         }
     }
     public void SendStopOrder()

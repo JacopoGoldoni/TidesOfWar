@@ -12,24 +12,17 @@ public class CaptainManager : UnitManager, IVisitable
     LineRenderer lineRenderer;
 
     //STATS
-
     public Stats stats { get; private set; }
     public void Accept(IVisitor visitor) => visitor.Visit(this);
 
     public bool drawPathLine = false;
-
-    [Header("Companies")]
-    public GameObject officerPrefab;
-    public CompanyTemplate companyTemplate;
-    public WeaponClass weaponClass;
-    public List<OfficerManager> companies = new List<OfficerManager>();
 
     [Header("Battalion identifier")]
     public int battalionNumber;
     public string battalionName;
 
     [Header("Battalion formation")]
-    public int battalionSize = 4;
+    public BattalionTemplate battalionTemplate;
     private Formation _battalionFormation;
     public Formation battalionFormation
     {
@@ -44,6 +37,7 @@ public class CaptainManager : UnitManager, IVisitable
         }
     }
     private bool _formationChanged = false;
+    public int battallionSize { get{return battalionTemplate.companies.Length;} }
 
     [Header("Battalion movement")]
     public float Speed { get { return stats.Speed; } }
@@ -55,6 +49,9 @@ public class CaptainManager : UnitManager, IVisitable
     public string stateName;
     public int Morale;
     public int FleeThreashold = 25;
+
+    [Header("Companies")]
+    public List<OfficerManager> companies = new List<OfficerManager>();
 
     [Header("Debug")]
     public bool ShowSightLines = false;
@@ -104,35 +101,58 @@ public class CaptainManager : UnitManager, IVisitable
     }
     private void InitializeFormation()
     {
-        Formation companyFormation = new Line(companyTemplate.CompanySize);
+        Formation companyFormation = new Line(battalionTemplate.companies[1].CompanySize);
 
-        battalionFormation = new Line((int)battalionSize);
-        battalionFormation.SetSizeByRanks(battalionSize, 1);
+        battalionFormation = new Line((int)battallionSize);
+        battalionFormation.SetSizeByRanks(battallionSize, 1);
         battalionFormation.a = companyFormation.a * companyFormation.Lines + 2f;
+    }
+
+    public float GetBattalionWidth(float space)
+    {
+        float width = 0f;
+        
+        for(int r = 0; r < battalionFormation.Ranks; r++)
+        {
+            float w = 0f;
+            for (int i = 0; i < battalionFormation.Lines; i++)
+            {
+                OfficerManager m = companies[i];
+                w += m.companyFormation.Lines * m.companyFormation.a;
+            }
+            if(w > width)
+            {
+                width = w;
+            }
+        }
+        
+        width += space * (battalionFormation.Lines - 1);
+
+        return width;
     }
 
     private void SpawnCompanyPawns()
     {
-        for (int i = 0; i < battalionSize; i++)
+        for (int i = 0; i < battallionSize; i++)
         {
             Vector2 v2 = GetFormationCoords(i);
-            SpawnOfficer(Utility.V2toV3(v2) + transform.position);
+            SpawnOfficer(Utility.V2toV3(v2) + transform.position, i);
         }
     }
-    private void SpawnOfficer(Vector3 pos)
+    private void SpawnOfficer(Vector3 pos, int localCompanyIndex)
     {
-        GameObject officer = Instantiate(officerPrefab);
+        GameObject officer = Instantiate(battalionTemplate.companies[localCompanyIndex].officerPrefab);
         officer.transform.position = pos;
         officer.transform.rotation = transform.rotation;
 
         OfficerManager officerManager = officer.GetComponent<OfficerManager>();
         OfficerMovement officerMovememnt = officer.GetComponent<OfficerMovement>();
 
-        officerManager.companyTemplate = companyTemplate;
-        officerManager.weaponTemplate = weaponClass;
+        officerManager.companyTemplate = battalionTemplate.companies[localCompanyIndex];
         officerManager.masterCaptain = this;
         officerManager.faction = faction;
-        officerManager.companyNumber = companies.Count;
+        GameUtility.RegisterCompany(officerManager);
+        officerManager.companyNumber = GameUtility.companiesRef.Count;
 
         officerManager.Initialize();
 
@@ -210,7 +230,7 @@ public class CaptainManager : UnitManager, IVisitable
     }
     public void SendFormation()
     {
-        for (int i = 0; i < battalionSize; i++)
+        for (int i = 0; i < battallionSize; i++)
         {
             if (companies[i] != null)
                 companies[i].SendOrder(
@@ -363,7 +383,7 @@ public class CaptainManager : UnitManager, IVisitable
     }
     private void FormationGizmo()
     {
-        for (int i = 0; i < battalionSize; i++)
+        for (int i = 0; i < battallionSize; i++)
         {
             Gizmos.color = new Color(0, 1, 0, 0.5f);
             Vector3 FormationSlot = Utility.V2toV3(GetFormationCoords(i)) + transform.position;

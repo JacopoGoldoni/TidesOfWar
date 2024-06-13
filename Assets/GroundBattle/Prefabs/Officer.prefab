@@ -109,8 +109,8 @@ MonoBehaviour:
   UnitMesh: {fileID: 4064786809506695948, guid: 84504a8247ebf044c84f362232097cb8,
     type: 3}
   UnitMaterial: {fileID: 2100000, guid: ef561f36c67d42c4dbea3f3a2082e033, type: 2}
-  unitTemplate: {fileID: 0}
-  weaponTemplate: {fileID: 0}
+  Killable: 0
+  companyTemplate: {fileID: 0}
   drawPathLine: 0
   masterCaptain: {fileID: 0}
   pawnPrefab: {fileID: 1997580412286425343, guid: b8496d99f613dc542aa07b81cf37d467,
@@ -120,6 +120,9 @@ MonoBehaviour:
   companyName: 
   companySize: 120
   Range: 20
+  companyBounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0, y: 0, z: 0}
   Ammo: 50
   FireAll: 1
   targetCompany: {fileID: 0}
@@ -171,7 +174,7 @@ NavMeshAgent:
   m_Height: 0.6
   m_BaseOffset: 0.2
   m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
+  m_ObstacleAvoidanceType: 0
 --- !u!120 &4794292282337715407
 LineRenderer:
   serializedVersion: 2

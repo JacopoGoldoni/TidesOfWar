@@ -6,6 +6,7 @@ using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
+using static UnityEngine.Splines.SplineInstantiate;
 
 public class OfficerManager : UnitManager, IVisitable
 {
@@ -14,7 +15,6 @@ public class OfficerManager : UnitManager, IVisitable
 
     //STATS
     [SerializeField] public CompanyTemplate companyTemplate;
-    [SerializeField] public WeaponClass weaponTemplate;
     public Stats stats { get; private set; }
     public void Accept(IVisitor visitor) => visitor.Visit(this);
 
@@ -50,7 +50,7 @@ public class OfficerManager : UnitManager, IVisitable
     public Bounds companyBounds;
 
     [Header("Company combact")]
-    public float Precision { get { return stats.Precision * weaponTemplate.Precision; } }
+    public float Precision { get { return stats.Precision; } }
     public int Ammo;
     public int MaxAmmo { get { return companyTemplate.MaxAmmo; } }
 
@@ -61,7 +61,6 @@ public class OfficerManager : UnitManager, IVisitable
     [Header("Abilities")]
     public bool MultipleLineFire { get { return companyTemplate.MultipleFire; } }
     public bool Fortification { get { return companyTemplate.Fortification; } }
-    public bool SquareFormation { get { return companyTemplate.SquareFormation; } }
     public bool Skirmish { get { return companyTemplate.Skirmish; } }
 
     [Header("Company state")]
@@ -119,12 +118,17 @@ public class OfficerManager : UnitManager, IVisitable
         companySize = companyTemplate.CompanySize;
         Ammo = MaxAmmo;
         Morale = companyTemplate.BaseMorale;
-        Range = weaponTemplate.Range;
+        Range = companyTemplate.Range;
     }
     private void InitializeFormation()
     {
         companyFormation = new Line((int)companySize);
         companyBounds = CalculateCompanyBounds();
+    }
+    public float GetCompanyWidth()
+    {
+        float width = companyFormation.Lines * companyFormation.a;
+        return width;
     }
 
     private void SpawnCompanyPawns()
@@ -149,7 +153,7 @@ public class OfficerManager : UnitManager, IVisitable
         pawnManager.ID = pawns.Count - 1;
         pawnManager.faction = faction;
 
-        pawnMovememnt.MovementSpeed = Speed + 1;
+        pawnMovememnt.MovementSpeed = Speed * 1.1f;
 
         pawnManager.name = "Company" + companyNumber.ToString() + "_" + pawnManager.ID;
 

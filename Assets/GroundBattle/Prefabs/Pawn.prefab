@@ -180,7 +180,7 @@ NavMeshAgent:
   m_Height: 0.53
   m_BaseOffset: 0.2
   m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
+  m_ObstacleAvoidanceType: 0
 --- !u!82 &5822568825861390372
 AudioSource:
   m_ObjectHideFlags: 0

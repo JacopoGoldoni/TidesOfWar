@@ -25,12 +25,14 @@ public class CameraMovement : MonoBehaviour
     public float maxHeight = 40f;
 
     Camera camera;
+    CameraManager cameraManager;
 
     float y;
 
     private void Awake()
     {
         playerControls = new PlayerInputActions();
+        cameraManager = new CameraManager();
     }
 
     private void OnEnable()

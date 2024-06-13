@@ -6,30 +6,31 @@ using UnityEngine;
 
 public static class GameUtility
 {
-    private static List<OfficerManager> regimentsRef;
+    public static List<OfficerManager> companiesRef = new List<OfficerManager>();
+    public static List<CaptainManager> battallionsRef = new List<CaptainManager>();
 
     public static List<OfficerManager> GetAllCompanies()
     {
-        if(regimentsRef == null || regimentsRef.Count == 0)
+        if(companiesRef == null || companiesRef.Count == 0)
         {
-            regimentsRef = (Object.FindObjectsByType<OfficerManager>(FindObjectsSortMode.None)).ToList<OfficerManager>();
+            companiesRef = (Object.FindObjectsByType<OfficerManager>(FindObjectsSortMode.None)).ToList<OfficerManager>();
         }
 
-        return regimentsRef;
+        return companiesRef;
     }
 
-    public static void RegisterRegiment(OfficerManager om)
+    public static void RegisterCompany(OfficerManager om)
     {
-        regimentsRef.Add(om);
+        companiesRef.Add(om);
     }
 
-    public static OfficerManager GetRegimentByID(int ID)
+    public static OfficerManager GetCompanyByID(int ID)
     {
-        return regimentsRef[ID];
+        return companiesRef[ID];
     }
 
-    public static int GetIDOfRegiment(OfficerManager om)
+    public static int GetIDOfCompany(OfficerManager om)
     {
-        return regimentsRef.IndexOf(om);
+        return companiesRef.IndexOf(om);
     }
 }

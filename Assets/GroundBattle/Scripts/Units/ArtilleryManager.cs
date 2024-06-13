@@ -9,7 +9,6 @@ public class ArtilleryManager : UnitManager, IVisitable
 
     //STATS
     [SerializeField] CompanyTemplate unitTemplate;
-    [SerializeField] ArtilleryClass cannonTemplate;
     public Stats stats { get; private set; }
 
     public void Accept(IVisitor visitor) => visitor.Visit(this);
@@ -43,7 +42,7 @@ public class ArtilleryManager : UnitManager, IVisitable
     public float Range = 20f;
 
     [Header("Regiment combact")]
-    public float Precision { get { return stats.Precision * cannonTemplate.Precision; } }
+    public float Precision { get { return stats.Precision; } }
     public int Ammo;
     public int MaxAmmo { get { return unitTemplate.MaxAmmo; } }
     

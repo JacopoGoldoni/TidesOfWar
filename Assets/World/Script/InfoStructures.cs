@@ -55,3 +55,10 @@ public struct CountryModifiers
     public string name;
     public string image;
 }
+
+[Serializable]
+public struct LawInfo
+{
+    public string name;
+    public string image;
+}

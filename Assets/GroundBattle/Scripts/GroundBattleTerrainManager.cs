@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.AI.Navigation;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.Localization.Plugins.XLIFF.V12;
@@ -10,6 +11,7 @@ public class GroundBattleTerrainManager : MonoBehaviour
 {
     Erosion erosion;
     MiniTerrainDecorator terrainDecorator;
+    NavMeshSurface navMeshSurface;
 
     public bool active = true;
 
@@ -20,7 +22,10 @@ public class GroundBattleTerrainManager : MonoBehaviour
     public int worldSize = 1000;
     public int height = 1;
     public float perlinNoiseStrenght = 1f;
-    public float perlinNoiseSize = 1f;
+    public float perlinNoiseScale = 1f;
+    public int octaves = 2;
+    public float lacunarity = 2f;
+    public float persistence = 0.5f;
     private string savePath = "GroundBattle/TerrainData/";
     public Material terrainMaterial;
 
@@ -28,6 +33,7 @@ public class GroundBattleTerrainManager : MonoBehaviour
     public List<TerrainLayer> terrainLayers;
 
     [Header("Erosion settings")]
+    public bool erode = false;
     public int erosionIterations = 1;
 
     [Header("River settings")]
@@ -42,15 +48,17 @@ public class GroundBattleTerrainManager : MonoBehaviour
     public float maxRoadSize;
     public float minRoadSize;
     private List<Road> roads;
+    private List<RoadNode> roadNodes;
     Texture2D roadTextureMap;
 
     [Header("Town settings")]
     private List<Town> towns;
+    public int maxTownCount;
+    public float minTownRadius;
+    public float maxTownRadius;
 
     [Header("Tree settings")]
-    public List<GameObject> treePrefabs;
-    public float treeDensity;
-    public float treeScale;
+    public List<TreeProfile> treeProfiles;
 
     GameObject terrainObject;
 
@@ -62,8 +70,17 @@ public class GroundBattleTerrainManager : MonoBehaviour
     {
         if(active)
         {
+            roadNodes = new List<RoadNode>();
+
             GenerateRivers();
             BuildTerrain();
+            Decorate();
+
+            //GenerateTowns();
+            //GenerateRoads();
+            //GenerateBridges();
+
+            GenerateNavMeshSurface();
         }
     }
 
@@ -86,41 +103,21 @@ public class GroundBattleTerrainManager : MonoBehaviour
         terrainData.terrainLayers = terrainLayers.ToArray();
 
         //GENERATE HEIGHTMAP
-        float[,] terrainHeights = new float[worldSize, worldSize];
-        for (int i = 0; i < worldSize; i++)
+        Texture2D terrainHeightMap = new Texture2D(worldSize, worldSize);
+        terrainHeightMap = TextureMath.AdvancedPerlinTexture
+            (worldSize, perlinNoiseScale, octaves, lacunarity, persistence);
+
+        if(erode)
         {
-            for (int j = 0; j < worldSize; j++)
-            {
-                terrainHeights[i, j] = GenerateHeight(i, j);
-            }
+            TextureMath.Erode(terrainHeightMap, erosion, erosionIterations, 0);
         }
 
-        float[] heightmap = new float[worldSize * worldSize];
-        for(int i = 0; i < worldSize; i++)
-        {
-            for (int j = 0; j < worldSize; j++)
-            {
-                heightmap[i + j * worldSize] = terrainHeights[i,j];
-            }
-        }
-        erosion.Erode(heightmap, worldSize, erosionIterations, false);
-        for (int i = 0; i < worldSize; i++)
-        {
-            for (int j = 0; j < worldSize; j++)
-            {
-                terrainHeights[i, j] = heightmap[i + j * worldSize];
-            }
-        }
+        terrainHeightMap = TextureMath.Subtraction(
+                terrainHeightMap, 
+                TextureMath.Multiplication(riverTextureMap, 0.5f)
+                );
 
-        for(int i = 0; i < worldSize; i++)
-        {
-            for(int j = 0; j < worldSize; j++)
-            {
-                terrainHeights[i, j] -= 0.5f * (1 - riverTextureMap.GetPixel(i, j).r);
-            }
-        }
-
-        //GENERATE RIVERS
+        //GENERATE RIVER MESHES
         for (int i = 0; i < rivers.Count; i++)
         {
             rivers[i].GenerateMesh();
@@ -137,15 +134,15 @@ public class GroundBattleTerrainManager : MonoBehaviour
 
         //TREE
         List<TreePrototype> treePrototypes = new List<TreePrototype>();
-        foreach (GameObject treeGO in treePrefabs)
+        foreach (TreeProfile treeProfile in treeProfiles)
         {
             TreePrototype treeProrotype = new TreePrototype();
-            treeProrotype.prefab = treeGO;
+            treeProrotype.prefab = treeProfile.treePrefab;
             treePrototypes.Add(treeProrotype);
         }
         terrainData.treePrototypes = treePrototypes.ToArray();
 
-        terrainData.SetHeights(0, 0, terrainHeights);
+        terrainData.SetHeights(0, 0, TextureMath.Extract(terrainHeightMap, 0));
 
         terrainObject = Terrain.CreateTerrainGameObject(terrainData);
 
@@ -157,8 +154,6 @@ public class GroundBattleTerrainManager : MonoBehaviour
         terrain.materialTemplate = terrainMaterial;
 
         AssetDatabase.CreateAsset(terrainData, "Assets/" + savePath + name + ".asset");
-
-        Decorate();
     }
 
     private void Decorate()
@@ -187,20 +182,26 @@ public class GroundBattleTerrainManager : MonoBehaviour
 
         rockLayer.rules = new List<MiniTerrainDecorator.Rules>();
 
-        MiniTerrainDecorator.Rules rockRule = new MiniTerrainDecorator.Rules();
-        rockRule.active = true;
-        rockRule.blend = MiniTerrainDecorator.BlendType.add;
-        rockRule.filter = MiniTerrainDecorator.FilterType.slope;
-        rockRule.min = 10;
-        rockRule.max = 90;
-        rockLayer.rules.Add(rockRule);
-        
+        MiniTerrainDecorator.Rules rockRule1 = new MiniTerrainDecorator.Rules();
+        rockRule1.active = true;
+        rockRule1.blend = MiniTerrainDecorator.BlendType.add;
+        rockRule1.filter = MiniTerrainDecorator.FilterType.slope;
+        rockRule1.min = 10;
+        rockRule1.max = 90;
+        rockLayer.rules.Add(rockRule1);
+        MiniTerrainDecorator.Rules rockRule2 = new MiniTerrainDecorator.Rules();
+        rockRule2.active = true;
+        rockRule2.blend = MiniTerrainDecorator.BlendType.add;
+        rockRule2.filter = MiniTerrainDecorator.FilterType.texture;
+        rockRule2.texture = riverTextureMap;
+        rockLayer.rules.Add(rockRule2);
+
         terrainDecorator.layers.Add(rockLayer);
 
         //TREE LAYER
-        for(int i = 0; i < treePrefabs.Count; i++)
+        for(int i = 0; i < treeProfiles.Count; i++)
         {
-            terrainDecorator.layers.Add(GenerateTree("tree", i + 2, 0, 10, 2));
+            terrainDecorator.layers.Add(GenerateTree(treeProfiles[i], i + 2, 0, 10, 2));
         }
 
         terrainDecorator.Decorate();
@@ -208,9 +209,16 @@ public class GroundBattleTerrainManager : MonoBehaviour
 
     private void GenerateRivers()
     {
+        if(maxRiverNumber == 0)
+        {
+            return;
+        }
+
         //TODO: RANDOMIZE RIVER NUMBER
         rivers = new List<River>();
         riverTextureMap = new Texture2D(worldSize, worldSize);
+
+        int n = Random.Range(0, maxRiverNumber);
         for(int i = 0; i < maxRiverNumber; i++)
         {
             River river = new River();
@@ -239,7 +247,7 @@ public class GroundBattleTerrainManager : MonoBehaviour
         {
             for (int y = 0; y < riverTextureMap.height; y++)
             {
-                Color c = new Color(1f, 1f, 1f);
+                Color c = new Color(0f, 0f, 0f);
                 riverTextureMap.SetPixel(x, y, c);
             }
         }
@@ -263,7 +271,7 @@ public class GroundBattleTerrainManager : MonoBehaviour
 
                 if (normalizedDistance < 1)
                 {
-                    float s = UtilityMath.SmoothFunction(normalizedDistance);
+                    float s = 1f - UtilityMath.SmoothFunction(normalizedDistance);
                     Color c = new Color(s, s, s);
                     riverTextureMap.SetPixel(x, y, c);
                 }
@@ -272,22 +280,52 @@ public class GroundBattleTerrainManager : MonoBehaviour
     }
     private void GenerateRoads()
     {
-        //TODO: RANDOMIZE RIVER NUMBER
         roads = new List<Road>();
         roadTextureMap = new Texture2D(worldSize, worldSize);
-        for (int i = 0; i < maxRiverNumber; i++)
+
+        int i = 0;
+        while (!AreAllRoadNodeConnected())
         {
             Road road = new Road();
             road.size = maxRoadSize;
-            //GENERATE RIVER
+            //GENERATE ROAD
 
-            //RANDOM START, END POSITIONS
-            road.start = new Vector2(Random.Range(0, worldSize), Random.Range(0, worldSize));
-            road.end = new Vector2(Random.Range(0, worldSize), Random.Range(0, worldSize));
+            //GET NEAREST NODE
+            int l = 0;
+            float distance = Mathf.Infinity;
+            for(int j = 0; j < roadNodes.Count; j++)
+            {
+                if (j == i) { continue; }
+                
+                float d = Vector2.Distance(roadNodes[i].position, roadNodes[j].position);
+                if(d < distance)
+                {
+                    l = j;
+                    distance = d;
+                }
+            }
 
-            //RANDOM START, END TANGENTS
-            road.start_tangent = new Vector2();
-            road.end_tangent = new Vector2();
+            //MAKE ROAD
+            road.start = roadNodes[i].position;
+            road.end = roadNodes[l].position;
+
+            //START, END TANGENTS
+            if (Vector2.Dot(roadNodes[i].tangent, roadNodes[l].position - roadNodes[i].position) > 0)
+            {
+                road.start_tangent = roadNodes[i].tangent;
+            }
+            else
+            {
+                road.start_tangent = -1 * roadNodes[i].tangent;
+            }
+            if (Vector2.Dot(roadNodes[l].tangent, roadNodes[i].position - roadNodes[l].position) > 0)
+            {
+                road.end_tangent = roadNodes[l].tangent;
+            }
+            else
+            {
+                road.end_tangent = -1 * roadNodes[l].tangent;
+            }
 
             //CHECK INTERSECTION
             for(int j = 0; j < i; j++)
@@ -296,6 +334,7 @@ public class GroundBattleTerrainManager : MonoBehaviour
             }
 
             roads.Add(road);
+            i++;
         }
 
         //DRAW ROAD TEXTUREMAP
@@ -306,16 +345,16 @@ public class GroundBattleTerrainManager : MonoBehaviour
                 float distance = Mathf.Infinity;
                 int index = 0;
                 //SET PIXEL WITH NEAREST SPLINE DISTANCE
-                for (int i = 0; i < maxRiverNumber; i++)
+                for (int m = 0; m < maxRiverNumber; m++)
                 {
-                    float d = rivers[i].Distance(new Vector2(x, y));
+                    float d = rivers[m].Distance(new Vector2(x, y));
                     if (d < distance)
                     {
                         distance = d;
-                        index = i;
+                        index = m;
                     }
                 }
-                float normalizedDistance = distance / roads[index].size;
+                float normalizedDistance = distance / roads[0].size;
 
                 if (normalizedDistance < 1)
                 {
@@ -329,21 +368,37 @@ public class GroundBattleTerrainManager : MonoBehaviour
     {
 
     }
+    private void GenerateTowns()
+    {
+        int n = (int)Mathf.Round(Random.Range(0, maxTownCount));
+        towns = new List<Town>(n);
+
+        for(int i = 0; i < n; i++)
+        {
+            towns[i].center = new Vector2(Random.Range(0, worldSize), Random.Range(0, worldSize));
+            towns[i].maxRadius = Random.Range(minTownRadius, maxTownRadius);
+
+            RoadNode townNode = new RoadNode();
+            townNode.position = towns[i].center;
+            townNode.tangent = Random.insideUnitCircle.normalized;
+            roadNodes.Add(townNode);
+        }
+    }
     private MiniTerrainDecorator.Layers GenerateTree
-        (string name, int layerIndex, int targetlayerIndex, float frequency, float lacunarity)
+        (TreeProfile treeProfile, int layerIndex, int targetlayerIndex, float frequency, float lacunarity)
     {
         MiniTerrainDecorator.Layers treeLayer = new MiniTerrainDecorator.Layers();
         treeLayer.active = true;
-        treeLayer.name = name;
+        treeLayer.name = treeProfile.name;
         treeLayer.layerType = MiniTerrainDecorator.LayerType.tree;
         treeLayer.layerIndex = layerIndex;
-        treeLayer.maximumTreeCount = (int)(treeDensity * worldSize * worldSize);
+        treeLayer.maximumTreeCount = (int)(treeProfile.density * worldSize * worldSize);
         treeLayer.probability = 1;
-        treeLayer.width = treeScale;
-        treeLayer.height = treeScale;
+        treeLayer.width = treeProfile.scale;
+        treeLayer.height = treeProfile.scale;
         treeLayer.randomPosition = 1;
         treeLayer.randomRotation = 1;
-        treeLayer.randomSize = 0.1f;
+        treeLayer.randomSize = treeProfile.randomScale;
 
         MiniTerrainDecorator.Rules treeRule1 = new MiniTerrainDecorator.Rules();
         treeRule1.active = true;
@@ -364,19 +419,22 @@ public class GroundBattleTerrainManager : MonoBehaviour
         
         return treeLayer;
     }
-
-    private float GenerateHeight(int x, int y)
+    private bool AreAllRoadNodeConnected()
     {
-        float xCoord_Local = ((float)x / (float)worldSize) * perlinNoiseSize;
-        float yCoord_Local = ((float)y / (float)worldSize) * perlinNoiseSize;
+        foreach(RoadNode rn in roadNodes)
+        {
+            if(!rn.isConnected)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 
-        float height;
-
-        height = Mathf.PerlinNoise(xCoord_Local, yCoord_Local) * perlinNoiseStrenght;
-
-        height = Mathf.Clamp01(height);
-
-        return height;
+    private void GenerateNavMeshSurface()
+    {
+        navMeshSurface = terrainObject.AddComponent<NavMeshSurface>();
+        navMeshSurface.BuildNavMesh();
     }
 
     //ELEMENTS
@@ -534,7 +592,18 @@ public class GroundBattleTerrainManager : MonoBehaviour
     }
     class Town
     {
-        Vector2 center;
-        float maxRadius;
+        public Vector2 center;
+        public float maxRadius;
+    }
+    class RoadNode
+    {
+        public Vector2 position;
+        public Vector2 tangent;
+        public bool isConnected;
+
+        public RoadNode()
+        {
+            isConnected = false;
+        }
     }
 }

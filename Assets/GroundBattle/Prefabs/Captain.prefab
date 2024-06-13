@@ -126,7 +126,7 @@ NavMeshAgent:
   m_Height: 0.6
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
+  m_ObstacleAvoidanceType: 0
 --- !u!114 &5757737711545003554
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -146,19 +146,16 @@ MonoBehaviour:
   UnitMesh: {fileID: 5626925631471267929, guid: 876bd02491ed1bf42ad5f0bdb8750b91,
     type: 3}
   UnitMaterial: {fileID: 2100000, guid: 2136bb957162a8446b0f8bd2ed644df3, type: 2}
+  Killable: 0
   drawPathLine: 0
-  officerPrefab: {fileID: 1622135471481153879, guid: 992e891c3975e994aaddbef655bcf49b,
-    type: 3}
-  companyTemplate: {fileID: 11400000, guid: 320ce0433b6cdfa4e9dd81bb82a0c5e5, type: 2}
-  weaponClass: {fileID: 11400000, guid: 2b9422f2ea95a1d4297ac8007042241e, type: 2}
-  companies: []
-  companyNumber: 0
-  companyName: 
-  battalionSize: 4
+  battalionNumber: 0
+  battalionName: 
+  battalionTemplate: {fileID: 0}
   FireAll: 1
   stateName: 
   Morale: 0
   FleeThreashold: 25
+  companies: []
   ShowSightLines: 0
   ShowFormation: 0
 --- !u!114 &3997354972869105768
