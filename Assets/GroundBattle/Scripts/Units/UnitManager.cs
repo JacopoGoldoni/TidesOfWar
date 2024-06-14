@@ -21,6 +21,32 @@ public abstract class UnitManager : MonoBehaviour
 
     //INITIALIZE
     public abstract void Initialize();
+    public virtual void InitializeMaterial()
+    {
+        m = Instantiate(UnitMaterial);
+        if (Utility.Camera.GetComponent<CameraManager>().faction == faction)
+        {
+            m.SetColor("_Color", Color.green);
+        }
+        else
+        {
+            m.SetColor("_Color", Color.red);
+        }
+        ms.material = m;
+    }
+
+    public virtual void ReceiveMovementOrder(bool add, Vector2 pos, Quaternion rot)
+    {
+        if (add)
+        {
+            um.AddDestination(pos, rot);
+        }
+        else
+        {
+            um.SetDestination(pos, rot);
+        }
+    }
+
     public virtual void Die()
     {
         Destroy(transform.gameObject);

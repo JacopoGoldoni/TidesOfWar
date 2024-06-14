@@ -133,13 +133,13 @@ public class Match_AI : MonoBehaviour
             case MoveTo:
                 MoveTo o1 = (MoveTo)order;
                 unit = controlledRegiments[o1.unitID];
-                unit.SendOrder(false, o1.pos, o1.dir);
+                unit.ReceiveMovementOrder(false, o1.pos, o1.dir);
                 break;
 
             case FaceTarget:
                 FaceTarget o2 = (FaceTarget)order;
                 unit = controlledRegiments[o2.unitID];
-                unit.SendOrder(false, Utility.V3toV2(unit.transform.position), o2.dir);
+                unit.ReceiveMovementOrder(false, Utility.V3toV2(unit.transform.position), o2.dir);
                 break;
 
             case AttackEnemy:
@@ -182,7 +182,7 @@ public class Match_AI : MonoBehaviour
         }
         Quaternion rot = Quaternion.LookRotation((target.transform.position - o.transform.position).normalized, Vector3.up);
 
-        o.SendOrder(false, pos, rot);
+        o.ReceiveMovementOrder(false, pos, rot);
     }
 
 }

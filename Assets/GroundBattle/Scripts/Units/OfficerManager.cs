@@ -18,7 +18,6 @@ public class OfficerManager : UnitManager, IVisitable
     public Stats stats { get; private set; }
     public void Accept(IVisitor visitor) => visitor.Visit(this);
 
-    public bool drawPathLine = false;
 
     public CaptainManager masterCaptain;
 
@@ -57,6 +56,7 @@ public class OfficerManager : UnitManager, IVisitable
     [Header("Company movement")]
     public float Speed { get { return stats.Speed; } }
     public const float RunMultiplier = 1.5f;
+    public bool drawPathLine = false;
 
     [Header("Abilities")]
     public bool MultipleLineFire { get { return companyTemplate.MultipleFire; } }
@@ -75,39 +75,32 @@ public class OfficerManager : UnitManager, IVisitable
     public bool ShowSightLines = false;
     public bool ShowFormation = false;
 
+    //INITIALIZE
     public override void Initialize()
     {
+        //GET COMPONENTS
         ms = GetComponent<MeshRenderer>();
         um = GetComponent<OfficerMovement>();
-
         lineRenderer = GetComponent<LineRenderer>();
 
-        m = Instantiate(UnitMaterial);
+        //SET MATERIAL
+        InitializeMaterial();
 
-        if (Utility.Camera.GetComponent<CameraManager>().faction == faction)
-        {
-            m.SetColor("_Color", Color.green);
-        }
-        else
-        {
-            m.SetColor("_Color", Color.red);
-        }
-
-        ms.material = m;
-
-        OfficerStateMachine = new FiniteStateMachine();
-
+        //APPEND COMPANY FLAG
         Utility.Camera.GetComponent<UIManager>().AppendCompanyFlag(this);
-
-        if(Utility.Camera.GetComponent<CameraManager>().faction == faction)
+        //APPEND COMPANY CARD
+        if (Utility.Camera.GetComponent<CameraManager>().faction == faction)
         {
             Utility.Camera.GetComponent<UIManager>().AddCompanyCard(this);
         }
 
         InitializeStats();
         InitializeFormation();
-        StateMachineInitializer();
         SpawnCompanyPawns();
+
+        //INITIALIZE FINITE STATE MACHINE
+        OfficerStateMachine = new FiniteStateMachine();
+        FiniteStateMachineInitializer();
     }
     private void InitializeStats()
     {
@@ -125,12 +118,8 @@ public class OfficerManager : UnitManager, IVisitable
         companyFormation = new Line((int)companySize);
         companyBounds = CalculateCompanyBounds();
     }
-    public float GetCompanyWidth()
-    {
-        float width = companyFormation.Lines * companyFormation.a;
-        return width;
-    }
 
+    //SPAWN CONTROLLED PAWNS
     private void SpawnCompanyPawns()
     {
         for (int i = 0; i < companySize; i++)
@@ -185,29 +174,29 @@ public class OfficerManager : UnitManager, IVisitable
         //Stats.Mediator.Update(Time.deltaTime);
     }
 
+    //UTILITY METHODS
     private void DrawPathLine()
     {
         lineRenderer.enabled = drawPathLine;
 
-        if(drawPathLine)
+        if (drawPathLine)
         {
             NavMeshAgent na = um.navAgent;
 
             lineRenderer.positionCount = na.path.corners.Length;
             lineRenderer.SetPosition(0, transform.position);
 
-            if(na.path.corners.Length < 2)
+            if (na.path.corners.Length < 2)
             {
                 return;
             }
 
-            for(int i = 1; i < na.path.corners.Length; i++)
+            for (int i = 1; i < na.path.corners.Length; i++)
             {
                 lineRenderer.SetPosition(i, na.path.corners[i] + Vector3.up * 0.5f);
             }
         }
     }
-
     public void Highlight(bool highlight)
     {
         if(highlight)
@@ -217,17 +206,6 @@ public class OfficerManager : UnitManager, IVisitable
         else
         {
             m.SetInt("_Hightlight", 0);
-        }
-    }
-    public void SendOrder(bool add, Vector2 pos, Quaternion rot)
-    {
-        if(add)
-        {
-            um.AddDestination(pos, rot);
-        }
-        else
-        {
-            um.SetDestination(pos, rot);
         }
     }
     private void CalculateMorale()
@@ -262,12 +240,12 @@ public class OfficerManager : UnitManager, IVisitable
 
         return new Bounds(p, s);
     }
-
-    //FORMATION MANAGEMENT
     public bool IsDetached()
     {
         return (masterCaptain == null);
     }
+
+    //FORMATION MANAGEMENT
     private void CheckFormation()
     {
         //PAWNS DIED
@@ -435,8 +413,13 @@ public class OfficerManager : UnitManager, IVisitable
 
         return false;
     }
+    public float GetCompanyWidth()
+    {
+        float width = companyFormation.Lines * companyFormation.a;
+        return width;
+    }
 
-    //FIRE MANAGEMENT
+    //COMPANY FIRE MANAGEMENT
     public void SendFireMessage()
     {
         for (int i = 0; i < companySize; i++)
@@ -510,7 +493,7 @@ public class OfficerManager : UnitManager, IVisitable
     {
         return OfficerStateMachine.currentState;
     }
-    private void StateMachineInitializer()
+    private void FiniteStateMachineInitializer()
     {
         List<State> officerStates = new List<State>();
         List<Transition> officerTransitions = new List<Transition>();
@@ -526,7 +509,7 @@ public class OfficerManager : UnitManager, IVisitable
                     CheckFormation();
                     if (_formationChanged)
                     {
-                        SendOrder(false, Utility.V3toV2(transform.position), transform.rotation);
+                        ReceiveMovementOrder(false, Utility.V3toV2(transform.position), transform.rotation);
                         SendFormation();
                         _formationChanged = false;
                     }
@@ -734,6 +717,22 @@ public class OfficerManager : UnitManager, IVisitable
         }
 
         return null;
+    }
+    private int AlliedCompaniesInRange(float Range)
+    {
+        int n = 0;
+        foreach(OfficerManager om in GameUtility.GetAllCompanies())
+        {
+            if(om != this)
+            {
+                float distance = Utility.V3toV2(om.gameObject.transform.position - gameObject.transform.position).magnitude;
+                if(distance <= Range)
+                {
+                    n++;
+                }
+            }
+        }
+        return n;
     }
 
     //GIZMOS

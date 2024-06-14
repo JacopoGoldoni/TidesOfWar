@@ -454,7 +454,7 @@ public class UIManager : MonoBehaviour
                 f.a = cm.companies[1].companyFormation.Lines * cm.companies[1].companyFormation.a + 1f;
                 f.b = 0;
                 cm.SetFormation(f);
-                cm.SendOrder(false, Utility.V3toV2(cm.transform.position), cm.transform.rotation);
+                cm.ReceiveMovementOrder(false, Utility.V3toV2(cm.transform.position), cm.transform.rotation);
             }
         }
         else
@@ -467,7 +467,7 @@ public class UIManager : MonoBehaviour
                 OfficerManager of = cameraManagerRef.selectedCompanies[i];
                 Formation f = new Line(of.companySize);
                 of.SetFormation(f);
-                of.SendOrder(false, Utility.V3toV2(of.transform.position), of.transform.rotation);
+                of.ReceiveMovementOrder(false, Utility.V3toV2(of.transform.position), of.transform.rotation);
             }
         }
     }
@@ -499,7 +499,7 @@ public class UIManager : MonoBehaviour
                 f.a = width + 1f;
                 f.b = 5;
                 cm.SetFormation(f);
-                cm.SendOrder(false, Utility.V3toV2(cm.transform.position), cm.transform.rotation);
+                cm.ReceiveMovementOrder(false, Utility.V3toV2(cm.transform.position), cm.transform.rotation);
             }
         }
         else
@@ -512,7 +512,7 @@ public class UIManager : MonoBehaviour
                 OfficerManager of = cameraManagerRef.selectedCompanies[i];
                 Formation f = new Column(of.companySize);
                 of.SetFormation(f);
-                of.SendOrder(false, Utility.V3toV2(of.transform.position), of.transform.rotation);
+                of.ReceiveMovementOrder(false, Utility.V3toV2(of.transform.position), of.transform.rotation);
             }
         }
     }

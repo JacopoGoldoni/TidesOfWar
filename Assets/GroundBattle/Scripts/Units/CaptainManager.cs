@@ -6,14 +6,10 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class CaptainManager : UnitManager, IVisitable
+public class CaptainManager : UnitManager
 {
     //COMPONENTS
     LineRenderer lineRenderer;
-
-    //STATS
-    public Stats stats { get; private set; }
-    public void Accept(IVisitor visitor) => visitor.Visit(this);
 
     public bool drawPathLine = false;
 
@@ -40,7 +36,7 @@ public class CaptainManager : UnitManager, IVisitable
     public int battallionSize { get{return battalionTemplate.companies.Length;} }
 
     [Header("Battalion movement")]
-    public float Speed { get { return stats.Speed; } }
+    public float Speed = 1.5f;
     public const float RunMultiplier = 1.5f;
 
     [Header("Battalion state")]
@@ -54,50 +50,39 @@ public class CaptainManager : UnitManager, IVisitable
     public List<OfficerManager> companies = new List<OfficerManager>();
 
     [Header("Debug")]
-    public bool ShowSightLines = false;
-    public bool ShowFormation = false;
+    public bool ShowBattalionFormation = false;
+    public bool ShowCompanyFormations = false;
 
-    //INITIALIZE
     private void Awake()
     {
         Initialize();
     }
-    void Start()
-    {
-        InitializeFormation();
 
-        SpawnCompanyPawns();
-    }
-
+    //INITALIZE METHODS
     public override void Initialize()
     {
+        //GET COMPONENTS
         ms = GetComponent<MeshRenderer>();
         um = GetComponent<CaptainMovement>();
-
         lineRenderer = GetComponent<LineRenderer>();
 
-        m = Instantiate(UnitMaterial);
+        //SET MATERIAL
+        InitializeMaterial();
 
-        if (Utility.Camera.GetComponent<CameraManager>().faction == faction)
-        {
-            m.SetColor("_Color", Color.green);
-        }
-        else
-        {
-            m.SetColor("_Color", Color.red);
-        }
-
-        ms.material = m;
-
+        //APPEND BATTALION FLAG
         Utility.Camera.GetComponent<UIManager>().AppendBattalionFlag(this);
-
+        //APPEND BATTALION CARD
         if (Utility.Camera.GetComponent<CameraManager>().faction == faction)
         {
             Utility.Camera.GetComponent<UIManager>().AddBattalionCard(this);
         }
 
+        InitializeFormation();
+        SpawnCompanies();
+
+        //INITALIZE FINITE STATE MACHINE
         captainStateMachine = new FiniteStateMachine();
-        StateMachineInitializer();
+        FiniteStateMachineInitializer();
     }
     private void InitializeFormation()
     {
@@ -108,30 +93,8 @@ public class CaptainManager : UnitManager, IVisitable
         battalionFormation.a = companyFormation.a * companyFormation.Lines + 2f;
     }
 
-    public float GetBattalionWidth(float space)
-    {
-        float width = 0f;
-        
-        for(int r = 0; r < battalionFormation.Ranks; r++)
-        {
-            float w = 0f;
-            for (int i = 0; i < battalionFormation.Lines; i++)
-            {
-                OfficerManager m = companies[i];
-                w += m.companyFormation.Lines * m.companyFormation.a;
-            }
-            if(w > width)
-            {
-                width = w;
-            }
-        }
-        
-        width += space * (battalionFormation.Lines - 1);
-
-        return width;
-    }
-
-    private void SpawnCompanyPawns()
+    //SPAWN CONTROLLED COMPANIES
+    private void SpawnCompanies()
     {
         for (int i = 0; i < battallionSize; i++)
         {
@@ -156,15 +119,17 @@ public class CaptainManager : UnitManager, IVisitable
 
         officerManager.Initialize();
 
+        //SET GIZMOS VISIBILITY
+        officerManager.ShowFormation = ShowCompanyFormations;
+
         companies.Add(officerManager);
     }
 
-    //UPDATES
+    //UPDATES METHODS
     void Update()
     {
         //STATE MACHINE
         captainStateMachine.Update();
-
         stateName = captainStateMachine.currentState.name;
 
         //UPDATE TIMER
@@ -174,9 +139,10 @@ public class CaptainManager : UnitManager, IVisitable
     }
     private void UpdateTimers()
     {
-        //Stats.Mediator.Update(Time.deltaTime);
+        //stats.Mediator.Update(Time.deltaTime);
     }
 
+    //UTILITY METHODS
     private void DrawPathLine()
     {
         lineRenderer.enabled = drawPathLine;
@@ -199,7 +165,6 @@ public class CaptainManager : UnitManager, IVisitable
             }
         }
     }
-
     public void Highlight(bool highlight)
     {
         if(highlight)
@@ -211,16 +176,18 @@ public class CaptainManager : UnitManager, IVisitable
             m.SetInt("_Hightlight", 0);
         }
     }
-    public void SendOrder(bool add, Vector2 pos, Quaternion rot)
+    public float AvarageMorale()
     {
-        if (add)
+        float avarageMorale = 0f;
+        
+        foreach(OfficerManager om in companies)
         {
-            um.AddDestination(pos, rot);
+            avarageMorale += om.Morale;
         }
-        else
-        {
-            um.SetDestination(pos, rot);
-        }
+
+        avarageMorale /= companies.Count;
+
+        return avarageMorale;
     }
 
     //FORMATION MANAGEMENT
@@ -233,11 +200,13 @@ public class CaptainManager : UnitManager, IVisitable
         for (int i = 0; i < battallionSize; i++)
         {
             if (companies[i] != null)
-                companies[i].SendOrder(
+            {
+                companies[i].ReceiveMovementOrder(
                     false,
                     GetFormationCoords(i) + Utility.V3toV2(transform.position),
                     um.CurrentRotation()
                     );
+            }
         }
     }
     public Vector2 GetFormationCoords(int ID)
@@ -251,6 +220,28 @@ public class CaptainManager : UnitManager, IVisitable
         pos3 = rotation * pos3;
 
         return Utility.V3toV2(pos3);
+    }
+    public float GetBattalionWidth(float space)
+    {
+        float width = 0f;
+
+        for (int r = 0; r < battalionFormation.Ranks; r++)
+        {
+            float w = 0f;
+            for (int i = 0; i < battalionFormation.Lines; i++)
+            {
+                OfficerManager m = companies[i];
+                w += m.companyFormation.Lines * m.companyFormation.a;
+            }
+            if (w > width)
+            {
+                width = w;
+            }
+        }
+
+        width += space * (battalionFormation.Lines - 1);
+
+        return width;
     }
     public bool AreCompaniesIdle()
     {
@@ -266,9 +257,9 @@ public class CaptainManager : UnitManager, IVisitable
         }
         return true;
     }
-    public int GetPawnRank(int ID)
+    public int GetCompanyRank(int localID)
     {
-        return battalionFormation.GetRank(ID);
+        return battalionFormation.GetRank(localID);
     }
     public string GetFormationType()
     {
@@ -280,7 +271,7 @@ public class CaptainManager : UnitManager, IVisitable
     {
         return captainStateMachine.currentState;
     }
-    private void StateMachineInitializer()
+    private void FiniteStateMachineInitializer()
     {
         List<State> captainStates = new List<State>();
         List<Transition> captainTransitions = new List<Transition>();
@@ -295,7 +286,7 @@ public class CaptainManager : UnitManager, IVisitable
                 () => {
                     if (_formationChanged)
                     {
-                        SendOrder(false, Utility.V3toV2(transform.position), transform.rotation);
+                        ReceiveMovementOrder(false, Utility.V3toV2(transform.position), transform.rotation);
                         SendFormation();
                         _formationChanged = false;
                     }
@@ -374,15 +365,15 @@ public class CaptainManager : UnitManager, IVisitable
         captainStateMachine.Initialize();
     }
 
-    
     //GIZMOS
     public void OnDrawGizmos()
     {
-        if (ShowFormation)
+        if (ShowBattalionFormation)
             FormationGizmo();
     }
     private void FormationGizmo()
     {
+        if (battalionFormation == null) { return; }
         for (int i = 0; i < battallionSize; i++)
         {
             Gizmos.color = new Color(0, 1, 0, 0.5f);

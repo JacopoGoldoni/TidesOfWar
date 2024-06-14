@@ -252,7 +252,7 @@ public class CameraManager : MonoBehaviour
                 Quaternion rot = Quaternion.LookRotation(Utility.V2toV3(Orientation), Vector3.up);
 
                 //SEND ORDER
-                unit.SendOrder(Input.GetKey(KeyCode.LeftShift), pos, rot);
+                unit.ReceiveMovementOrder(Input.GetKey(KeyCode.LeftShift), pos, rot);
 
                 //UPDATE PROJECTIONS
                 //DeleteAllProjections();
@@ -280,7 +280,7 @@ public class CameraManager : MonoBehaviour
                 Quaternion rot = Quaternion.LookRotation(Utility.V2toV3(Orientation), Vector3.up);
 
                 //SEND ORDER
-                unit.SendOrder(Input.GetKey(KeyCode.LeftShift), pos, rot);
+                unit.ReceiveMovementOrder(Input.GetKey(KeyCode.LeftShift), pos, rot);
 
                 //UPDATE PROJECTIONS
                 //DeleteAllProjections();
@@ -305,7 +305,7 @@ public class CameraManager : MonoBehaviour
             }
             Quaternion rot = Quaternion.LookRotation((target.transform.position - o.transform.position).normalized, Vector3.up);
 
-            o.SendOrder(false, pos, rot);
+            o.ReceiveMovementOrder(false, pos, rot);
         }
     }
 
