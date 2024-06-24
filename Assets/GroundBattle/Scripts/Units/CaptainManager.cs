@@ -189,6 +189,17 @@ public class CaptainManager : UnitManager
 
         return avarageMorale;
     }
+    public int GetSize()
+    {
+        int size = 0;
+
+        foreach(OfficerManager company in companies)
+        {
+            size += company.companySize;
+        }
+
+        return size;
+    }
 
     //FORMATION MANAGEMENT
     public void SetFormation(Formation formation)
@@ -223,23 +234,18 @@ public class CaptainManager : UnitManager
     }
     public float GetBattalionWidth(float space)
     {
-        float width = 0f;
-
-        for (int r = 0; r < battalionFormation.Ranks; r++)
+        //GET LARGEST company
+        float w = 0f;
+        for(int i = 0; i < companies.Count; i++)
         {
-            float w = 0f;
-            for (int i = 0; i < battalionFormation.Lines; i++)
+            float l = companies[i].GetCompanyWidth();
+            if(l > w)
             {
-                OfficerManager m = companies[i];
-                w += m.companyFormation.Lines * m.companyFormation.a;
-            }
-            if (w > width)
-            {
-                width = w;
+                w = l;
             }
         }
 
-        width += space * (battalionFormation.Lines - 1);
+        float width = w * battalionFormation.Lines + (battalionFormation.Lines - 1) * space;
 
         return width;
     }
@@ -376,9 +382,9 @@ public class CaptainManager : UnitManager
         if (battalionFormation == null) { return; }
         for (int i = 0; i < battallionSize; i++)
         {
-            Gizmos.color = new Color(0, 1, 0, 0.5f);
+            Gizmos.color = new Color(0, 0, 1, 0.5f);
             Vector3 FormationSlot = Utility.V2toV3(GetFormationCoords(i)) + transform.position;
-            Gizmos.DrawSphere(FormationSlot, 0.2f);
+            Gizmos.DrawSphere(FormationSlot, companies[i].GetCompanyWidth() / 2);
         }
     }
 }

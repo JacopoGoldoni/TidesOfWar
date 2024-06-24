@@ -1,16 +1,11 @@
-using Newtonsoft.Json.Serialization;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.ShaderKeywordFilter;
 using UnityEngine;
 using UnityEngine.AI;
 
 public class ArmyManager : MonoBehaviour
 {
-    [Header("Army infos")]
-    public int ID;
-    public string TAG = "FRA";
-    public string armyName;
+    Army army;
 
     NavMeshAgent agent;
 
@@ -28,7 +23,14 @@ public class ArmyManager : MonoBehaviour
     {
         destination = Utility.V3toV2(transform.position);
         direction = Utility.V3toV2(transform.forward);
+
+        ArmyInitialize();
     }
+    private void ArmyInitialize()
+    {
+        army = new Army();
+    }
+
     private void PositionArmy()
     {
         RaycastHit hit;

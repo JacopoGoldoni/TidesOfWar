@@ -375,6 +375,17 @@ public class UIManager : MonoBehaviour
             }
         }
     }
+    public void HighlightBattalionCard(int battalionID, bool highlight)
+    {
+        for (int i = 0; i < battalionCards.Count; i++)
+        {
+            if (battalionCards[i].Item1.battalionNumber == battalionID)
+            {
+                battalionCards[i].Item2.HighLight(highlight);
+                return;
+            }
+        }
+    }
 
     //BATTALION CARD HOLDER MANAGEMENT
     private void BattalionCardHolderCheck()

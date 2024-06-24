@@ -32,4 +32,16 @@ public class BattalionCardManager : MonoBehaviour
     {
         ammoSlider.value = (float)ammo / (float)maxAmmo;
     }
+
+    public void HighLight(bool highlight)
+    {
+        if (highlight)
+        {
+            cardImage.color = Color.yellow;
+        }
+        else
+        {
+            cardImage.color = Color.white;
+        }
+    }
 }

@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
 using System;
 using System.Linq;
+using Newtonsoft.Json.Linq;
 
 public class CameraManager : MonoBehaviour
 {
@@ -20,7 +21,12 @@ public class CameraManager : MonoBehaviour
     List<float> sizes = new List<float>();
     List<Mesh> sm = new List<Mesh>();
 
+    [Header("Player info")]
     public Factions faction = Factions.France;
+
+    [Header("Formation")]
+    public float battalionSpace = 4f;
+    public float companySpace = 2f;
 
     //COMPONENTS
     Camera camera;
@@ -198,6 +204,7 @@ public class CameraManager : MonoBehaviour
         DeselectAllCompanies();
 
         uimanager.BattalionCommandTabCheck();
+        uimanager.HighlightBattalionCard(t.battalionNumber, true);
     }
     public void DeselectBattalion(Transform target)
     {
@@ -206,6 +213,7 @@ public class CameraManager : MonoBehaviour
         t.Highlight(false);
 
         uimanager.BattalionCommandTabCheck();
+        uimanager.HighlightBattalionCard(t.battalionNumber, false);
     }
     public void DeselectAllBattalions()
     {
@@ -215,6 +223,7 @@ public class CameraManager : MonoBehaviour
             foreach (CaptainManager t in selectedBattalions)
             {
                 t.Highlight(false);
+                uimanager.HighlightBattalionCard(t.battalionNumber, false);
             }
         }
 
@@ -229,19 +238,35 @@ public class CameraManager : MonoBehaviour
 
         if(selectedCompanies.Count != 0)
         {
+            float comapnyFormationWidth = 0f;
+            //CALCULATE SELECTED FORMATION WIDTH
+            for (int i = 0; i < selectedCompanies.Count; i++)
+            {
+                comapnyFormationWidth += companySpace + selectedCompanies[i].GetCompanyWidth();
+            }
+            Debug.Log(comapnyFormationWidth);
+
             //COMPANY MOVEMENT ORDER
             for (int i = 0; i < selectedCompanies.Count; i++)
             {
                 OfficerManager unit = selectedCompanies[i];
-                
 
-                float space = 1f;
+                float localX = 0f;
+                for (int j = 0; j <= i; j++)
+                {
+                    if(j == i)
+                    {
+                        localX += companySpace + selectedCompanies[j].GetCompanyWidth() / 2f;
+                    }
+                    else
+                    {
+                        localX += companySpace + selectedCompanies[j].GetCompanyWidth();
+                    }
+                }
 
-                Vector2 pos =
-                    new Vector2(OrderPoint.x, OrderPoint.z) +
-                    UtilityMath.RotateVector2(Orientation) * 
-                    (((float)i - (float)(selectedCompanies.Count - 1) * 0.5f) * 
-                    (unit.GetCompanyWidth() / 2f + space));
+                Vector2 relativePos = UtilityMath.RotateVector2(Orientation) * (localX - comapnyFormationWidth / 2f);
+
+                Vector2 pos = Utility.V3toV2(OrderPoint) + relativePos;
 
 
                 if (unit.IsObstructedAt(pos))
@@ -263,19 +288,34 @@ public class CameraManager : MonoBehaviour
         }
         else
         {
+            float battalioFormationWidth = 0f;
+            //CALCULATE SELECTED FORMATION WIDTH
+            for(int i = 0; i < selectedBattalions.Count; i++)
+            {
+                battalioFormationWidth += battalionSpace + selectedBattalions[i].GetBattalionWidth(battalionSpace);
+            }
+
             //BATTALION MOVEMENT ORDER
             for (int i = 0; i < selectedBattalions.Count; i++)
             {
                 CaptainManager unit = selectedBattalions[i];
 
-                float space = 2f;
+                float localX = 0f;
+                for(int j = 0; j <= i; j++)
+                {
+                    if (j == i)
+                    {
+                        localX += battalionSpace + selectedBattalions[j].GetBattalionWidth(battalionSpace) / 2f;
+                    }
+                    else
+                    {
+                        localX += battalionSpace + selectedBattalions[j].GetBattalionWidth(battalionSpace);
+                    }
+                }
 
+                Vector2 relativePos = UtilityMath.RotateVector2(Orientation) * (localX - battalioFormationWidth / 2f);
 
-                Vector2 pos =
-                    new Vector2(OrderPoint.x, OrderPoint.z) +
-                    UtilityMath.RotateVector2(Orientation) * 
-                    (((float)i - (float)(selectedBattalions.Count - 1) * 0.5f) * 
-                    (unit.GetBattalionWidth(space) + space));
+                Vector2 pos = Utility.V3toV2(OrderPoint) + relativePos;
 
                 Quaternion rot = Quaternion.LookRotation(Utility.V2toV3(Orientation), Vector3.up);
 

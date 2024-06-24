@@ -18,6 +18,15 @@ public static class GameUtility
 
         return companiesRef;
     }
+    public static List<CaptainManager> GetAllBattalions()
+    {
+        if (battallionsRef == null || battallionsRef.Count == 0)
+        {
+            battallionsRef = (Object.FindObjectsByType<CaptainManager>(FindObjectsSortMode.None)).ToList<CaptainManager>();
+        }
+
+        return battallionsRef;
+    }
 
     public static void RegisterCompany(OfficerManager om)
     {
@@ -27,6 +36,10 @@ public static class GameUtility
     public static OfficerManager GetCompanyByID(int ID)
     {
         return companiesRef[ID];
+    }
+    public static CaptainManager GetBattalionByID(int ID)
+    {
+        return battallionsRef[ID];
     }
 
     public static int GetIDOfCompany(OfficerManager om)

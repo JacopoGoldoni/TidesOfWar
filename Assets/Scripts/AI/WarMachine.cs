@@ -8,88 +8,170 @@ using UnityEngine;
 
 public class WarMachine
 {
-    private List<Sensor> sensorsInput = new List<Sensor>();
+    Match_AI match_AI_Ref;
 
-    //INTERFACE FUNCTIONS
-    public void PopulateSensors(Sensor s)
+    Factions faction;
+
+    private HighLevelTacticalProcesessor HLTP;
+    List<LowLevelTacticalProcessor> LLTPs;
+
+    private List<StrategicAction> currentStrategy;
+    public List<TacticAction> currentTactics;
+
+    public enum Stance { Aggressive, Defensive }
+    public Stance stance = Stance.Aggressive;
+
+    public void Initialize()
     {
-        sensorsInput.Add(s);
+        HLTP = new HighLevelTacticalProcesessor(this);
+        LLTPs = new List<LowLevelTacticalProcessor>();
     }
-    public void ClearSensors()
+
+    public void Populate_HLTP_BlackBoard()
     {
-        sensorsInput.Clear();
+
     }
-    public List<TacticAction> Plan()
+    public void Populate_LLTP_BlackBoard()
     {
-        return HLTP.PlanHighLevelTactic(sensorsInput);
+        foreach(LowLevelTacticalProcessor LLTP in LLTPs)
+        {
+            
+        }
     }
 
 
+    public void Execute_HLTP()
+    {
+        HLTP.EvaluateHighLevelSituation();
+        HLTP.CalculatePriorities();
+        currentStrategy = HLTP.PlanHighLevelTactic();
+    }
+    public void Execute_LLTPs()
+    {
+        currentTactics = new List<TacticAction>();
+        foreach(LowLevelTacticalProcessor LLTP in LLTPs)
+        {
+            currentTactics.AddRange(LLTP.PlanLowLevelTactic());
+        }
+    }
 
     //HLTP
     private class HighLevelTacticalProcesessor
     {
-        List<FriendlySensor> friendlySensors = new List<FriendlySensor>();
-        List<HostileSensor> hostileSensors = new List<HostileSensor>();
-        public List<TacticAction> PlanHighLevelTactic(List<Sensor> sensors)
+        WarMachine warMachine_Ref;
+
+        BlackBoard blackBoard = new BlackBoard();
+
+        public HighLevelTacticalProcesessor(WarMachine warMachine)
         {
-            List<TacticAction> plan = new List<TacticAction>();
+            warMachine_Ref = warMachine;
+        }
 
-            //Split sensors
-            foreach(Sensor s in sensors)
-            {
-                if(s.GetType() == typeof(FriendlySensor))
-                {
-                    friendlySensors.Add((FriendlySensor)s);
-                }
-            }
-            foreach (Sensor s in sensors)
-            {
-                if (s.GetType() == typeof(HostileSensor))
-                {
-                    hostileSensors.Add((HostileSensor)s);
-                }
-            }
+        public List<StrategicAction> PlanHighLevelTactic()
+        {
+            List<StrategicAction> plan = new List<StrategicAction>();
 
-            //LOGIC
-            //Attack nearest enemy
-            plan = AttackNearest();
+            //TODO :HL LOGIC
+            if((float)blackBoard.GetData("forceRatio") >= 1f)
+            {
+                //ATTACK
+                List<int> battalions = new List<int>();
+                foreach(CaptainManager cm in warMachine_Ref.match_AI_Ref.controlledBattalions)
+                {
+                    battalions.Add(cm.battalionNumber);
+                }
+
+                plan.Add(new AttackEnemyTroops(battalions.ToArray()));
+                warMachine_Ref.stance = Stance.Aggressive;
+            }
+            else
+            {
+                //RETREAT
+                plan.Add(new Retreat());
+                warMachine_Ref.stance = Stance.Defensive;
+            }
 
             return plan;
         }
-
-        List<TacticAction> AttackNearest()
+        public void PopulateBlackBoard(Factions faction)
         {
-            List<TacticAction> orders = new List<TacticAction>();
-            foreach (FriendlySensor s in friendlySensors)
+            int alliedForce = 0;
+            int enemyForce = 0;
+
+            //CALCULATE FORCES STRENGHT
+            foreach(OfficerManager om in GameUtility.GetAllCompanies())
             {
-                AttackEnemy order = new AttackEnemy();
-                order.unitID = s.unitID;
-
-                float currentDistance = float.MaxValue;
-                int currentEnemyID = 0;
-                foreach (HostileSensor h in hostileSensors)
+                if(om.faction == faction)
                 {
-                    float distance = (s.pos - h.pos).magnitude;
-                    if (distance < currentDistance)
-                    {
-                        currentDistance = distance;
-                        currentEnemyID = h.unitID;
-                    }
+                    alliedForce += om.companySize;
                 }
-                order.enemyID = currentEnemyID;
-
-                orders.Add(order);
+                else
+                {
+                    enemyForce += om.companySize;
+                }
             }
-            return orders;
+            blackBoard.AddData("alliedForce", alliedForce);
+            blackBoard.AddData("enemyForce", enemyForce);
+        }
+        public void CalculatePriorities()
+        {
+            //TODO: calculate priority of all units and flags
+        }
+        public float EvaluateHighLevelSituation()
+        {
+            float forceRatio = (float)blackBoard.GetData("alliedForces") / (float)blackBoard.GetData("enemyForces");
+            blackBoard.AddData("forceRatio", forceRatio);
+
+            return forceRatio;
         }
     }
-    private HighLevelTacticalProcesessor HLTP = new HighLevelTacticalProcesessor();
 
     //LLTP
     private class LowLevelTacticalProcessor
     {
+        WarMachine warMachine_Ref;
 
+        int battalionID;
+        BlackBoard blackBoard = new BlackBoard();
+        Stance stance;
+
+        public LowLevelTacticalProcessor(int battalionID, WarMachine warMachine)
+        {
+            this.battalionID = battalionID;
+            warMachine_Ref = warMachine;
+        }
+        
+        public void PopulateBlackBoard()
+        {
+            CaptainManager cm = GameUtility.GetBattalionByID(battalionID);
+
+            blackBoard.AddData("size", cm.GetSize());
+            blackBoard.AddData("pos", Utility.V3toV2(cm.transform.position));
+            blackBoard.AddData("dir", Utility.V3toV2(cm.transform.forward).normalized);
+        }
+
+        public List<TacticAction> PlanLowLevelTactic() 
+        {
+            List<TacticAction> plan = new List<TacticAction>();
+
+            //TODO :TACTICAL LOGIC
+            StrategicAction strategicAction = warMachine_Ref.currentStrategy[0];
+            if (strategicAction.GetType() == typeof(AttackEnemyTroops))
+            {
+                //ATTACK NEAREST
+                AttackNearest attackNearestOrder = new AttackNearest();
+                attackNearestOrder.unitID = battalionID;
+                plan.Add(attackNearestOrder);
+            }
+            else if(strategicAction.GetType() == typeof(Retreat))
+            {
+                //RETREAT UNIT
+                MoveTo MoveToOrder = new MoveTo();
+                MoveToOrder.unitID = battalionID;
+                plan.Add(MoveToOrder);
+            }
+
+            return plan;
+        }
     }
-    List<LowLevelTacticalProcessor> LLTP;
 }

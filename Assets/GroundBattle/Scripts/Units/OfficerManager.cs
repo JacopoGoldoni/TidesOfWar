@@ -142,7 +142,7 @@ public class OfficerManager : UnitManager, IVisitable
         pawnManager.ID = pawns.Count - 1;
         pawnManager.faction = faction;
 
-        pawnMovememnt.MovementSpeed = Speed * 1.1f;
+        pawnMovememnt.MovementSpeed = Speed * 1.5f;
 
         pawnManager.name = "Company" + companyNumber.ToString() + "_" + pawnManager.ID;
 
@@ -415,7 +415,7 @@ public class OfficerManager : UnitManager, IVisitable
     }
     public float GetCompanyWidth()
     {
-        float width = companyFormation.Lines * companyFormation.a;
+        float width = (companyFormation.Lines - 1) * companyFormation.a;
         return width;
     }
 

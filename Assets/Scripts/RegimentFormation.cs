@@ -17,16 +17,16 @@ public abstract class Formation
 
     public int GetRank(int ID)
     {
-        int y = (ID / Lines + 1);
+        int r = (ID / Lines + 1);
 
-        return y;
+        return r;
     }
 
     public int GetLine(int ID)
     {
-        int y = (ID % Lines);
+        int l = (ID % Lines);
 
-        return y;
+        return l;
     }
 
     public void SetSizeByRanks(int size, int ranks)
