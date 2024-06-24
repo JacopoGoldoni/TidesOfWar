@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Services.CloudSave.Models.Data.Player;
 using UnityEngine;
 
 public class Army
@@ -11,6 +12,20 @@ public class Army
     private const int reinforcementPerLevel = 20;
 
     public List<Battalion> battalions;
+
+    public Army(string TAG)
+    {
+        this.TAG = TAG;
+        WorldUtility.AppendArmy(this);
+
+        Initialize();
+    }
+
+    private void Initialize()
+    {
+        //GENERATE ARMY NAME
+        armyName = TAG + ID;
+    }
 
     public int GetArmySize()
     {

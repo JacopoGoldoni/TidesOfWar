@@ -13,6 +13,10 @@ public static class WorldUtility
     static Law[] laws;
     static Technology[] techs;
 
+    //ARMY & NAVY
+    static List<Army> armies = new List<Army>();
+    static List<Fleet> Fleets = new List<Fleet>();
+
     //MAPS
     static Texture2D rasterizedMap;
 
@@ -257,5 +261,35 @@ public static class WorldUtility
         }
 
         return palette.ToArray();
+    }
+
+    //ARMY & NAVY METHODS
+    public static void AppendArmy(Army army)
+    {
+        army.ID = armies.Count;
+        armies.Add(army);
+    }
+    public static Army GetArmyByID(int ID)
+    {
+        return armies[ID];
+    }
+    public static Army[] GetArmiesByTAG(string TAG)
+    {
+        List<Army> foundArmies = new List<Army>(armies.FindAll(a => a.TAG == TAG));
+        return foundArmies.ToArray();
+    }
+    public static void AppendFleet(Fleet fleet)
+    {
+        fleet.ID = Fleets.Count;
+        Fleets.Add(fleet);
+    }
+    public static Fleet GetFleetByID(int ID)
+    {
+        return Fleets[ID];
+    }
+    public static Fleet[] GetFleetsByTAG(string TAG)
+    {
+        List<Fleet> foundFleet = new List<Fleet>(Fleets.FindAll(f => f.TAG == TAG));
+        return foundFleet.ToArray();
     }
 }

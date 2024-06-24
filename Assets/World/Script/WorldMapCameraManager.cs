@@ -17,7 +17,6 @@ public class WorldMapCameraManager : MonoBehaviour
     WorldUIManager worldUIManager;
     LineRenderer lineRenderer;
 
-
     int UILayer;
 
     void Start()
@@ -112,12 +111,12 @@ public class WorldMapCameraManager : MonoBehaviour
             if(selectedArmies.Contains(a))
             {
                 selectedArmies.Remove(a);
-                worldUIManager.RemoveArmyCard(a.ID);
+                worldUIManager.RemoveArmyCard(a.army.ID);
             }
             else
             {
                 selectedArmies.Add(a);
-                worldUIManager.AddArmyCard(a.ID);
+                worldUIManager.AddArmyCard(a.army.ID);
             }
         }
         else
@@ -126,7 +125,7 @@ public class WorldMapCameraManager : MonoBehaviour
             worldUIManager.ClearArmyCard();
 
             selectedArmies.Add(a);
-            worldUIManager.AddArmyCard(a.ID);
+            worldUIManager.AddArmyCard(a.army.ID);
         }
     }
     private Vector3 TraceForDestination()
