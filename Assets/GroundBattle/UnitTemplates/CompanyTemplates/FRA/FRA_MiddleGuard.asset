@@ -13,17 +13,19 @@ MonoBehaviour:
   m_Name: FRA_MiddleGuard
   m_EditorClassIdentifier: 
   type: 0
-  RegimentSize: 75
+  hardness: 0
+  officerPrefab: {fileID: 0}
+  CompanySize: 0
   OfficerMesh: {fileID: 0}
-  PawnMesh: {fileID: 0}
-  RegimentIcon: {fileID: 0}
+  SoldierMesh: {fileID: 0}
+  CompanyIcon: LineInfantry
   BaseMorale: 100
   Precision: 12
+  Range: 0
   Speed: 2
   MaxAmmo: 50
   MeleeAttack: 0
   MeleeDefense: 0
   MultipleFire: 1
   Fortification: 1
-  SquareFormation: 1
   Skirmish: 0

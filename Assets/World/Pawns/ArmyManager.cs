@@ -26,9 +26,13 @@ public class ArmyManager : MonoBehaviour
 
         ArmyInitialize();
     }
-    private void ArmyInitialize()
+
+    public int GetArmyID() { return army.ID; }
+
+    public void ArmyInitialize()
     {
         army = new Army();
+        agent.enabled = true;
     }
 
     private void PositionArmy()

@@ -51,6 +51,9 @@ public class Battalion
 
     public List<Company> companies = new List<Company>();
 
+    public bool Deployed;
+    public int HomeBarrack;
+
     public void Initialize(BattalionTemplate bt)
     {
         template = bt;

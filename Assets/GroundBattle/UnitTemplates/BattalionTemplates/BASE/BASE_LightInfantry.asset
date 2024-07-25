@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: BASE_LightInfantry
   m_EditorClassIdentifier: 
   type: 0
+  battalionType: 1
+  BattalionIcon: LightInfantry
   companies:
   - {fileID: 11400000, guid: 1fed02cf791645a4d8b4dba56dc5af17, type: 2}
   - {fileID: 11400000, guid: 98cf56784d492b147be01735c1caf6dc, type: 2}

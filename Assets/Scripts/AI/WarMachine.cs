@@ -99,7 +99,7 @@ public class WarMachine
             int enemyForce = 0;
 
             //CALCULATE FORCES STRENGHT
-            foreach(OfficerManager om in GameUtility.GetAllCompanies())
+            foreach(OfficerManager om in GroundBattleUtility.GetAllCompanies())
             {
                 if(om.faction == faction)
                 {
@@ -143,7 +143,7 @@ public class WarMachine
         
         public void PopulateBlackBoard()
         {
-            CaptainManager cm = GameUtility.GetBattalionByID(battalionID);
+            CaptainManager cm = GroundBattleUtility.GetBattalionByID(battalionID);
 
             blackBoard.AddData("size", cm.GetSize());
             blackBoard.AddData("pos", Utility.V3toV2(cm.transform.position));

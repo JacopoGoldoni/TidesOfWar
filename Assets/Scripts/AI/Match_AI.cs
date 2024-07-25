@@ -68,7 +68,7 @@ public class Match_AI : MonoBehaviour
 
     private void GetCompanies()
     {
-        foreach(OfficerManager o in GameUtility.GetAllCompanies())
+        foreach(OfficerManager o in GroundBattleUtility.GetAllCompanies())
         {
             if(o.faction == faction)
             {
@@ -82,7 +82,7 @@ public class Match_AI : MonoBehaviour
     }
     private void GetBattalions()
     {
-        foreach (CaptainManager o in GameUtility.GetAllBattalions())
+        foreach (CaptainManager o in GroundBattleUtility.GetAllBattalions())
         {
             if (o.faction == faction)
             {

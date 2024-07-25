@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: BASE_LineInfantry
   m_EditorClassIdentifier: 
   type: 0
+  BattalionIcon: LineInfantry
   companies:
   - {fileID: 11400000, guid: 2bfdd6aa94461604fb6921fca755f665, type: 2}
   - {fileID: 11400000, guid: 6070203ac32ec7f499070e62c0e723bb, type: 2}

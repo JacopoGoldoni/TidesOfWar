@@ -6,9 +6,17 @@ using UnityEngine;
 public class BattalionTemplate : ScriptableObject
 {
     public UnitType type;
+    public BattalionType battalionType;
+    public string BattalionIcon;
 
     public CompanyTemplate[] companies;
 
     [Header("Abilities")]
     public bool SquareFormation;
+}
+
+public enum BattalionType
+{
+    Line,
+    Light
 }

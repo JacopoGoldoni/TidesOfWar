@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: BASE_LineInfantry
   m_EditorClassIdentifier: 
   type: 0
+  hardness: 1
   officerPrefab: {fileID: 1622135471481153879, guid: 992e891c3975e994aaddbef655bcf49b,
     type: 3}
   CompanySize: 120
@@ -20,7 +21,7 @@ MonoBehaviour:
     type: 3}
   SoldierMesh: {fileID: -5836900086478109309, guid: 728f8898744e77048a7ff5529d0e4a59,
     type: 3}
-  CompanyIcon: {fileID: 0}
+  CompanyIcon: LineInfantry
   BaseMorale: 100
   Precision: 12
   Range: 0

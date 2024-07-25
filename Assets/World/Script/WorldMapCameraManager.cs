@@ -6,7 +6,9 @@ using UnityEngine.InputSystem;
 
 public class WorldMapCameraManager : MonoBehaviour
 {
-    public InputAction playerControls;
+    public PlayerInputActions playerControls;
+    private InputAction timeScale_Axis;
+    private InputAction pauseButton;
 
     public List<ArmyManager> selectedArmies = new List<ArmyManager>();
 
@@ -17,16 +19,45 @@ public class WorldMapCameraManager : MonoBehaviour
     WorldUIManager worldUIManager;
     LineRenderer lineRenderer;
 
+    //REFS
+    public WorldManager worldManager;
 
     int UILayer;
+
+    [Header("Army management paramenters")]
+    public float movementPathDisplacement = 1f;
+
+    private void OnEnable()
+    {
+        playerControls.Enable();
+
+        timeScale_Axis = playerControls.Player.TimeScale;
+        timeScale_Axis.Enable();
+
+        pauseButton = playerControls.Player.Pause;
+        pauseButton.Enable();
+    }
+
+    private void OnDisable()
+    {
+        playerControls.Disable();
+
+        timeScale_Axis.Disable();
+        pauseButton.Disable();
+    }
+
+    private void Awake()
+    {
+        camera = Utility.Camera;
+        worldUIManager = GetComponent<WorldUIManager>();
+        lineRenderer = GetComponent<LineRenderer>();
+
+        playerControls = new PlayerInputActions();
+    }
 
     void Start()
     {
         UILayer = LayerMask.NameToLayer("UI");
-
-        camera = Utility.Camera;
-        worldUIManager = GetComponent<WorldUIManager>();
-        lineRenderer = GetComponent<LineRenderer>();
 
         Initialize_UI();
     }
@@ -35,6 +66,7 @@ public class WorldMapCameraManager : MonoBehaviour
     {
         worldUIManager.CloseRegionTab();
         worldUIManager.CloseBuildingTab();
+        worldUIManager.SetTimeScale(worldManager.timeScaleIndex);
     }
 
     private void Update()
@@ -72,8 +104,19 @@ public class WorldMapCameraManager : MonoBehaviour
         {
             selectedArmies.Clear();
         }
+        if (timeScale_Axis.triggered)
+        {
+            worldManager.timeScaleIndex += (int)timeScale_Axis.ReadValue<float>();
+            worldManager.timeScaleIndex = Mathf.Clamp(worldManager.timeScaleIndex, 0, 3);
 
-        //TODO DRAW MOVEMENT PREVIEW
+            worldUIManager.SetTimeScale(worldManager.timeScaleIndex);
+        }
+        if (pauseButton.triggered)
+        {
+            worldManager.pausedGame = !worldManager.pausedGame;
+            worldUIManager.SetPausePlay(worldManager.pausedGame);
+        }
+
         if(selectedArmies.Count != 0)
         {
             Ray ray = GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
@@ -86,7 +129,11 @@ public class WorldMapCameraManager : MonoBehaviour
                 lineRenderer.enabled = true;
 
                 lineRenderer.positionCount = navMeshPath.corners.Length;
-                lineRenderer.SetPositions(navMeshPath.corners);
+
+                for(int i = 0; i < navMeshPath.corners.Length; i++)
+                {
+                    lineRenderer.SetPosition(i, navMeshPath.corners[i] + new Vector3(0,movementPathDisplacement,0));
+                }
             }
         }
         else
@@ -112,12 +159,12 @@ public class WorldMapCameraManager : MonoBehaviour
             if(selectedArmies.Contains(a))
             {
                 selectedArmies.Remove(a);
-                worldUIManager.RemoveArmyCard(a.ID);
+                worldUIManager.RemoveArmyCard(a.GetArmyID());
             }
             else
             {
                 selectedArmies.Add(a);
-                worldUIManager.AddArmyCard(a.ID);
+                worldUIManager.AddArmyCard(a.GetArmyID());
             }
         }
         else
@@ -126,7 +173,7 @@ public class WorldMapCameraManager : MonoBehaviour
             worldUIManager.ClearArmyCard();
 
             selectedArmies.Add(a);
-            worldUIManager.AddArmyCard(a.ID);
+            worldUIManager.AddArmyCard(a.GetArmyID());
         }
     }
     private Vector3 TraceForDestination()

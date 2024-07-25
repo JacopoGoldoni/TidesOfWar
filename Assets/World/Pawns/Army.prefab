@@ -43,7 +43,7 @@ NavMeshAgent:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4090402244252568163}
-  m_Enabled: 1
+  m_Enabled: 0
   m_AgentTypeID: -1372625422
   m_Radius: 0.15
   m_Speed: 3.5
@@ -122,9 +122,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a242913550252846a4d2c2ef6986d87, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ID: 0
-  TAG: FRA
-  armyName: 
   destination: {x: 0, y: 0}
   direction: {x: 0, y: 0}
 --- !u!136 &9008957623952135019

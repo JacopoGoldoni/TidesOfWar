@@ -13,17 +13,20 @@ MonoBehaviour:
   m_Name: FRA_Voltigeurs
   m_EditorClassIdentifier: 
   type: 0
+  hardness: 0
+  officerPrefab: {fileID: 1622135471481153879, guid: 992e891c3975e994aaddbef655bcf49b,
+    type: 3}
   CompanySize: 120
   OfficerMesh: {fileID: 0}
   SoldierMesh: {fileID: 0}
-  CompanyIcon: {fileID: 0}
+  CompanyIcon: LightInfantry
   BaseMorale: 100
   Precision: 12
+  Range: 0
   Speed: 2
   MaxAmmo: 50
   MeleeAttack: 0
   MeleeDefense: 0
   MultipleFire: 1
   Fortification: 1
-  SquareFormation: 1
   Skirmish: 0

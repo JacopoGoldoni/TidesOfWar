@@ -6,6 +6,7 @@ using UnityEngine;
 public class CompanyTemplate : ScriptableObject
 {
     public UnitType type;
+    public UnitHardness hardness;
 
     public GameObject officerPrefab;
 
@@ -14,7 +15,7 @@ public class CompanyTemplate : ScriptableObject
     [Header("Esthetics")]
     public Mesh OfficerMesh;
     public Mesh SoldierMesh;
-    public Sprite CompanyIcon;
+    public string CompanyIcon;
 
     [Header("STATS")]
     public int BaseMorale;
@@ -34,6 +35,11 @@ public class CompanyTemplate : ScriptableObject
 public enum UnitType
 {
     Infantry,
-    Cavalry,
-    Artillery
+    Cavalry
+}
+public enum UnitHardness
+{
+    Light,
+    Medium,
+    Heavy
 }

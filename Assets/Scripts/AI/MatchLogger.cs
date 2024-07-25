@@ -19,7 +19,7 @@ public class MatchLogger : MonoBehaviour
     {
         if(registrate)
         {
-            foreach(OfficerManager om in GameUtility.GetAllCompanies())
+            foreach(OfficerManager om in GroundBattleUtility.GetAllCompanies())
             {
                 if(trackedRegiments.Contains(om))
                 {
