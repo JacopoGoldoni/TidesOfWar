@@ -24,7 +24,7 @@ MonoBehaviour:
     type: 3}
   CompanyIcon: Artillery
   BatterySize: 4
-  BaseMorale: 0
+  BaseMorale: 100
   Precision: 0
   Range: 0
   Speed: 2

@@ -9,7 +9,7 @@ public class ArtilleryMovement : UnitMovement
         Initialize();
     }
 
-    private void Update()
+    public void UpdateMovement()
     {
         UpdateMove();
 

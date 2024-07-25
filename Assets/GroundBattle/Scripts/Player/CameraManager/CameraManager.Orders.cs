@@ -65,19 +65,19 @@ public partial class CameraManager : MonoBehaviour
             //BATTALION
 
             float[] battalionPositions = new float[selectedBattalions.Count]; ;
-            float battalioFormationWidth = 0f;
+            float battalionFormationWidth = 0f;
 
-            battalioFormationWidth += selectedBattalions[0].battalionFormation.GetWidth() / 2f;
-            battalionPositions[0] = battalioFormationWidth;
-            battalioFormationWidth += selectedBattalions[0].battalionFormation.GetWidth() / 2f;
+            battalionFormationWidth += selectedBattalions[0].battalionFormation.GetWidth() / 2f;
+            battalionPositions[0] = battalionFormationWidth;
+            battalionFormationWidth += selectedBattalions[0].battalionFormation.GetWidth() / 2f;
 
             //CALCULATE SELECTED FORMATION WIDTH
             for (int i = 1; i < selectedBattalions.Count; i++)
             {
-                battalioFormationWidth += battalionSpace;
-                battalioFormationWidth += selectedBattalions[i].battalionFormation.GetWidth() / 2f;
-                battalionPositions[i] = battalioFormationWidth;
-                battalioFormationWidth += selectedBattalions[i].battalionFormation.GetWidth() / 2f;
+                battalionFormationWidth += battalionSpace;
+                battalionFormationWidth += selectedBattalions[i].battalionFormation.GetWidth() / 2f;
+                battalionPositions[i] = battalionFormationWidth;
+                battalionFormationWidth += selectedBattalions[i].battalionFormation.GetWidth() / 2f;
             }
 
             //BATTALION MOVEMENT ORDER
@@ -85,7 +85,7 @@ public partial class CameraManager : MonoBehaviour
             {
                 CaptainManager unit = selectedBattalions[i];
 
-                Vector2 relativePos = UtilityMath.RotateVector2(Orientation) * (battalionPositions[i] - battalioFormationWidth / 2f);
+                Vector2 relativePos = UtilityMath.RotateVector2(Orientation) * (battalionPositions[i] - battalionFormationWidth / 2f);
 
                 Vector2 pos = Utility.V3toV2(OrderPoint) + relativePos;
 
@@ -93,40 +93,35 @@ public partial class CameraManager : MonoBehaviour
 
                 //SEND ORDER
                 unit.ReceiveMovementOrder(Input.GetKey(KeyCode.LeftShift), pos, rot);
-
-                ShowOrderArrow = false;
             }
+            ShowOrderArrow = false;
         }
         else if (selectedArtilleryBatteries.Count != 0)
         {
             //ARTILLERY BATTERY
 
-            float artilleryBattaryFormationWidth = 0f;
+            float[] artilleryBatteryPositions = new float[selectedArtilleryBatteries.Count]; ;
+            float artilleryBatteryFormationWidth = 0f;
+
+            artilleryBatteryFormationWidth += selectedArtilleryBatteries[0].GetWidth() / 2f;
+            artilleryBatteryPositions[0] = artilleryBatteryFormationWidth;
+            artilleryBatteryFormationWidth += selectedArtilleryBatteries[0].GetWidth() / 2f;
+
             //CALCULATE SELECTED FORMATION WIDTH
-            for (int i = 0; i < selectedArtilleryBatteries.Count; i++)
+            for (int i = 1; i < selectedArtilleryBatteries.Count; i++)
             {
-                artilleryBattaryFormationWidth += artilleryBatterySpace + selectedArtilleryBatteries[i].GetWidth();
+                artilleryBatteryFormationWidth += battalionSpace;
+                artilleryBatteryFormationWidth += selectedArtilleryBatteries[i].GetWidth() / 2f;
+                artilleryBatteryPositions[i] = artilleryBatteryFormationWidth;
+                artilleryBatteryFormationWidth += selectedArtilleryBatteries[i].GetWidth() / 2f;
             }
 
-            //COMPANY MOVEMENT ORDER
+            //BATTALION MOVEMENT ORDER
             for (int i = 0; i < selectedArtilleryBatteries.Count; i++)
             {
                 ArtilleryOfficerManager unit = selectedArtilleryBatteries[i];
 
-                float localX = 0f;
-                for (int j = 0; j <= i; j++)
-                {
-                    if (j == i)
-                    {
-                        localX += artilleryBatterySpace + selectedArtilleryBatteries[j].GetWidth() / 2f;
-                    }
-                    else
-                    {
-                        localX += artilleryBatterySpace + selectedArtilleryBatteries[j].GetWidth();
-                    }
-                }
-
-                Vector2 relativePos = UtilityMath.RotateVector2(Orientation) * (localX - artilleryBattaryFormationWidth / 2f);
+                Vector2 relativePos = UtilityMath.RotateVector2(Orientation) * (artilleryBatteryPositions[i] - artilleryBatteryFormationWidth / 2f);
 
                 Vector2 pos = Utility.V3toV2(OrderPoint) + relativePos;
 
@@ -134,12 +129,7 @@ public partial class CameraManager : MonoBehaviour
 
                 //SEND ORDER
                 unit.ReceiveMovementOrder(Input.GetKey(KeyCode.LeftShift), pos, rot);
-
-                //UPDATE PROJECTIONS
-                //DeleteAllProjections();
-                //ProjectAll();
             }
-
             ShowOrderArrow = false;
         }
     }

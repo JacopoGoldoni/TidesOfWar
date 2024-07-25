@@ -142,6 +142,7 @@ MonoBehaviour:
   UnitMesh: {fileID: -1277366460620338370, guid: 2dee33fd68d527d49997a23c5e1cefb5,
     type: 3}
   UnitMaterial: {fileID: 2100000, guid: 2136bb957162a8446b0f8bd2ed644df3, type: 2}
+  Killable: 0
   masterArtillery: {fileID: 0}
   ID: 0
 --- !u!114 &4586783925874501289
@@ -156,7 +157,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 611187c7854055c419d5e53170c3d162, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  navAgent: {fileID: 0}
+  navAgent: {fileID: 1586456324525980965}
   um: {fileID: 0}
   direction: {x: 0, y: 0, z: 0}
   rotationVector: {x: 0, y: 0, z: 0}

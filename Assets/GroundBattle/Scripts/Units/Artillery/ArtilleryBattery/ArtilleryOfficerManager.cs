@@ -28,7 +28,6 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
     [Header("Battery formation")]
     public Formation batteryFormation;
     private bool _formationChanged = false;
-    public int batterySize = 4;
     public Bounds batteryBounds;
 
     [Header("Battery combact")]
@@ -94,28 +93,28 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
     private void InitializeStats()
     {
         //INITIALIZE STATS
-        //stats = new Stats(new StatsMediator(), companyTemplate);
+        stats = new Stats(new StatsMediator(), artilleryBatteryTemplate);
 
         um.MovementSpeed = Speed;
-        batterySize = Mathf.CeilToInt(artilleryBatteryTemplate.BatterySize * GameUtility.UNIT_SCALE);
         Ammo = MaxAmmo;
         Morale = artilleryBatteryTemplate.BaseMorale;
         Range = artilleryBatteryTemplate.Range;
     }
     private void InitializeFormation()
     {
-        batteryFormation = new Line(batterySize);
-        batteryFormation.SetSizeByRanks(batterySize, 1);
+        batteryFormation = new Line(artilleryBatteryTemplate.BatterySize);
+        batteryFormation.SetSizeByRanks(artilleryBatteryTemplate.BatterySize, 1);
+        batteryFormation.a = 2f;
         batteryBounds = CalculateCompanyBounds();
     }
 
     //SPAWN CONTROLLED PAWNS
     public void SpawnBatteryCannons()
     {
-        for (int i = 0; i < batterySize; i++)
+        for (int i = 0; i < artilleryBatteryTemplate.BatterySize; i++)
         {
             Vector2 v2 = GetFormationCoords(i);
-            SpawnCannons(Utility.V2toV3(v2) + transform.position);
+            SpawnCannons(Utility.V2toV3(v2) + transform.position - Vector3.up * 0.2f);
         }
     }
     private void SpawnCannons(Vector3 pos)
@@ -152,9 +151,9 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
         CalculateMorale();
 
         //STATE MACHINE
-        //artilleryBatteryStateMachine.Update();
+        artilleryBatteryStateMachine.Update();
 
-        //stateName = artilleryBatteryStateMachine.currentState.name;
+        stateName = artilleryBatteryStateMachine.currentState.name;
 
         //UPDATE TIMER
         UpdateTimers();
@@ -208,9 +207,9 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
                 null,
                 () => {
                     //MOVEMENT BEHAVIOUR
-                    ((OfficerMovement)um).UpdateMovement();
+                    ((ArtilleryOfficerMovement)um).UpdateMovement();
 
-                    //PAWN MOVEMENT
+                    //CANNONS MOVEMENT
                     SendFormation();
                 }
             );
@@ -241,10 +240,10 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
                 "Fleeing",
                 () => {
 
-                    Vector3 fleePos = (transform.position - targetCompany.transform.position).normalized + transform.position;
-                    Quaternion fleeRot = Quaternion.LookRotation((transform.position - targetCompany.transform.position).normalized, Vector3.up);
+                    //Vector3 fleePos = (transform.position - targetCompany.transform.position).normalized + transform.position;
+                    //Quaternion fleeRot = Quaternion.LookRotation((transform.position - targetCompany.transform.position).normalized, Vector3.up);
 
-                    um.SetDestination(Utility.V3toV2(fleePos), fleeRot);
+                    //um.SetDestination(Utility.V3toV2(fleePos), fleeRot);
                 },
                 null,
                 () => 
@@ -275,11 +274,7 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
                 Idle,
                 Moving,
                 () => {
-                    if (um.MovementPoints.Count != 0)
-                    {
-                        return true;
-                    }
-                    return false;
+                    return um.MovementPoints.Count != 0;
                 }
             );
         artilleryOfficerTransitions.Add( IdleMoving );
@@ -288,11 +283,7 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
                 Moving,
                 Idle,
                 () => {
-                    if (um.MovementPoints.Count == 0)
-                    {
-                        return true;
-                    }
-                    return false;
+                    return um.MovementPoints.Count == 0;
                 }
             );
         artilleryOfficerTransitions.Add( MovingIdle );
@@ -410,7 +401,7 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
     }
     private void FormationGizmo()
     {
-        for (int i = 0; i < batterySize; i++)
+        for (int i = 0; i < artilleryBatteryTemplate.BatterySize; i++)
         {
             Gizmos.color = new Color(0, 1, 0, 0.5f);
             Vector3 FormationSlot = Utility.V2toV3(GetFormationCoords(i)) + transform.position;

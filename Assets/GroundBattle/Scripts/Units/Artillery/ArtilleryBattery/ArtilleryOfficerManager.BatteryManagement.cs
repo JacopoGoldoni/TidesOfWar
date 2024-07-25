@@ -111,7 +111,7 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
     }
     public void SendFormation()
     {
-        for (int i = 0; i < batterySize; i++)
+        for (int i = 0; i < artilleryBatteryTemplate.BatterySize; i++)
         {
             if (cannons[i] != null)
                 cannons[i].MoveTo(
@@ -205,7 +205,7 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
     }
     public void SendRelaodMessage()
     {
-        for (int i = 0; i < batterySize; i++)
+        for (int i = 0; i < artilleryBatteryTemplate.BatterySize; i++)
         {
             if (GetCannonRank(i) == 1)
             {
@@ -218,7 +218,7 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
     public bool CheckLoadedStatus()
     {
         //TRUE IF ALL LOADED, FALSE IF AT LEAST ONE IS NOT LOADED
-        for (int i = 0; i < batterySize; i++)
+        for (int i = 0; i < artilleryBatteryTemplate.BatterySize; i++)
         {
             if (cannons[i] != null)
             {
@@ -233,7 +233,7 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
     public bool CheckUnLoadedStatus()
     {
         //TRUE IF ALL UNLOADED, FALSE IF AT LEAST ONE IS LOADED
-        for (int i = 0; i < batterySize; i++)
+        for (int i = 0; i < artilleryBatteryTemplate.BatterySize; i++)
         {
             if (GetCannonRank(i) == 1)
             {

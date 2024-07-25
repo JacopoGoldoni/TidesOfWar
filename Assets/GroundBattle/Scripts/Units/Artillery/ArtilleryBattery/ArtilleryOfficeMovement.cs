@@ -15,7 +15,7 @@ public class ArtilleryOfficerMovement : UnitMovement
 
     public override void Initialize()
     {
-        um = GetComponent<OfficerManager>();
+        um = GetComponent<ArtilleryOfficerManager>();
         navAgent = GetComponent<NavMeshAgent>();
     }
 
@@ -46,7 +46,7 @@ public class ArtilleryOfficerMovement : UnitMovement
             if (!IsRotating())
             {
                 //NOT ROTATING
-                if (((OfficerManager)um).ArePawnIdle())
+                if (((ArtilleryOfficerManager)um).AreCannonsIdle())
                 {
                     //ALL REGIMENT ARRIVED AT DESTINATION
                     if (MovementPoints.Count > 1)

@@ -11,7 +11,7 @@ public class ArtilleryCrewManager : UnitManager
     public override void Initialize()
     {
         ms = GetComponent<MeshRenderer>();
-        um = GetComponent<ArtilleryMovement>();
+        um = GetComponent<ArtilleryCrewMovement>();
 
         Material m = Instantiate(UnitMaterial);
 
@@ -30,11 +30,6 @@ public class ArtilleryCrewManager : UnitManager
     public void MoveTo(Vector2 dest, Quaternion quat)
     {
         um.SetDestination(dest, quat);
-    }
-
-    public void Update()
-    {
-        
     }
 
     public void Die()

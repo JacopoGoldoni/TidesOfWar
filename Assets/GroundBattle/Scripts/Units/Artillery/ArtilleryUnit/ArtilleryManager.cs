@@ -79,19 +79,15 @@ public class ArtilleryManager : UnitManager, IVisitable
         artilleryStateMachine = new FiniteStateMachine();
         StateMachineInitializer();
 
-        //SpawnCrew();
+        SpawnCrew();
     }
 
     public void MoveTo(Vector2 dest, Quaternion quat)
     {
-        if (IsOnCarriage)
-        {
-            um.SetDestination(dest, quat);
-        }
+        um.SetDestination(dest, quat);
     }
 
     //CREW
-    /*
     private void SpawnCrew()
     {
         for (int i = 0; i < crewSize; i++)
@@ -100,7 +96,6 @@ public class ArtilleryManager : UnitManager, IVisitable
             SpawnCrewPawn(Utility.V2toV3(v2) + transform.position);
         }
     }
-    */
     private void SpawnCrewPawn(Vector3 pos)
     {
         GameObject crewMember = Instantiate(crewPrefab);
@@ -127,6 +122,11 @@ public class ArtilleryManager : UnitManager, IVisitable
     public void Update()
     {
         UpdateTimers();
+
+        //STATE MACHINE
+        artilleryStateMachine.Update();
+
+        stateName = artilleryStateMachine.currentState.name;
     }
 
     //UPDATERS
@@ -222,83 +222,41 @@ public class ArtilleryManager : UnitManager, IVisitable
                 null
             );
         artilleryStates.Add(Idle);
-        //MOUNT
-        State Mounting = new State(
-                "Mount",
-                null,
-                null,
-                null
-            );
-        artilleryStates.Add(Mounting);
-        //DISMOUNT
-        State Dismounting = new State(
-                "Mount",
-                null,
-                null,
-                null
-            );
-        artilleryStates.Add(Dismounting);
-        //MOUNTED
-        State Mounted = new State(
-                "Mounted",
-                null,
-                null,
-                null
-            );
-        artilleryStates.Add(Dismounting);
         //MOVE
-        State Move = new State(
-                "Move",
+        State Moving = new State(
+                "Moving",
                 null,
                 null,
-                null
+                () =>
+                {
+                    //MOVEMENT BEHAVIOUR
+                    ((ArtilleryMovement)um).UpdateMovement();
+
+                    //CREW MOVEMENT
+                    SendFormation();
+                }
             );
+        artilleryStates.Add(Moving);
 
         //TRANSITIONS
-        //IDLE -> MOUNTING
-        Transition IdleMounting = new Transition(
+        //IDLE -> MOVING
+        Transition IdleMoving = new Transition(
                 Idle,
-                Mounting,
+                Moving,
                 () => {
-                    return false;
+                    return um.MovementPoints.Count != 0;
                 }
             );
-        artilleryTransitions.Add(IdleMounting);
-        //MOUNTING -> MOUNTED
-        Transition MountingMounted = new Transition(
-                Mounting,
-                Mounted,
-                () => {
-                    return false;
-                }
-            );
-        artilleryTransitions.Add(MountingMounted);
-        //MOUNTED -> DISMOUNTING
-        Transition MountedDismounting = new Transition(
-                Mounted,
-                Dismounting,
-                () => {
-                    return false;
-                }
-            );
-        artilleryTransitions.Add(MountedDismounting);
-        //DISMOUNTING -> IDLE
-        Transition DismountingIdle = new Transition(
-                Dismounting,
+        artilleryTransitions.Add(IdleMoving);
+        //MOVING -> IDLE
+        Transition MovingIdle = new Transition(
+                Moving,
                 Idle,
                 () => {
-                    return false;
+                    return um.MovementPoints.Count == 0;
                 }
             );
-        artilleryTransitions.Add(DismountingIdle);
-        //MOUNTED -> MOVE
-        Transition MountedMove = new Transition(
-                Mounted,
-                Move,
-                () => {
-                    return false;
-                }
-            );
+        artilleryTransitions.Add(MovingIdle);
 
 
         artilleryStateMachine.AddStates(artilleryStates);
@@ -307,6 +265,32 @@ public class ArtilleryManager : UnitManager, IVisitable
         artilleryStateMachine.initialState = Idle;
 
         artilleryStateMachine.Initialize();
+    }
+
+    private Vector2 GetFormationCoords(int ID)
+    {
+        Vector2 pos2 = Vector2.up * (1 + ID);
+
+        pos2.y *= -1;
+
+        Vector3 pos3 = Utility.V2toV3(pos2);
+
+        Quaternion rotation = transform.rotation;
+
+        pos3 = rotation * pos3;
+
+        return Utility.V3toV2(pos3);
+    }
+
+    private void SendFormation()
+    {
+        for (int i = 0; i < crew.Count; i++)
+        {
+            if (crew[i] != null)
+            {
+                crew[i].MoveTo(GetFormationCoords(i) + Utility.V3toV2(transform.position),um.CurrentRotation());
+            } 
+        }
     }
 
     //GIZMOS

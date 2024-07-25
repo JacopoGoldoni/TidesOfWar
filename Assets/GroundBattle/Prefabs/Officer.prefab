@@ -31,7 +31,7 @@ Transform:
   m_GameObject: {fileID: 1622135471481153879}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.2692527, y: 0.433, z: -0.759}
+  m_LocalPosition: {x: 1.2692527, y: 0.2, z: -0.759}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -111,7 +111,7 @@ MonoBehaviour:
   UnitMaterial: {fileID: 2100000, guid: ef561f36c67d42c4dbea3f3a2082e033, type: 2}
   Killable: 0
   companyTemplate: {fileID: 0}
-  drawPathLine: 0
+  ID: 0
   masterCaptain: {fileID: 0}
   pawnPrefab: {fileID: 1997580412286425343, guid: b8496d99f613dc542aa07b81cf37d467,
     type: 3}
@@ -124,6 +124,7 @@ MonoBehaviour:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
   Ammo: 50
+  drawPathLine: 0
   FireAll: 1
   targetCompany: {fileID: 0}
   stateName: 
