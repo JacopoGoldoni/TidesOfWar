@@ -128,7 +128,7 @@ public class PawnManager : UnitManager
 
         Vector3 FireDirection = transform.forward;
 
-        UnitManager target = masterOfficer.targetCompany;
+        UnitManager target = masterOfficer.targetUnit;
 
         float targetWidth = target.GetWidth();
         Vector3 targetPos = target.transform.position;

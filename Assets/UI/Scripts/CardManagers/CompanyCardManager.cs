@@ -21,7 +21,7 @@ public class CompanyCardManager : MonoBehaviour, IPointerEnterHandler, IPointerE
     {
         bg = GetComponent<Image>();
         companyRef = company;
-        companyRef.companyCardManager = this;
+        companyRef.companyCardRef = this;
 
         SetFlag(company.faction);
         SetUnit(company.companyTemplate.CompanyIcon);

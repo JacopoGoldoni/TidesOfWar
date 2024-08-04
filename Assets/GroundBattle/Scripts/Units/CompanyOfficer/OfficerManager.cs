@@ -20,6 +20,7 @@ public partial class OfficerManager : UnitManager, IVisitable
     public int ID;
 
     public CaptainManager masterCaptain;
+    public CompanyCardManager companyCardRef;
 
     [Header("Pawns")]
     public GameObject pawnPrefab;
@@ -66,7 +67,7 @@ public partial class OfficerManager : UnitManager, IVisitable
 
     [Header("Company state")]
     public bool FireAll = true;
-    public OfficerManager targetCompany = null;
+    public UnitManager targetUnit = null;
     private FiniteStateMachine OfficerStateMachine;
     public string stateName;
     public int Morale;
@@ -76,18 +77,30 @@ public partial class OfficerManager : UnitManager, IVisitable
     public bool ShowSightLines = false;
     public bool ShowFormation = false;
 
-    //SELECTION DESELECTION DETACH
+    //SELECTION DESELECTION DETACH ATTACH
     public override void OnSelection()
     {
-        
+        companyCardRef.HighLight(true);
     }
     public override void OnDeselection()
     {
-        
+        companyCardRef.HighLight(false);
     }
     public void Detach()
-    { 
-        
+    {
+        masterCaptain.battalionFormation.LineCompanies.Remove(this);
+        masterCaptain.battalionFormation.RearCompanies.Remove(this);
+        masterCaptain.battalionFormation.FrontCompanies.Remove(this);
+
+        masterCaptain = null;
+
+        Utility.Camera.GetComponent<CameraManager>().uimanager.UpdateCompanyCommandStatus();
+    }
+    public void Attach(CaptainManager battalion)
+    {
+        masterCaptain = battalion;
+
+        masterCaptain.battalionFormation.AddCompany(this);
     }
 
     //INITIALIZE
@@ -220,20 +233,37 @@ public partial class OfficerManager : UnitManager, IVisitable
                     }
                 },
                 null,
-                null
+                () =>
+                {
+                    targetUnit = EnemyInRange(Range);
+                }
             );
         officerStates.Add(Idle);
         //MOVING
         State Moving = new State(
                 "Moving",
-                null,
+                () =>
+                {
+                    if (companyFormation.name == "Column")
+                    {
+                        InitializeSnakeFormation();
+                    }
+                },
                 null,
                 () => {
                     //MOVEMENT BEHAVIOUR
                     ((OfficerMovement)um).UpdateMovement();
 
                     //PAWN MOVEMENT
-                    SendFormation();
+                    if(companyFormation.name == "Column")
+                    {
+                        UpdateSnakeFormation();
+                        SendSnakeFormation();
+                    }
+                    else
+                    {
+                        SendFormation();
+                    }
                 }
             );
         officerStates.Add(Moving);
@@ -263,8 +293,8 @@ public partial class OfficerManager : UnitManager, IVisitable
                 "Fleeing",
                 () => {
 
-                    Vector3 fleePos = (transform.position - targetCompany.transform.position).normalized + transform.position;
-                    Quaternion fleeRot = Quaternion.LookRotation((transform.position - targetCompany.transform.position).normalized, Vector3.up);
+                    Vector3 fleePos = (transform.position - targetUnit.transform.position).normalized + transform.position;
+                    Quaternion fleeRot = Quaternion.LookRotation((transform.position - targetUnit.transform.position).normalized, Vector3.up);
 
                     um.SetDestination(Utility.V3toV2(fleePos), fleeRot);
                 },
@@ -323,7 +353,7 @@ public partial class OfficerManager : UnitManager, IVisitable
                 Idle,
                 Firing,
                 () => {
-                    if (targetCompany != null && CheckLoadedStatus() && GetFormationType() == "Line")
+                    if (targetUnit != null && CheckLoadedStatus() && GetFormationType() == "Line")
                     {
                         return true;
                     }
@@ -382,7 +412,7 @@ public partial class OfficerManager : UnitManager, IVisitable
     }
 
     //SENSING
-    private OfficerManager EnemyInRange(float Range)
+    private UnitManager EnemyInRange(float Range)
     {
         float R2 = 5f;
         Vector3 Start = transform.position + transform.up * 1 + transform.forward * -R2;
