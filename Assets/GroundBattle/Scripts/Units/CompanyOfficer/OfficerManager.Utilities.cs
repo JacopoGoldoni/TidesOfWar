@@ -5,6 +5,10 @@ using UnityEngine.AI;
 
 public partial class OfficerManager : UnitManager, IVisitable
 {
+    public override float GetWidth()
+    {
+        return (companyFormation.Lines - 1) * companyFormation.a;
+    }
     private void DrawPathLine()
     {
         lineRenderer.enabled = drawPathLine;

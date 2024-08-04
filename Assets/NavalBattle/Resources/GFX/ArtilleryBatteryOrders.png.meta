@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 098e7145b3e47bd4e92aeffe45e61ec5
+guid: 4fefbc0be4b2f454a906e85f221d0252
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -97,7 +97,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: CompanyOrders_0
+      name: ArtilleryBatteryOrders_0
       rect:
         serializedVersion: 2
         x: 0
@@ -111,14 +111,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e43a427d9a632fd4b9dd869916720617
-      internalID: -1048698807
+      spriteID: 329394c60812a104d869bba106bcab1e
+      internalID: 888101246
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: CompanyOrders_1
+      name: ArtilleryBatteryOrders_1
       rect:
         serializedVersion: 2
         x: 36
@@ -132,14 +132,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 59c6db2577f3f4845874f31ddb6ca93c
-      internalID: 1918760082
+      spriteID: d20da4f59c805ae4e9f6da9ad433f0f5
+      internalID: -886185909
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: CompanyOrders_2
+      name: ArtilleryBatteryOrders_2
       rect:
         serializedVersion: 2
         x: 72
@@ -153,14 +153,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 46932820ebf6e5646bd73f187cd3ae46
-      internalID: -526239805
+      spriteID: 7f34602c0552e1e4ba3cb283624a1c90
+      internalID: 414926338
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: CompanyOrders_3
+      name: ArtilleryBatteryOrders_3
       rect:
         serializedVersion: 2
         x: 108
@@ -174,14 +174,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ceceb9ae7832d86469aa3d863899ef4a
-      internalID: -1790380010
+      spriteID: c1683e03772b9dd489af6ebe24dfda70
+      internalID: 986379609
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: CompanyOrders_4
+      name: ArtilleryBatteryOrders_4
       rect:
         serializedVersion: 2
         x: 144
@@ -195,14 +195,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: bc9a6ec4fac271a43a282f6e1493d76b
-      internalID: -2119789146
+      spriteID: d1e633b084409574892d6332ec723efb
+      internalID: 40471279
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: CompanyOrders_5
+      name: ArtilleryBatteryOrders_5
       rect:
         serializedVersion: 2
         x: 180
@@ -216,29 +216,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 57173c2d31759b74b80e93b80550e76f
-      internalID: -218078611
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: CompanyOrders_6
-      rect:
-        serializedVersion: 2
-        x: 216
-        y: 0
-        width: 36
-        height: 36
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: e2fa7380cc6599b4f845238e217fda38
-      internalID: -47165141
+      spriteID: c4f0d1b502b3dd34cb0bac1fda54681f
+      internalID: -2069437667
       vertices: []
       indices: 
       edges: []
@@ -246,7 +225,7 @@ TextureImporter:
     outline: []
     physicsShape: []
     bones: []
-    spriteID: f835ef8c67b428547b6c8639fef9abcb
+    spriteID: d70af5ce459d25a4a86755201c963784
     internalID: 0
     vertices: []
     indices: 
@@ -254,13 +233,12 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      CompanyOrders_0: -1048698807
-      CompanyOrders_1: 1918760082
-      CompanyOrders_2: -526239805
-      CompanyOrders_3: -1790380010
-      CompanyOrders_4: -2119789146
-      CompanyOrders_5: -218078611
-      CompanyOrders_6: -47165141
+      ArtilleryBatteryOrders_0: 888101246
+      ArtilleryBatteryOrders_1: -886185909
+      ArtilleryBatteryOrders_2: 414926338
+      ArtilleryBatteryOrders_3: 986379609
+      ArtilleryBatteryOrders_4: 40471279
+      ArtilleryBatteryOrders_5: -2069437667
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

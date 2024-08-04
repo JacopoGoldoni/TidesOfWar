@@ -10,6 +10,7 @@ public class CompanyFlagManager : MonoBehaviour, IPointerClickHandler, IPointerE
     public OfficerManager companyRef;
     public Image flagImage;
     public Image unitIconImage;
+    public Image unitFireStatusImage;
 
     public void Initialize(OfficerManager om)
     {
@@ -20,6 +21,22 @@ public class CompanyFlagManager : MonoBehaviour, IPointerClickHandler, IPointerE
         unitIconImage.sprite = unitIconSprite;
 
         companyRef = om;
+
+        SetFireStatusImage();
+    }
+
+    public void SetFireStatusImage()
+    {
+        if(companyRef.FireAll)
+        {
+            //FIRE ALL
+            unitFireStatusImage.sprite = GFXUtility.GetSpriteSheet("CompanyOrders")[3];
+        }
+        else
+        {
+            //HOLD FIRE
+            unitFireStatusImage.sprite = GFXUtility.GetSpriteSheet("CompanyOrders")[4];
+        }
     }
 
     private void CompanyFlagAction()
@@ -43,6 +60,11 @@ public class CompanyFlagManager : MonoBehaviour, IPointerClickHandler, IPointerE
             cameraManagerRef.SelectCompany(companyRef);
         }
     }
+    public void OnFlagMiddleClicked()
+    {
+        Utility.Camera.GetComponent<CameraManager>().SendAttackOrder(companyRef.gameObject);
+    }
+
     public void OnPointerClick(PointerEventData eventData)
     {
         switch (eventData.button)
@@ -57,17 +79,14 @@ public class CompanyFlagManager : MonoBehaviour, IPointerClickHandler, IPointerE
                 break;
         }
     }
-    public void OnFlagMiddleClicked()
-    {
-        Utility.Camera.GetComponent<CameraManager>().SendAttackOrder(companyRef.gameObject);
-    }
+    
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        flagImage.color = new Color(1f, 1f, 1f, 0.8f);
+
     }
     public void OnPointerExit(PointerEventData eventData)
     {
-        flagImage.color = new Color(1f, 1f, 1f, 0.5f);
+
     }
 }

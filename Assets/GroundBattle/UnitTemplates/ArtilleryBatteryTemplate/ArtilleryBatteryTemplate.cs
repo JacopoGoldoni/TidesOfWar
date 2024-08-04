@@ -15,13 +15,15 @@ public class ArtilleryBatteryTemplate : ScriptableObject
     public Mesh ArtilleryOfficerMesh;
     public Mesh CannonMesh;
     public Mesh CrewMesh;
-    public string CompanyIcon;
+    public string ArtilleryBatteryIcon;
 
     [Header("STATS")]
     public int BatterySize;
+    public int CarriageSize;
     public int BaseMorale;
     public int Precision;
     public int Range;
+    public float ReloadTime;
     public int Speed;
     public int MaxAmmo;
     public int MeleeAttack;

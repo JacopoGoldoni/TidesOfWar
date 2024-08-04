@@ -29,14 +29,13 @@ public partial class UIManager : MonoBehaviour
         CompanyCard.transform.parent = companyCardHolder.transform;
 
         CompanyCardManager companyCardManager = CompanyCard.GetComponent<CompanyCardManager>();
-        companyCardManager.SetAmmoSlider(company.Ammo, company.MaxAmmo);
-        companyCardManager.Initialize(company.faction);
+        companyCardManager.Initialize(company);
 
         companyCards.Add((company, companyCardManager));
 
         //Displacement
         Vector2 cardSize = CompanyCardPrefab.GetComponent<RectTransform>().sizeDelta;
-        companyCardHolder.GetComponent<RectTransform>().sizeDelta = new Vector2(companyCards.Count * cardSize.x + 10, cardSize.y + 10);
+        //companyCardHolder.GetComponent<RectTransform>().sizeDelta = new Vector2(companyCards.Count * cardSize.x + 10, cardSize.y + 10);
 
         CompanyCardHolderCheck();
     }

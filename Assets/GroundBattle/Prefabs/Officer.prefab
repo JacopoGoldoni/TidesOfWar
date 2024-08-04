@@ -110,6 +110,7 @@ MonoBehaviour:
     type: 3}
   UnitMaterial: {fileID: 2100000, guid: ef561f36c67d42c4dbea3f3a2082e033, type: 2}
   Killable: 0
+  sightMeshFilter: {fileID: 3527839363118081194}
   companyTemplate: {fileID: 0}
   ID: 0
   masterCaptain: {fileID: 0}
@@ -363,7 +364,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: e7170e2dab1d5a24995ea29f309302e5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

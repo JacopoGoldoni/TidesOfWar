@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b279b946f5cb7b4d9fda0447c8491be, type: 3}
+  m_Name: BASE_HeavyArtillery
+  m_EditorClassIdentifier: 
+  type: 0
+  hardness: 2
+  artilleryOfficerPrefab: {fileID: 1622135471481153879, guid: 9c69f5e92b6a2684ba92953ebbc12163,
+    type: 3}
+  ArtilleryOfficerMesh: {fileID: 4064786809506695948, guid: 84504a8247ebf044c84f362232097cb8,
+    type: 3}
+  CannonMesh: {fileID: 2959467708922500008, guid: 2537f3e8befa52743be40a4b25467a78,
+    type: 3}
+  CrewMesh: {fileID: -1277366460620338370, guid: 2dee33fd68d527d49997a23c5e1cefb5,
+    type: 3}
+  ArtilleryBatteryIcon: Artillery
+  BatterySize: 4
+  CarriageSize: 2
+  BaseMorale: 100
+  Precision: 0
+  Range: 200
+  ReloadTime: 60
+  Speed: 2
+  MaxAmmo: 30
+  MeleeAttack: 0
+  MeleeDefense: 0
+  ExplosiveShells: 0
+  GrapeShots: 0

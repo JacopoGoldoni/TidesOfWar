@@ -19,7 +19,6 @@ public partial class CaptainManager : UnitManager
 
     [Header("Battalion formation")]
     public BattalionTemplate battalionTemplate;
-    private Formation _battalionFormation;
     public BattalionFormation battalionFormation;
     private bool _formationChanged = false;
     public int battallionSize { get{return battalionTemplate.companies.Length;} }
@@ -42,6 +41,7 @@ public partial class CaptainManager : UnitManager
     public bool InitializationDebug = false;
     public bool ShowBattalionFormation = false;
     public bool ShowCompanyFormations = false;
+    public bool ShowCompaniesSightLines = false;
 
     private void Awake()
     {
@@ -52,7 +52,7 @@ public partial class CaptainManager : UnitManager
     public override void Initialize()
     {
         //GET COMPONENTS
-        ms = GetComponent<MeshRenderer>();
+        mr = GetComponent<MeshRenderer>();
         um = GetComponent<CaptainMovement>();
         lineRenderer = GetComponent<LineRenderer>();
 
@@ -90,6 +90,8 @@ public partial class CaptainManager : UnitManager
             companies[i].transform.position = Utility.V2toV3(GetFormationCoords(companies[i])) + transform.position;
             companies[i].SpawnCompanyPawns();
         }
+
+        UpdateFire();
     }
 
     //SPAWN CONTROLLED COMPANIES
@@ -110,8 +112,11 @@ public partial class CaptainManager : UnitManager
 
         officerManager.Initialize();
 
+        officer.name = "Offier_" + officerManager.companyNumber;
+
         //SET GIZMOS VISIBILITY
         officerManager.ShowFormation = ShowCompanyFormations;
+        officerManager.ShowSightLines = ShowCompaniesSightLines;
 
         companies.Add(officerManager);
 
@@ -237,6 +242,21 @@ public partial class CaptainManager : UnitManager
         captainStateMachine.initialState = Idle;
 
         captainStateMachine.Initialize();
+    }
+
+    public override void OnSelection()
+    {
+        foreach(OfficerManager om in companies)
+        {
+            om.OnSelection();
+        }
+    }
+    public override void OnDeselection()
+    {
+        foreach (OfficerManager om in companies)
+        {
+            om.OnDeselection();
+        }
     }
 
     //GIZMOS

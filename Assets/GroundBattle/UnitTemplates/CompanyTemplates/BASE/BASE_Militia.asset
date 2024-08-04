@@ -22,7 +22,7 @@ MonoBehaviour:
   CompanyIcon: LineInfantry
   BaseMorale: 60
   Precision: 20
-  Range: 0
+  Range: 20
   Speed: 2
   MaxAmmo: 50
   MeleeAttack: 0

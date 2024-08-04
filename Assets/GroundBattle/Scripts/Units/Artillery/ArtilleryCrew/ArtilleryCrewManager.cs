@@ -10,7 +10,7 @@ public class ArtilleryCrewManager : UnitManager
 
     public override void Initialize()
     {
-        ms = GetComponent<MeshRenderer>();
+        mr = GetComponent<MeshRenderer>();
         um = GetComponent<ArtilleryCrewMovement>();
 
         Material m = Instantiate(UnitMaterial);
@@ -24,7 +24,7 @@ public class ArtilleryCrewManager : UnitManager
             m.SetColor("_Color", Color.red);
         }
 
-        ms.material = m;
+        mr.material = m;
     }
 
     public void MoveTo(Vector2 dest, Quaternion quat)
@@ -35,5 +35,19 @@ public class ArtilleryCrewManager : UnitManager
     public void Die()
     {
         Destroy(transform.gameObject);
+    }
+
+    public override float GetWidth()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override void OnSelection()
+    {
+        throw new System.NotImplementedException();
+    }
+    public override void OnDeselection()
+    {
+        throw new System.NotImplementedException();
     }
 }

@@ -21,6 +21,9 @@ public partial class UIManager : MonoBehaviour
     public GameObject CompanyCommandTab;
     public GameObject BattalionCommandTab;
     public GameObject ArtilleryBatteryCommandTab;
+    public List<CommandButtonManager> companyCommandButtons;
+    public List<CommandButtonManager> battalionCommandButtons;
+    public List<CommandButtonManager> artilleryBatteryCommandButtons;
 
     [Header("UI - Flag parents")]
     public GameObject companyFlagParent;
@@ -42,9 +45,9 @@ public partial class UIManager : MonoBehaviour
     public GameObject NotificationTabPrefab;
 
     //COMMAND EVENT
-    private List<Action> CompanyCommands = new List<Action>();
-    private List<Action> BattalionCommands = new List<Action>();
-    private List<Action> ArtilleryBatteryCommands = new List<Action>();
+    private List<Action<OfficerManager[]>> CompanyCommands = new List<Action<OfficerManager[]>>();
+    private List<Action<CaptainManager[]>> BattalionCommands = new List<Action<CaptainManager[]>>();
+    private List<Action<ArtilleryOfficerManager[]>> ArtilleryBatteryCommands = new List<Action<ArtilleryOfficerManager[]>>();
 
     // Start is called before the first frame update
     void Start()
@@ -55,12 +58,6 @@ public partial class UIManager : MonoBehaviour
     private void Update()
     {
         UpdateFlagPosition();
-
-        //UPDATE COMPANY CARD INFOS
-        foreach ((OfficerManager, CompanyCardManager) r in companyCards)
-        {
-            r.Item2.SetAmmoSlider(r.Item1.Ammo, r.Item1.MaxAmmo);
-        }
     }
 
     public void Initialize()
@@ -71,42 +68,55 @@ public partial class UIManager : MonoBehaviour
 
         PopulateCompanyCommandTab();
         PopulateBattalionCommandTab();
+        PopulateArtilleryBatteryCommandTab();
 
         NotificationTab_Builder();
 
         CompanyCommandTabCheck();
         BattalionCommandTabCheck();
+        ArtilleryBatteryCommandTabCheck();
     }
-    public void InitializeCommands()
+    private void InitializeCommands()
     {
         //COMPANY
-        CompanyCommands.Add(SendLineFormation);
-        CompanyCommands.Add(SendColumnFormation);
-        CompanyCommands.Add(SendStopOrder);
-        CompanyCommands.Add(SendFireAll);
-        CompanyCommands.Add(SendHoldFire);
-        CompanyCommands.Add(SendMelee);
-        CompanyCommands.Add(SendMarch);
+        CompanyCommands.Add(UnitOrders.Company_SendLineFormation);
+        CompanyCommands.Add(UnitOrders.Company_SendColumnFormation);
+
+        CompanyCommands.Add(UnitOrders.Company_SendStopOrder);
+        CompanyCommands.Add(UnitOrders.Company_SendFireAll);
+        CompanyCommands.Add(UnitOrders.Company_SendHoldFire);
+        CompanyCommands.Add(UnitOrders.Company_SendMelee);
+        CompanyCommands.Add(UnitOrders.Company_SendMarch);
+        CompanyCommands.Add((OfficerManager[] companies) => { 
+            UnitOrders.Company_SendDetach(companies);
+            UpdateCompanyCommandStatus();
+        });
 
         //BATTALION
-        BattalionCommands.Add(SendLineFormation);
-        BattalionCommands.Add(SendColumnFormation);
+        BattalionCommands.Add(UnitOrders.Battalion_SendLineFormation);
+        BattalionCommands.Add(UnitOrders.Battalion_SendColumnFormation);
 
-        BattalionCommands.Add(SendStopOrder);
-        BattalionCommands.Add(SendFireAll);
-        BattalionCommands.Add(SendHoldFire);
-        BattalionCommands.Add(SendMarch);
+        BattalionCommands.Add(UnitOrders.Battalion_SendStopOrder);
+        BattalionCommands.Add(UnitOrders.Battalion_SendFireAll);
+        BattalionCommands.Add(UnitOrders.Battalion_SendHoldFire);
+        BattalionCommands.Add(UnitOrders.Battalion_SendMarch);
 
-        BattalionCommands.Add(SendLightFront);
-        BattalionCommands.Add(SendHeavyFront);
-        BattalionCommands.Add(SendLightRear);
-        BattalionCommands.Add(SendHeavyRear);
-        BattalionCommands.Add(SendLightLine);
-        BattalionCommands.Add(SendHeavyLine);
+        BattalionCommands.Add(UnitOrders.Battalion_SendLightFront);
+        BattalionCommands.Add(UnitOrders.Battalion_SendHeavyFront);
+        BattalionCommands.Add(UnitOrders.Battalion_SendLightRear);
+        BattalionCommands.Add(UnitOrders.Battalion_SendHeavyRear);
+        BattalionCommands.Add(UnitOrders.Battalion_SendLightLine);
+        BattalionCommands.Add(UnitOrders.Battalion_SendHeavyLine);
 
-        BattalionCommands.Add(SendDefend);
-        BattalionCommands.Add(SendAttack);
+        BattalionCommands.Add(UnitOrders.Battalion_SendDefend);
+        BattalionCommands.Add(UnitOrders.Battalion_SendAttack);
 
+        //ARTILLERY BATTERY
+        ArtilleryBatteryCommands.Add(UnitOrders.ArtilleryBattery_SendLineFormation);
+        ArtilleryBatteryCommands.Add(UnitOrders.ArtilleryBattery_SendColumnFormation);
+        ArtilleryBatteryCommands.Add(UnitOrders.ArtilleryBattery_SendStopOrder);
+        ArtilleryBatteryCommands.Add(UnitOrders.ArtilleryBattery_SendFireAll);
+        ArtilleryBatteryCommands.Add(UnitOrders.ArtilleryBattery_SendHoldFire);
     }
     public void ToggleUI()
     {

@@ -103,7 +103,6 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
     {
 
     }
-
     public void SetFormation(Formation formation)
     {
         batteryFormation = formation;
@@ -116,6 +115,14 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
             if (cannons[i] != null)
                 cannons[i].MoveTo(
                     GetFormationCoords(i) + Utility.V3toV2(transform.position),
+                    um.CurrentRotation()
+                    );
+        }
+        for (int i = 0; i < carriages.Count; i++)
+        {
+            if (carriages[i] != null)
+                carriages[i].MoveTo(
+                    CarriagePosition(i) + Utility.V3toV2(transform.position),
                     um.CurrentRotation()
                     );
         }
@@ -184,47 +191,26 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
 
         return false;
     }
-    public float GetCompanyWidth()
+    public override float GetWidth()
     {
         float width = (batteryFormation.Lines - 1) * batteryFormation.a;
         return width;
     }
 
     //BATTERY FIRE MANAGEMENT
-    public void SendFireMessage()
-    {
-        if(GetFormationType() == "Line")
-        {
-            for (int i = 0; i < artilleryBatteryTemplate.BatterySize; i++)
-            {
-                if (cannons[i] != null)
-                    cannons[i].CallFire();
-            }
-            Ammo -= 1;
-        }
-    }
-    public void SendRelaodMessage()
-    {
-        for (int i = 0; i < artilleryBatteryTemplate.BatterySize; i++)
-        {
-            if (GetCannonRank(i) == 1)
-            {
-                //FIRE ONLY FIRST RANK
-                if (cannons[i] != null)
-                    cannons[i].CallReload();
-            }
-        }
-    }
     public bool CheckLoadedStatus()
     {
         //TRUE IF ALL LOADED, FALSE IF AT LEAST ONE IS NOT LOADED
         for (int i = 0; i < artilleryBatteryTemplate.BatterySize; i++)
         {
-            if (cannons[i] != null)
+            if (GetCannonRank(i) == 1)
             {
-                if (!cannons[i].Loaded)
+                if (cannons[i] != null)
                 {
-                    return false;
+                    if (!cannons[i].Loaded)
+                    {
+                        return false;
+                    }
                 }
             }
         }
@@ -233,13 +219,13 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
     public bool CheckUnLoadedStatus()
     {
         //TRUE IF ALL UNLOADED, FALSE IF AT LEAST ONE IS LOADED
-        for (int i = 0; i < artilleryBatteryTemplate.BatterySize; i++)
+        for (int i = 0; i < cannons.Count; i++)
         {
             if (GetCannonRank(i) == 1)
             {
+                //CHECK ONLY FIRST RANK
                 if (cannons[i] != null)
                 {
-                    //CHECK ONLY FIRST RANK
                     if (cannons[i].Loaded)
                     {
                         return false;
@@ -247,6 +233,30 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
                 }
             }
         }
+        return true;
+    }
+    public bool AllMounted()
+    {
+        foreach(ArtilleryManager am in cannons)
+        {
+            if(!am.mounted)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+    public bool AllDismounted()
+    {
+        foreach (ArtilleryManager am in cannons)
+        {
+            if (am.mounted)
+            {
+                return false;
+            }
+        }
+
         return true;
     }
     public void SetFireStatus(bool status)

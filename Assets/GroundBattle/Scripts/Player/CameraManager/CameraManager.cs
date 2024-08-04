@@ -25,7 +25,7 @@ public partial class CameraManager : MonoBehaviour
     public float artilleryBatterySpace = 4f;
 
     //COMPONENTS
-    UIManager uimanager;
+    public UIManager uimanager;
     LineRenderer tr;
 
     Material OlogramMaterial;

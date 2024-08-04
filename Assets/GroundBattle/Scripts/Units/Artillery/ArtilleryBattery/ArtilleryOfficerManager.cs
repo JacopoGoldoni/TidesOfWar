@@ -11,15 +11,19 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
 {
     //COMPONENTS
     LineRenderer lineRenderer;
+    public ArtilleryBatteryCardManager artilleryBatteryCardManager;
 
     //STATS
     [SerializeField] public ArtilleryBatteryTemplate artilleryBatteryTemplate;
     public Stats stats { get; private set; }
     public void Accept(IVisitor visitor) => visitor.Visit(this);
 
+    public MeshFilter batterySightMeshFilter;
+
     [Header("Cannons")]
     public GameObject cannonPrefab;
     public List<ArtilleryManager> cannons = new List<ArtilleryManager>();
+    public int batterySize { get => cannons.Count; }
 
     [Header("Battery identifier")]
     public int batteryNumber;
@@ -29,6 +33,11 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
     public Formation batteryFormation;
     private bool _formationChanged = false;
     public Bounds batteryBounds;
+
+    [Header("Carriage")]
+    public List<ArtilleryCarriageManager> carriages = new List<ArtilleryCarriageManager>();
+    public GameObject carriagePrefab;
+    private Formation carriageFormation;
 
     [Header("Battery combact")]
     public float Precision { get { return stats.Precision; } }
@@ -48,7 +57,7 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
 
     [Header("Battery state")]
     public bool FireAll = true;
-    public UnitManager targetCompany = null;
+    public UnitManager targeUnit = null;
     private FiniteStateMachine artilleryBatteryStateMachine;
     public string stateName;
     public int Morale;
@@ -67,7 +76,7 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
     public override void Initialize()
     {
         //GET COMPONENTS
-        ms = GetComponent<MeshRenderer>();
+        mr = GetComponent<MeshRenderer>();
         um = GetComponent<ArtilleryOfficerMovement>();
         lineRenderer = GetComponent<LineRenderer>();
 
@@ -77,6 +86,7 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
         InitializeStats();
         InitializeFormation();
         SpawnBatteryCannons();
+        SpawnBatteryCarriages();
 
         //INITIALIZE FINITE STATE MACHINE
         artilleryBatteryStateMachine = new FiniteStateMachine();
@@ -89,6 +99,8 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
         {
             Utility.Camera.GetComponent<UIManager>().AddArtilleryBatteryCard(this);
         }
+
+        GenerateSightMesh(11, artilleryBatteryTemplate.BatterySize * 0.25f, artilleryBatteryTemplate.Range, artilleryBatteryTemplate.BatterySize * 0.5f);
     }
     private void InitializeStats()
     {
@@ -106,18 +118,22 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
         batteryFormation.SetSizeByRanks(artilleryBatteryTemplate.BatterySize, 1);
         batteryFormation.a = 2f;
         batteryBounds = CalculateCompanyBounds();
+
+        carriageFormation = new Column(artilleryBatteryTemplate.CarriageSize);
+        carriageFormation.SetSizeByLines(artilleryBatteryTemplate.CarriageSize, 1);
+        carriageFormation.b = -4f;
     }
 
-    //SPAWN CONTROLLED PAWNS
+    //SPAWN CONTROLLED CANNONS
     public void SpawnBatteryCannons()
     {
         for (int i = 0; i < artilleryBatteryTemplate.BatterySize; i++)
         {
             Vector2 v2 = GetFormationCoords(i);
-            SpawnCannons(Utility.V2toV3(v2) + transform.position - Vector3.up * 0.2f);
+            SpawnCannon(Utility.V2toV3(v2) + transform.position - Vector3.up * 0.2f);
         }
     }
-    private void SpawnCannons(Vector3 pos)
+    private void SpawnCannon(Vector3 pos)
     {
         GameObject cannon = Instantiate(cannonPrefab);
         cannon.transform.position = pos;
@@ -136,6 +152,120 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
         artilleryManager.name = "Battery" + batteryName.ToString() + "_" + artilleryManager.ArtilleryLocalID;
 
         artilleryManager.Initialize();
+    }
+
+    //SPAWN CARRIAGE
+    public void SpawnBatteryCarriages()
+    {
+        for (int i = 0; i < artilleryBatteryTemplate.CarriageSize; i++)
+        {
+            Vector2 v2 = CarriagePosition(i);
+            SpawnCarriage(Utility.V2toV3(v2) + transform.position + Vector3.up * 0.4f);
+        }
+    }
+    public void SpawnCarriage(Vector3 pos)
+    {
+        GameObject carriage = Instantiate(carriagePrefab);
+        carriage.transform.position = pos;
+        carriage.transform.rotation = transform.rotation;
+
+        ArtilleryCarriageManager carriageManager = carriage.GetComponent<ArtilleryCarriageManager>();
+        ArtilleryCarriageMovement carriageMovememnt = carriageManager.GetComponent<ArtilleryCarriageMovement>();
+
+        carriages.Add(carriageManager);
+        carriageManager.masterArtilleryOfficer = this;
+        carriageManager.local_ID = carriages.Count - 1;
+        carriageManager.faction = faction;
+
+        carriageMovememnt.MovementSpeed = Speed * 1.5f;
+
+        carriageManager.name = "Battery" + batteryNumber.ToString() + "_Carriage_" + carriageManager.local_ID;
+
+        carriageManager.Initialize();
+    }
+    private Vector2 CarriagePosition(int i)
+    {
+        Vector2 pos2;
+        if (batteryFormation.name == "Column")
+        {
+            //IN COLUMN
+            pos2 = Vector2.down * (cannons.Count * batteryFormation.b + 6) + carriageFormation.GetPos(i);
+        }
+        else
+        {
+            //IN LINE
+            pos2 = Vector2.down * 6f + carriageFormation.GetPos(i);
+        }
+
+        Vector3 pos3 = Utility.V2toV3(pos2);
+
+        Quaternion rotation = transform.rotation;
+
+        pos3 = rotation * pos3;
+        
+        return Utility.V3toV2(pos3);
+    }
+
+    public void GenerateSightMesh(int arcVertices, float baseWidth, float SightRadius, float CenterRadius)
+    {
+        Mesh sightMesh = new Mesh
+        {
+            name = "Sight mesh"
+        };
+
+        float unitAngle = Mathf.Atan(baseWidth / CenterRadius) / ((arcVertices - 1) / 2f);
+
+        Vector3 s = Vector3.forward * -CenterRadius;
+
+        //VERTICES
+        List<Vector3> vertices = new List<Vector3>
+        {
+            //BASE VERTICES
+            Vector3.zero,                       //0
+            Vector3.right * -baseWidth,         //1
+            Vector3.right * baseWidth           //2
+        };
+
+        //ARC VERTICES
+        for (int i = 0; i < arcVertices; i++)
+        {
+            float angle = (i - (arcVertices - 1) / 2f) * -unitAngle * Mathf.Rad2Deg;
+            Quaternion rot = Quaternion.AngleAxis(angle, Vector3.up);
+            Vector3 v = s + rot * Vector3.forward * (CenterRadius + SightRadius);
+
+            vertices.Add(v);
+        }
+
+        //FACES
+        List<int> faces = new List<int>
+        {
+            //BASE FACES
+            1,
+            arcVertices + 2,
+            0
+        };
+
+        //ARC FACES
+        for (int i = 0; i < arcVertices; i++)
+        {
+            faces.Add(0);
+            faces.Add(2 + i + 1);
+            faces.Add(2 + i);
+        }
+
+        sightMesh.vertices = vertices.ToArray();
+        sightMesh.triangles = faces.ToArray();
+
+        batterySightMeshFilter.mesh = sightMesh;
+    }
+
+    public override void OnSelection()
+    {
+        batterySightMeshFilter.gameObject.SetActive(true);
+    }
+    public override void OnDeselection()
+    {
+        batterySightMeshFilter.gameObject.SetActive(false);
     }
 
     //UPDATES
@@ -165,11 +295,6 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
         //Stats.Mediator.Update(Time.deltaTime);
     }
 
-    public float GetWidth()
-    {
-        return (batteryFormation.Lines - 1) * batteryFormation.a;
-    }
-
     //STATE MACHINE
     public State GetState()
     {
@@ -196,8 +321,14 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
                         _formationChanged = false;
                     }
                 },
-                null,
-                null
+                () =>
+                {
+                    targeUnit = null;
+                },
+                () =>
+                {
+                    targeUnit = EnemyInRange(artilleryBatteryTemplate.Range);
+                }
             );
         artilleryOfficerStates.Add(Idle);
         //MOVING
@@ -214,27 +345,28 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
                 }
             );
         artilleryOfficerStates.Add(Moving);
-        //FIRING
-        State Firing = new State(
-                "Firing",
+        //MOUNTING
+        State Mounting = new State(
+                "Mounting",
                 () => {
-                    SendFireMessage();
+                    //CANNONS MOVEMENT
+                    SendFormation();
                 },
                 null,
                 null
             );
-        artilleryOfficerStates.Add(Firing);
-        //RELOADING
-        State Reloading = new State(
-                "Reloading",
+        artilleryOfficerStates.Add(Mounting);
+        //DISMOUNTING
+        State Dismounting = new State(
+                "Dismounting",
                 () => {
-                    //SEND RELOAD MESSAGE
-                    SendRelaodMessage();
+                    //CANNONS MOVEMENT
+                    SendFormation();
                 },
                 null,
                 null
             );
-        artilleryOfficerStates.Add(Reloading);
+        artilleryOfficerStates.Add(Dismounting);
         //FLEE
         State Fleeing = new State(
                 "Fleeing",
@@ -268,77 +400,43 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
                     return false;
                 }
             );
-        artilleryOfficerTransitions.Add(AnyFleeing);
-            //IDLE -> MOVING
-        Transition IdleMoving = new Transition(
+        artilleryOfficerTransitions.Add( AnyFleeing );
+            //IDLE -> MOUNTING
+        Transition IdleMounting = new Transition(
                 Idle,
-                Moving,
+                Mounting,
                 () => {
                     return um.MovementPoints.Count != 0;
                 }
             );
-        artilleryOfficerTransitions.Add( IdleMoving );
-            //MOVING -> IDLE
-        Transition MovingIdle = new Transition(
-                Moving,
+        artilleryOfficerTransitions.Add( IdleMounting );
+            //DISMOUNTING -> IDLE
+        Transition DismountingIdle = new Transition(
+                Dismounting,
                 Idle,
+                () => {
+                    return AllDismounted();
+                }
+            );
+        artilleryOfficerTransitions.Add( DismountingIdle );
+        //MOUNTING -> MOVING
+        Transition MountingMoving = new Transition(
+                Mounting,
+                Moving,
+                () => {
+                    return AllMounted();
+                }
+            );
+        artilleryOfficerTransitions.Add(MountingMoving);
+        //MOVING -> DISMOUNTING
+        Transition MovingDismounting = new Transition(
+                Moving,
+                Dismounting,
                 () => {
                     return um.MovementPoints.Count == 0;
                 }
             );
-        artilleryOfficerTransitions.Add( MovingIdle );
-            //IDLE -> FIRING
-        Transition IdleFiring = new Transition(
-                Idle,
-                Firing,
-                () => {
-                    if (targetCompany != null && CheckLoadedStatus() && GetFormationType() == "Line")
-                    {
-                        return true;
-                    }
-                    return false;
-                }
-            );
-        artilleryOfficerTransitions.Add(IdleFiring);
-            //FIRING -> RELOADING
-        Transition FiringReloading = new Transition(
-                Firing,
-                Reloading,
-                () => {
-                    if (CheckUnLoadedStatus() && um.MovementPoints.Count == 0)
-                    {
-                        return true;
-                    }
-                    return false;
-                }
-            );
-        artilleryOfficerTransitions.Add(FiringReloading);
-            //RELOADING -> IDLE
-        Transition ReloadingIdle = new Transition(
-                Reloading,
-                Idle,
-                () => {
-                    if (CheckLoadedStatus())
-                    {
-                        return true;
-                    }
-                    return false;
-                }
-            );
-        artilleryOfficerTransitions.Add(ReloadingIdle);
-        //IDLE -> RELOADING
-        Transition IdleReloading = new Transition(
-                Reloading,
-                Idle,
-                () => {
-                    if (CheckUnLoadedStatus())
-                    {
-                        return true;
-                    }
-                    return false;
-                }
-            );
-        artilleryOfficerTransitions.Add(IdleReloading);
+        artilleryOfficerTransitions.Add(MovingDismounting);
 
 
         artilleryBatteryStateMachine.AddStates(artilleryOfficerStates);

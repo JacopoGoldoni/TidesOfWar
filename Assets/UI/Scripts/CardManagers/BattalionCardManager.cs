@@ -1,47 +1,85 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(Image))]
-public class BattalionCardManager : MonoBehaviour
+public class BattalionCardManager : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
-    public Image cardImage;
-    public Slider ammoSlider;
+    private Image bg;
+    public Image flagImage;
+    public Image unitImage;
+    public TextMeshProUGUI nameText;
 
-    private Factions faction = Factions.France;
+    public CaptainManager battallionRef;
 
-    private void Start()
+    public void Initialize(CaptainManager battalion)
     {
-        Initialize(faction);
+        bg = GetComponent<Image>();
+        battallionRef = battalion;
+
+        SetFlag(battalion.faction);
+        SetUnit(battalion.battalionTemplate.BattalionIcon);
+        SetBattalionTextName(battalion.battalionNumber ,battalion.battalionName);
     }
 
-    public void Initialize(Factions faction)
+    public void SetFlag(Factions faction)
     {
-        this.faction = faction;
-        
-        SetImage(GFXUtility.GetFlag(faction));
+        flagImage.sprite = GFXUtility.GetFlag(faction);
     }
-
-    public void SetImage(Sprite sprite)
+    public void SetUnit(string unit)
     {
-        cardImage.sprite = sprite;
+        unitImage.sprite = GFXUtility.GetUnitSprite(unit);
     }
-
-    public void SetAmmoSlider(int ammo, int maxAmmo)
+    public void SetBattalionTextName(int battalioNumber, string name)
     {
-        ammoSlider.value = (float)ammo / (float)maxAmmo;
+        nameText.text = battalioNumber + " Batt. " + name;
     }
 
     public void HighLight(bool highlight)
     {
         if (highlight)
         {
-            cardImage.color = Color.yellow;
+            flagImage.color = Color.yellow;
         }
         else
         {
-            cardImage.color = Color.white;
+            flagImage.color = Color.white;
+        }
+    }
+
+    void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData)
+    {
+        bg.color = new Color(1.2f, 1.2f, 1.2f , 1f);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        bg.color = new Color(1f, 1f, 1f, 1f);
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        CameraManager cameraManagerRef = Utility.Camera.GetComponent<CameraManager>();
+        //SELECT COMPANY
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            if (!cameraManagerRef.selectedBattalions.Contains(battallionRef))
+            {
+                cameraManagerRef.SelectBattalion(battallionRef);
+            }
+            else
+            {
+                cameraManagerRef.DeselectBattalion(battallionRef);
+            }
+        }
+        else
+        {
+            cameraManagerRef.DeselectAllBattalions();
+            cameraManagerRef.SelectBattalion(battallionRef);
         }
     }
 }

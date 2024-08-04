@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class BattalionFlagManager : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler 
+public class BattalionFlagManager : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
     public CaptainManager battalionRef;
     public Image flagImage;
@@ -22,10 +22,9 @@ public class BattalionFlagManager : MonoBehaviour, IPointerClickHandler, IPointe
         battalionRef = cm;
     }
 
-    private void BattalionFlagAction()
+    private void BattalionSelection()
     {
         CameraManager cameraManagerRef = Utility.Camera.GetComponent<CameraManager>();
-        //SELECT COMPANY
         if (Input.GetKey(KeyCode.LeftShift))
         {
             if (!cameraManagerRef.selectedBattalions.Contains(battalionRef))
@@ -43,14 +42,32 @@ public class BattalionFlagManager : MonoBehaviour, IPointerClickHandler, IPointe
             cameraManagerRef.SelectBattalion(battalionRef);
         }
     }
+    private void BattallionAttach()
+    {
+        CameraManager cameraManagerRef = Utility.Camera.GetComponent<CameraManager>();
+
+        if(cameraManagerRef.selectedCompanies.Count != 0)
+        {
+            foreach(OfficerManager om in cameraManagerRef.selectedCompanies)
+            {
+                om.Attach(battalionRef);
+            }
+            battalionRef.battalionFormation.CalculateAllPositions();
+            battalionRef.ReceiveMovementOrder(false, Utility.V3toV2(battalionRef.transform.position), battalionRef.transform.rotation);
+        }
+
+        cameraManagerRef.uimanager.UpdateCompanyCommandStatus();
+    }
+
     public void OnPointerClick(PointerEventData eventData)
     {
         switch (eventData.button)
         {
             case PointerEventData.InputButton.Left:
-                BattalionFlagAction();
+                BattalionSelection();
                 break;
             case PointerEventData.InputButton.Right:
+                BattallionAttach();
                 break;
             case PointerEventData.InputButton.Middle:
                 break;
@@ -59,10 +76,10 @@ public class BattalionFlagManager : MonoBehaviour, IPointerClickHandler, IPointe
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        flagImage.color = new Color(1f, 1f, 1f, 0.8f);
+
     }
     public void OnPointerExit(PointerEventData eventData)
     {
-        flagImage.color = new Color(1f, 1f, 1f, 0.5f);
+
     }
 }

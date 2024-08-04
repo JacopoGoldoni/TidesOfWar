@@ -51,7 +51,7 @@ public partial class CaptainManager : UnitManager
 
         return avarageMorale;
     }
-    public int GetSize()
+    public override float GetWidth()
     {
         int size = 0;
 

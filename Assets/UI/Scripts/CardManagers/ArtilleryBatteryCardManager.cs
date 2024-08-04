@@ -1,47 +1,92 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(Image))]
-public class ArtilleryBatteryCardManager : MonoBehaviour
+public class ArtilleryBatteryCardManager : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
-    public Image cardImage;
+    private Image bg;
+    public Image flagImage;
+    public Image unitImage;
+    public TextMeshProUGUI nameText;
     public Slider ammoSlider;
 
-    private Factions faction = Factions.France;
+    public ArtilleryOfficerManager artilleryBatteryRef;
 
-    private void Start()
+    public void Initialize(ArtilleryOfficerManager artilleryBattery)
     {
-        Initialize(faction);
+        bg = GetComponent<Image>();
+        artilleryBatteryRef = artilleryBattery;
+        artilleryBatteryRef.artilleryBatteryCardManager = this;
+
+        SetFlag(artilleryBattery.faction);
+        SetUnit(artilleryBattery.artilleryBatteryTemplate.ArtilleryBatteryIcon);
+        SetBattalionTextName(artilleryBattery.batteryNumber, artilleryBattery.batteryName, artilleryBattery.artilleryBatteryTemplate.hardness);
+        SetAmmoSlide();
     }
 
-    public void Initialize(Factions faction)
+    public void SetFlag(Factions faction)
     {
-        this.faction = faction;
-        
-        SetImage(GFXUtility.GetFlag(faction));
+        flagImage.sprite = GFXUtility.GetFlag(faction);
     }
-
-    public void SetImage(Sprite sprite)
+    public void SetAmmoSlide()
     {
-        cardImage.sprite = sprite;
+        ammoSlider.value = (float)artilleryBatteryRef.Ammo / (float)artilleryBatteryRef.artilleryBatteryTemplate.MaxAmmo;
     }
-
-    public void SetAmmoSlider(int ammo, int maxAmmo)
+    public void SetUnit(string unit)
     {
-        ammoSlider.value = (float)ammo / (float)maxAmmo;
+        unitImage.sprite = GFXUtility.GetUnitSprite(unit);
+    }
+    public void SetBattalionTextName(int artilleryBatteryNumber, string name, UnitHardness hardness)
+    {
+        nameText.text = artilleryBatteryNumber.ToString() + " " + hardness.ToString() + " Art.Batt. " + " " + name;
     }
 
     public void HighLight(bool highlight)
     {
         if (highlight)
         {
-            cardImage.color = Color.yellow;
+            flagImage.color = Color.yellow;
         }
         else
         {
-            cardImage.color = Color.white;
+            flagImage.color = Color.white;
+        }
+    }
+
+    void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData)
+    {
+        bg.color = new Color(1.2f, 1.2f, 1.2f, 1f);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        bg.color = new Color(1f, 1f, 1f, 1f);
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        CameraManager cameraManagerRef = Utility.Camera.GetComponent<CameraManager>();
+        //SELECT COMPANY
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            if (!cameraManagerRef.selectedArtilleryBatteries.Contains(artilleryBatteryRef))
+            {
+                cameraManagerRef.SelectArtilleryBattery(artilleryBatteryRef);
+            }
+            else
+            {
+                cameraManagerRef.DeselectArtilleryBattery(artilleryBatteryRef);
+            }
+        }
+        else
+        {
+            cameraManagerRef.DeselectAllArtilleryBatteries();
+            cameraManagerRef.SelectArtilleryBattery(artilleryBatteryRef);
         }
     }
 }

@@ -14,7 +14,7 @@ public class ArtilleryBatteryFlagManager : MonoBehaviour, IPointerClickHandler, 
     public void Initialize(ArtilleryOfficerManager aom)
     {
         Sprite flagSprite = GFXUtility.GetFlag(aom.faction);
-        Sprite unitIconSprite = GFXUtility.GetUnitSprite(aom.artilleryBatteryTemplate.CompanyIcon);
+        Sprite unitIconSprite = GFXUtility.GetUnitSprite(aom.artilleryBatteryTemplate.ArtilleryBatteryIcon);
 
         flagImage.sprite = flagSprite;
         unitIconImage.sprite = unitIconSprite;
@@ -64,10 +64,10 @@ public class ArtilleryBatteryFlagManager : MonoBehaviour, IPointerClickHandler, 
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        flagImage.color = new Color(1f, 1f, 1f, 0.8f);
+
     }
     public void OnPointerExit(PointerEventData eventData)
     {
-        flagImage.color = new Color(1f, 1f, 1f, 0.5f);
+
     }
 }

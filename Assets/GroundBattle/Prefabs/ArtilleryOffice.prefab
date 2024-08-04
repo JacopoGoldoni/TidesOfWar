@@ -257,21 +257,24 @@ MonoBehaviour:
   UnitMaterial: {fileID: 2100000, guid: ef561f36c67d42c4dbea3f3a2082e033, type: 2}
   Killable: 0
   artilleryBatteryTemplate: {fileID: 0}
+  batterySightMeshFilter: {fileID: 3527839363118081194}
   cannonPrefab: {fileID: 5430257181103470016, guid: aa107584682b5d54693bc905c4a2063c,
     type: 3}
   cannons: []
   batteryNumber: 1
   batteryName: 
-  batterySize: 4
   batteryBounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
+  carriages: []
+  carriagePrefab: {fileID: 2919108418555523868, guid: 74fb95e0a88c2c44688073e2018c7cf7,
+    type: 3}
   Range: 20
   Ammo: 0
   IsCarried: 0
   drawPathLine: 0
   FireAll: 1
-  targetCompany: {fileID: 0}
+  targeUnit: {fileID: 0}
   stateName: 
   Morale: 0
   FleeThreashold: 25
@@ -326,7 +329,7 @@ Transform:
   m_GameObject: {fileID: 3243434273922990761}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.64055157, y: 0.5244044, z: 0.40670842}
+  m_LocalPosition: {x: 0, y: 0.1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -362,7 +365,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 2100000, guid: e7170e2dab1d5a24995ea29f309302e5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

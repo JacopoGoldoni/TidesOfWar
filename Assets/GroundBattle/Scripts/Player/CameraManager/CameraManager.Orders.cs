@@ -4,7 +4,7 @@ using UnityEngine;
 
 public partial class CameraManager : MonoBehaviour
 {
-    private void SendMovementOrder()
+    public void SendMovementOrder()
     {
         Vector2 Orientation = Utility.V3toV2(OrderPoint2 - OrderPoint).normalized;
 
@@ -18,7 +18,6 @@ public partial class CameraManager : MonoBehaviour
             {
                 comapnyFormationWidth += companySpace + selectedCompanies[i].GetCompanyWidth();
             }
-            Debug.Log(comapnyFormationWidth);
 
             //COMPANY MOVEMENT ORDER
             for (int i = 0; i < selectedCompanies.Count; i++)
@@ -135,20 +134,50 @@ public partial class CameraManager : MonoBehaviour
     }
     public void SendAttackOrder(GameObject target)
     {
-        foreach (OfficerManager o in selectedCompanies)
+        if(selectedCompanies.Count != 0)
         {
-            Vector2 pos;
-            if ((o.transform.position - target.transform.position).magnitude >= o.Range * 0.75f)
+            //COMPANY ATTACK ORDER
+            foreach (OfficerManager o in selectedCompanies)
             {
-                pos = Utility.V3toV2(target.transform.position + (o.transform.position - target.transform.position).normalized * o.Range * 0.75f);
-            }
-            else
-            {
-                pos = o.transform.position;
-            }
-            Quaternion rot = Quaternion.LookRotation((target.transform.position - o.transform.position).normalized, Vector3.up);
+                Vector2 pos;
+                if ((o.transform.position - target.transform.position).magnitude >= o.Range * 0.75f)
+                {
+                    pos = Utility.V3toV2(target.transform.position + (o.transform.position - target.transform.position).normalized * o.Range * 0.75f);
+                }
+                else
+                {
+                    pos = o.transform.position;
+                }
+                Quaternion rot = Quaternion.LookRotation((target.transform.position - o.transform.position).normalized, Vector3.up);
 
-            o.ReceiveMovementOrder(false, pos, rot);
+                o.ReceiveMovementOrder(false, pos, rot);
+            }
+        }
+        else if(selectedArtilleryBatteries.Count != 0)
+        {
+            foreach (ArtilleryOfficerManager o in selectedArtilleryBatteries)
+            {
+                Vector2 pos;
+                if ((o.transform.position - target.transform.position).magnitude >= o.Range * 0.75f)
+                {
+                    pos = Utility.V3toV2(target.transform.position + (o.transform.position - target.transform.position).normalized * o.Range * 0.75f);
+                }
+                else
+                {
+                    pos = o.transform.position;
+                }
+                Quaternion rot = Quaternion.LookRotation((target.transform.position - o.transform.position).normalized, Vector3.up);
+
+                o.ReceiveMovementOrder(false, pos, rot);
+            }
         }
     }
+    public void AttachToBattalion(CaptainManager battalion)
+    {
+        foreach(OfficerManager om in selectedCompanies)
+        {
+            om.Attach(battalion);
+        }
+    }
+
 }

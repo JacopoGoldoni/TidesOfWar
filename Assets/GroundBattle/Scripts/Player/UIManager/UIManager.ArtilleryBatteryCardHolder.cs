@@ -30,14 +30,13 @@ public partial class UIManager : MonoBehaviour
         ArtilleryBatteryCard.transform.parent = artilleryBatteryCardHolder.transform;
 
         ArtilleryBatteryCardManager artilleryBatteryCardManager = ArtilleryBatteryCard.GetComponent<ArtilleryBatteryCardManager>();
-        artilleryBatteryCardManager.SetAmmoSlider(battery.Ammo, battery.MaxAmmo);
-        artilleryBatteryCardManager.Initialize(battery.faction);
+        artilleryBatteryCardManager.Initialize(battery);
 
         artilleryBatteryCards.Add((battery, artilleryBatteryCardManager));
 
         //Displacement
         Vector2 cardSize = ArtilleryBatteryCardPrefab.GetComponent<RectTransform>().sizeDelta;
-        artilleryBatteryCardHolder.GetComponent<RectTransform>().sizeDelta = new Vector2(artilleryBatteryCards.Count * cardSize.x + 10, cardSize.y + 10);
+        //artilleryBatteryCardHolder.GetComponent<RectTransform>().sizeDelta = new Vector2(artilleryBatteryCards.Count * cardSize.x + 10, cardSize.y + 10);
 
         ArtilleryBatteryCardHolderCheck();
     }

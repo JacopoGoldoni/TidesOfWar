@@ -8,7 +8,8 @@ public abstract class UnitManager : MonoBehaviour
     public Factions faction = Factions.France;
 
     //Components
-    [HideInInspector] public MeshRenderer ms;
+    [HideInInspector] public MeshRenderer mr;
+    [HideInInspector] public SkinnedMeshRenderer smr;
     [HideInInspector] public Material m;
     [HideInInspector] public UnitMovement um;
 
@@ -32,7 +33,7 @@ public abstract class UnitManager : MonoBehaviour
         {
             m.SetColor("_Color", Color.red);
         }
-        ms.material = m;
+        mr.material = m;
     }
 
     public virtual void ReceiveMovementOrder(bool add, Vector2 pos, Quaternion rot)
@@ -47,8 +48,16 @@ public abstract class UnitManager : MonoBehaviour
         }
     }
 
+    public abstract float GetWidth();
+
+    public abstract void OnSelection();
+    public abstract void OnDeselection();
+
     public virtual void Die()
     {
-        Destroy(transform.gameObject);
+        if(Killable)
+        {
+            Destroy(transform.gameObject);
+        }
     }
 }

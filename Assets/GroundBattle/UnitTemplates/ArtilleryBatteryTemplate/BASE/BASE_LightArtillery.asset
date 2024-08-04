@@ -18,15 +18,17 @@ MonoBehaviour:
     type: 3}
   ArtilleryOfficerMesh: {fileID: 4064786809506695948, guid: 84504a8247ebf044c84f362232097cb8,
     type: 3}
-  CannonMesh: {fileID: -2477511411847689622, guid: c21689a417506f244bf939b2ca9b9941,
+  CannonMesh: {fileID: -3014937882001165872, guid: 6c4bead83c645cf46a0fc8080254e732,
     type: 3}
   CrewMesh: {fileID: -1277366460620338370, guid: 2dee33fd68d527d49997a23c5e1cefb5,
     type: 3}
-  CompanyIcon: Artillery
+  ArtilleryBatteryIcon: Artillery
   BatterySize: 4
+  CarriageSize: 2
   BaseMorale: 100
   Precision: 0
-  Range: 0
+  Range: 200
+  ReloadTime: 20
   Speed: 2
   MaxAmmo: 30
   MeleeAttack: 0

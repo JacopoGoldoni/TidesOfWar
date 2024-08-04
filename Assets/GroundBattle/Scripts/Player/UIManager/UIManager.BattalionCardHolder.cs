@@ -29,13 +29,13 @@ public partial class UIManager : MonoBehaviour
         BattalionCard.transform.parent = battalionCardHolder.transform;
 
         BattalionCardManager battalionCardManager = BattalionCard.GetComponent<BattalionCardManager>();
-        battalionCardManager.Initialize(battalion.faction);
+        battalionCardManager.Initialize(battalion);
 
         battalionCards.Add((battalion, battalionCardManager));
 
         //Displacement
         Vector2 cardSize = BattalionCardPrefab.GetComponent<RectTransform>().sizeDelta;
-        battalionCardHolder.GetComponent<RectTransform>().sizeDelta = new Vector2(battalionCards.Count * cardSize.x + 10, cardSize.y + 10);
+        //battalionCardHolder.GetComponent<RectTransform>().sizeDelta = new Vector2(battalionCards.Count * cardSize.x + 10, cardSize.y + 10);
 
         BattalionCardHolderCheck();
     }
@@ -52,7 +52,7 @@ public partial class UIManager : MonoBehaviour
         }
 
         //Displacement
-        battalionCardHolder.GetComponent<RectTransform>().sizeDelta = new Vector2(battalionCards.Count * 100 + 10, 110);
+        //battalionCardHolder.GetComponent<RectTransform>().sizeDelta = new Vector2(battalionCards.Count * 100 + 10, 110);
 
         BattalionCardHolderCheck();
         BattalionCommandTabCheck();

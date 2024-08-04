@@ -31,6 +31,7 @@ public partial class OfficerManager : UnitManager, IVisitable
 
     [Header("Company formation")]
     public int companySize = 120;
+    private Vector2[] snakeFormationVertices;
     private Formation _companyFormation;
     public Formation companyFormation
     {
@@ -75,11 +76,25 @@ public partial class OfficerManager : UnitManager, IVisitable
     public bool ShowSightLines = false;
     public bool ShowFormation = false;
 
+    //SELECTION DESELECTION DETACH
+    public override void OnSelection()
+    {
+        
+    }
+    public override void OnDeselection()
+    {
+        
+    }
+    public void Detach()
+    { 
+        
+    }
+
     //INITIALIZE
     public override void Initialize()
     {
         //GET COMPONENTS
-        ms = GetComponent<MeshRenderer>();
+        mr = GetComponent<MeshRenderer>();
         um = GetComponent<OfficerMovement>();
         lineRenderer = GetComponent<LineRenderer>();
 
@@ -237,7 +252,7 @@ public partial class OfficerManager : UnitManager, IVisitable
                 "Reloading",
                 () => {
                     //SEND RELOAD MESSAGE
-                    SendRelaodMessage();
+                    SendReloadMessage();
                 },
                 null,
                 null

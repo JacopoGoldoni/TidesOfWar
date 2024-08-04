@@ -26,8 +26,14 @@ public class ArtilleryManager : UnitManager, IVisitable
     //TIMERS
     private CountdownTimer fireTimer;
     private CountdownTimer reloadTimer;
+    private CountdownTimer mountTimer = new CountdownTimer(5f);
+    private CountdownTimer dismountTimer = new CountdownTimer(5f);
 
     public ArtilleryOfficerManager masterOfficer;
+
+    [Header("Projectile")]
+    public GameObject ProjectilePrefab;
+    public float projectileSpeed = 10f;
 
     [Header("Crew")]
     public GameObject crewPrefab;
@@ -41,10 +47,12 @@ public class ArtilleryManager : UnitManager, IVisitable
     //private ArtilleryCrewFormation crewFormation;
 
     [Header("Artillery movement")]
-    public bool IsOnCarriage = false;
+    public bool mounted = false;
 
     [Header("Artillery state")]
+    public bool isReloading { get { return reloadTimer.IsRunning; } }
     private FiniteStateMachine artilleryStateMachine;
+    public UnitManager targetUnit { get { return masterOfficer.targeUnit; } }
     public string stateName;
 
     [Header("Debug")]
@@ -52,9 +60,10 @@ public class ArtilleryManager : UnitManager, IVisitable
     public bool ShowFiringLine = false;
     public bool ShowCrewFormation = false;
 
+
     public override void Initialize()
     {
-        ms = GetComponent<MeshRenderer>();
+        smr = GetComponentInChildren<SkinnedMeshRenderer>();
         um = GetComponent<ArtilleryMovement>();
 
         audioData = GetComponent<AudioSource>();
@@ -71,7 +80,8 @@ public class ArtilleryManager : UnitManager, IVisitable
             m.SetColor("_Color", Color.red);
         }
 
-        ms.material = m;
+        smr.sharedMesh = masterOfficer.artilleryBatteryTemplate.CannonMesh;
+        smr.material = m;
 
         //CREW FORMATION INITALIZATION
 
@@ -79,7 +89,16 @@ public class ArtilleryManager : UnitManager, IVisitable
         artilleryStateMachine = new FiniteStateMachine();
         StateMachineInitializer();
 
+        InitializeTimers();
+
         SpawnCrew();
+
+        projectileSpeed = Mathf.Sqrt(masterOfficer.artilleryBatteryTemplate.Range * 9.81f);
+    }
+    private void InitializeTimers()
+    {
+        mountTimer.OnTimerStop = () => { Mount(); };
+        dismountTimer.OnTimerStop = () => { Dismount(); };
     }
 
     public void MoveTo(Vector2 dest, Quaternion quat)
@@ -171,11 +190,20 @@ public class ArtilleryManager : UnitManager, IVisitable
         fireTimer = new CountdownTimer(Random.Range(0f, 2f));
         fireTimer.OnTimerStop = Fire;
         fireTimer.Start();
+        transform.rotation = Quaternion.LookRotation(
+            Utility.V2toV3( ( Utility.V3toV2(targetUnit.transform.position - transform.position) ) ).normalized , 
+            Vector3.up);
+    }
+    public void AbortFire()
+    {
+        fireTimer.Stop();
+        fireTimer.Reset();
     }
     private void Fire()
     {
         //UNLOAD GUN
         Loaded = false;
+        fireTimer.Stop();
 
         //PLAY AUDIO CLIP
         audioData.clip = SFXUtility.GetAudio(fireSFXName + Random.Range(1, 4));
@@ -184,24 +212,63 @@ public class ArtilleryManager : UnitManager, IVisitable
         //PLAY PARTCLE EFFECT
         particleSystem.Play();
 
+        float d = Utility.V3toV2(transform.position - targetUnit.transform.position).magnitude;
+        float angleElevation = -0.5f * Mathf.Asin(9.81f * d / Mathf.Pow(projectileSpeed, 2));
+        float t = 2 * projectileSpeed * Mathf.Sin(angleElevation) / 9.81f;
+        angleElevation *= Mathf.Rad2Deg;
+        angleElevation += Random.Range(-5f, +5f);
+        float maxAngleDir = Mathf.Atan( (targetUnit.GetWidth() / 2f) / d) * Mathf.Rad2Deg;
+
         //TRACE FOR HIT
-        Transform muzzleTransform = transform.GetChild(1).transform;
+        Transform muzzleTransform = transform.GetChild(0).transform;
 
         Vector3 FireDirection = transform.forward;
+        FireDirection = Quaternion.AngleAxis(angleElevation, transform.right) * FireDirection;
+        FireDirection = Quaternion.AngleAxis(Random.Range(-maxAngleDir, +maxAngleDir), transform.up) * FireDirection;
 
         //ARTILLERY FIRE MECHANICS
+        GameObject projectile = Instantiate(ProjectilePrefab);
+        projectile.transform.position = muzzleTransform.position;
+        projectile.transform.rotation = muzzleTransform.rotation;
+        projectile.GetComponent<Rigidbody>().velocity = FireDirection * projectileSpeed;
+        projectile.name = "ArtilleryProjectile";
+
+        projectile.GetComponent<ArtilleryBulletManager>().Initialize(t * 2f);
+
+        Debug.DrawLine(transform.position, transform.position + FireDirection, Color.red, 1f);
     }
 
     //RELOAD
     public void CallReload()
     {
-        reloadTimer = new CountdownTimer(10f);
+        reloadTimer = new CountdownTimer(masterOfficer.artilleryBatteryTemplate.ReloadTime);
         reloadTimer.OnTimerStop = Reload;
         reloadTimer.Start();
+    }
+    public void AbortReloading()
+    {
+        reloadTimer.Stop();
+        reloadTimer.Reset();
     }
     private void Reload()
     {
         Loaded = true;
+        reloadTimer.Stop();
+
+        masterOfficer.Ammo--;
+        masterOfficer.artilleryBatteryCardManager.SetAmmoSlide();
+    }
+
+    //MOUNT & DISMOUNT
+    private void Mount()
+    {
+        mounted = true;
+        transform.transform.localScale = new Vector3(1, 1, -1);
+    }
+    private void Dismount()
+    {
+        mounted = false;
+        transform.transform.localScale = new Vector3(1, 1, 1);
     }
 
     //STATE MACHINE
@@ -222,7 +289,7 @@ public class ArtilleryManager : UnitManager, IVisitable
                 null
             );
         artilleryStates.Add(Idle);
-        //MOVE
+        //MOVING
         State Moving = new State(
                 "Moving",
                 null,
@@ -237,26 +304,162 @@ public class ArtilleryManager : UnitManager, IVisitable
                 }
             );
         artilleryStates.Add(Moving);
+        //MOUNTING
+        State Mounting = new State(
+                "Mounting",
+                () =>
+                {
+                    mountTimer.Reset();
+                    mountTimer.Start();
+                },
+                null,
+                () =>
+                {
+                    mountTimer.Tick(Time.deltaTime);
+                }
+            );
+        artilleryStates.Add(Mounting);
+        //DISMOUNTING
+        State Dismounting = new State(
+                "Dismounting",
+                () =>
+                {
+                    dismountTimer.Reset();
+                    dismountTimer.Start();
+                },
+                null,
+                () =>
+                {
+                    dismountTimer.Tick(Time.deltaTime);
+                }
+            );
+        artilleryStates.Add(Dismounting);
+        //FIRING
+        State Firing = new State(
+                "Firing",
+                () => {
+                    CallFire();
+                },
+                null,
+                null
+            );
+        artilleryStates.Add(Firing);
+        //RELOADING
+        State Reloading = new State(
+                "Reloading",
+                () => {
+                    CallReload();
+                },
+                null,
+                null
+            );
+        artilleryStates.Add(Reloading);
 
         //TRANSITIONS
-        //IDLE -> MOVING
-        Transition IdleMoving = new Transition(
+        //IDLE -> MOUNTING
+        Transition IdleMounting = new Transition(
                 Idle,
-                Moving,
+                Mounting,
                 () => {
                     return um.MovementPoints.Count != 0;
                 }
             );
-        artilleryTransitions.Add(IdleMoving);
-        //MOVING -> IDLE
-        Transition MovingIdle = new Transition(
+        artilleryTransitions.Add(IdleMounting);
+        //MOUNTING -> MOVING
+        Transition MountingMoving = new Transition(
+                Mounting,
                 Moving,
-                Idle,
+                () => {
+                    return mounted;
+                }
+            );
+        artilleryTransitions.Add(MountingMoving);
+        //MOVING -> DISMOUNTING
+        Transition MovingDismounting = new Transition(
+                Moving,
+                Dismounting,
                 () => {
                     return um.MovementPoints.Count == 0;
                 }
             );
-        artilleryTransitions.Add(MovingIdle);
+        artilleryTransitions.Add(MovingDismounting);
+        //DISMOUNTING -> IDLE
+        Transition DismountingIdle = new Transition(
+                Dismounting,
+                Idle,
+                () => {
+                    return !mounted;
+                }
+            );
+        artilleryTransitions.Add(DismountingIdle);
+        //IDLE -> FIRING
+        Transition IdleFiring = new Transition(
+                Idle,
+                Firing,
+                () => {
+                    //HAS TARGET AND HAS NO MOVEMENT AND IS LOADED
+                    return targetUnit != null && um.MovementPoints.Count == 0 && Loaded;
+                }
+            );
+        artilleryTransitions.Add(IdleFiring);
+        //FIRING -> IDLE
+        Transition FiringIdle1 = new Transition(
+                Firing,
+                Idle,
+                () => {
+                    //HAS NO TARGET OR IS UNLOADED
+                    return targetUnit == null || !Loaded;
+                }
+            );
+        artilleryTransitions.Add(FiringIdle1);
+        //FIRING -> IDLE WITH ABORT
+        Transition FiringIdle2 = new Transition(
+                Firing,
+                Idle,
+                () => {
+                    //ABORT FIRE
+                    AbortFire();
+                },
+                () => {
+                    //HAS MOVEMENT
+                    return um.MovementPoints.Count != 0;
+                }
+            );
+        artilleryTransitions.Add(FiringIdle2);
+        //IDLE -> RELOADING
+        Transition IdleReloading = new Transition(
+                Idle,
+                Reloading,
+                () => {
+                    //IS NOT LOADED AND HAS NO MOVEMENT
+                    return !Loaded && um.MovementPoints.Count == 0 && masterOfficer.Ammo > 0;
+                }
+            );
+        artilleryTransitions.Add(IdleReloading);
+        //RELOADING -> IDLE
+        Transition ReloadingIdle1 = new Transition(
+                Reloading,
+                Idle,
+                () => {
+                    //IS LOADED
+                    return Loaded;
+                }
+            );
+        artilleryTransitions.Add(ReloadingIdle1);
+        //RELOADING -> IDLE WITH ABORT
+        Transition ReloadingIdle2 = new Transition(
+                Reloading,
+                Idle,
+                () => {
+                    //ABORT RELOADING
+                    AbortReloading();
+                },
+                () => {
+                    //HAS MOVEMENT
+                    return um.MovementPoints.Count != 0;
+                }
+            );
+        artilleryTransitions.Add(ReloadingIdle2);
 
 
         artilleryStateMachine.AddStates(artilleryStates);
@@ -293,21 +496,24 @@ public class ArtilleryManager : UnitManager, IVisitable
         }
     }
 
+    public override float GetWidth()
+    {
+        throw new System.NotImplementedException();
+    }
+
     //GIZMOS
     public void OnDrawGizmos()
     {
         //if (ShowFormation)
             //FormationGizmo();
     }
-    /*
-    private void FormationGizmo()
+
+    public override void OnSelection()
     {
-        for (int i = 0; i < crewSize; i++)
-        {
-            Gizmos.color = new Color(0, 1, 0, 0.5f);
-            Vector3 FormationSlot = Utility.V2toV3(GetFormationCoords(i)) + transform.position;
-            Gizmos.DrawSphere(FormationSlot, 0.2f);
-        }
+        throw new System.NotImplementedException();
     }
-    */
+    public override void OnDeselection()
+    {
+        throw new System.NotImplementedException();
+    }
 }

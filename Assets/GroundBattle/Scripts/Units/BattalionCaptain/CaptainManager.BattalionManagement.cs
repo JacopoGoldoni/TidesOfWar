@@ -7,7 +7,7 @@ public partial class CaptainManager : UnitManager
     //BATTALLION FORMATION MANAGEMENT
     public void SendFormation()
     {
-        for (int i = 0; i < battallionSize; i++)
+        for (int i = 0; i < companies.Count; i++)
         {
             if (companies[i] != null)
             {
@@ -44,5 +44,49 @@ public partial class CaptainManager : UnitManager
             }
         }
         return true;
+    }
+    public int GetCompanyPos(OfficerManager company)
+    {
+        if(battalionFormation.FrontCompanies.Contains(company))
+        {
+            return 0;
+        }
+        if (battalionFormation.LineCompanies.Contains(company))
+        {
+            return 1;
+        }
+        if (battalionFormation.RearCompanies.Contains(company))
+        {
+            return 2;
+        }
+        return 0;
+    }
+    public void UpdateFire()
+    {
+        if(battalionFormation.FrontCompanies.Count == 0)
+        {
+            //NO FRONT COMPANIES
+            foreach(OfficerManager l in battalionFormation.LineCompanies)
+            {
+                l.FireAll = true;
+            }
+        }
+        else
+        {
+            //HAS FRONT COMPANIES
+            foreach (OfficerManager f in battalionFormation.FrontCompanies)
+            {
+                f.FireAll = true;
+            }
+            foreach (OfficerManager l in battalionFormation.LineCompanies)
+            {
+                l.FireAll = false;
+            }
+        }
+
+        foreach(OfficerManager r in battalionFormation.RearCompanies)
+        {
+            r.FireAll = false;
+        }
     }
 }

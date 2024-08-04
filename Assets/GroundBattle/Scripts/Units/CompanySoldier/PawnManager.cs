@@ -31,7 +31,7 @@ public class PawnManager : UnitManager
 
     public override void Initialize()
     {
-        ms = GetComponent<MeshRenderer>();
+        mr = GetComponent<MeshRenderer>();
         um = GetComponent<PawnMovement>();
 
         audioData = GetComponent<AudioSource>();
@@ -48,7 +48,7 @@ public class PawnManager : UnitManager
             m.SetColor("_Color", Color.red);
         }
 
-        ms.material = m;
+        mr.material = m;
 
         rifle = transform.GetChild(0).gameObject;
 
@@ -94,12 +94,22 @@ public class PawnManager : UnitManager
         }
     }
 
+    public override float GetWidth()
+    {
+        throw new System.NotImplementedException();
+    }
+
     //FIRE
     public void CallFire()
     {
         fireTimer = new CountdownTimer(Random.Range(0f, 2f));
         fireTimer.OnTimerStop = Fire;
         fireTimer.Start();
+    }
+    public void AbortFiring()
+    {
+        fireTimer.Stop();
+        fireTimer.Reset();
     }
     private void Fire()
     {
@@ -118,9 +128,9 @@ public class PawnManager : UnitManager
 
         Vector3 FireDirection = transform.forward;
 
-        OfficerManager target = masterOfficer.targetCompany;
+        UnitManager target = masterOfficer.targetCompany;
 
-        float targetWidth = target.companyFormation.Lines * target.companyFormation.a;
+        float targetWidth = target.GetWidth();
         Vector3 targetPos = target.transform.position;
         Vector3 targetRight = target.transform.right;
         
@@ -156,6 +166,12 @@ public class PawnManager : UnitManager
         reloadTimer.Start();
         TakeRifleUp();
     }
+    public void AbortReload()
+    {
+        reloadTimer.Stop();
+        reloadTimer.Reset();
+        TakeRifleDown();
+    }
     private void Reload()
     {
         Loaded = true;
@@ -169,5 +185,14 @@ public class PawnManager : UnitManager
     public void TakeRifleDown()
     {
         rifle.transform.localEulerAngles = new Vector3(0, 0, 0);
+    }
+
+    public override void OnSelection()
+    {
+        throw new System.NotImplementedException();
+    }
+    public override void OnDeselection()
+    {
+        throw new System.NotImplementedException();
     }
 }

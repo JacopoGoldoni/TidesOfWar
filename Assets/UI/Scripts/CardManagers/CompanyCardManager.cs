@@ -1,47 +1,93 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(Image))]
-public class CompanyCardManager : MonoBehaviour
+public class CompanyCardManager : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
-    public Image cardImage;
+    private Image bg;
+    public Image flagImage;
+    public Image unitImage;
+    public TextMeshProUGUI nameText;
     public Slider ammoSlider;
 
-    private Factions faction = Factions.France;
+    public OfficerManager companyRef;
 
-    private void Start()
+    public void Initialize(OfficerManager company)
     {
-        Initialize(faction);
+        bg = GetComponent<Image>();
+        companyRef = company;
+        companyRef.companyCardManager = this;
+
+        SetFlag(company.faction);
+        SetUnit(company.companyTemplate.CompanyIcon);
+        SetBattalionTextName(company.companyNumber, company.companyName, company.companyTemplate.hardness);
+        SetAmmoSlide();
     }
 
-    public void Initialize(Factions faction)
+    public void SetFlag(Factions faction)
     {
-        this.faction = faction;
-        
-        SetImage(GFXUtility.GetFlag(faction));
+        flagImage.sprite = GFXUtility.GetFlag(faction);
+    }
+    public void SetAmmoSlide()
+    {
+        ammoSlider.value = (float)companyRef.Ammo / (float)companyRef.companyTemplate.MaxAmmo;
     }
 
-    public void SetImage(Sprite sprite)
+    public void SetUnit(string unit)
     {
-        cardImage.sprite = sprite;
+        unitImage.sprite = GFXUtility.GetUnitSprite(unit);
     }
-
-    public void SetAmmoSlider(int ammo, int maxAmmo)
+    public void SetBattalionTextName(int battalioNumber, string name, UnitHardness hardness)
     {
-        ammoSlider.value = (float)ammo / (float)maxAmmo;
+        nameText.text = battalioNumber.ToString() + " " + hardness.ToString() + " Comp. " + " " + name;
     }
 
     public void HighLight(bool highlight)
     {
-        if(highlight)
+        if (highlight)
         {
-            cardImage.color = Color.yellow;
+            flagImage.color = Color.yellow;
         }
         else
         {
-            cardImage.color = Color.white;
+            flagImage.color = Color.white;
+        }
+    }
+
+    void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData)
+    {
+        bg.color = new Color(1.2f, 1.2f, 1.2f, 1f);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        bg.color = new Color(1f, 1f, 1f, 1f);
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        CameraManager cameraManagerRef = Utility.Camera.GetComponent<CameraManager>();
+        //SELECT COMPANY
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            if (!cameraManagerRef.selectedCompanies.Contains(companyRef))
+            {
+                cameraManagerRef.SelectCompany(companyRef);
+            }
+            else
+            {
+                cameraManagerRef.DeselectCompany(companyRef);
+            }
+        }
+        else
+        {
+            cameraManagerRef.DeselectAllCompanies();
+            cameraManagerRef.SelectCompany(companyRef);
         }
     }
 }

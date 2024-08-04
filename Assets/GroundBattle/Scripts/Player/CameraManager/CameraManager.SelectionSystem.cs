@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public partial class CameraManager : MonoBehaviour
@@ -13,9 +14,13 @@ public partial class CameraManager : MonoBehaviour
         selectedCompanies.Add(target);
 
         DeselectAllBattalions();
+        DeselectAllArtilleryBatteries();
 
         uimanager.CompanyCommandTabCheck();
         uimanager.HighlightCompanyCard(target.companyNumber, true);
+        uimanager.UpdateCompanyCommandStatus();
+
+        target.OnSelection();
     }
     public void DeselectCompany(OfficerManager target)
     {
@@ -23,6 +28,9 @@ public partial class CameraManager : MonoBehaviour
 
         uimanager.CompanyCommandTabCheck();
         uimanager.HighlightCompanyCard(target.companyNumber, false);
+        uimanager.UpdateCompanyCommandStatus();
+
+        target.OnDeselection();
     }
     public void DeselectAllCompanies()
     {
@@ -32,6 +40,7 @@ public partial class CameraManager : MonoBehaviour
             foreach (OfficerManager t in selectedCompanies)
             {
                 uimanager.HighlightCompanyCard(t.companyNumber, false);
+                t.OnDeselection();
             }
         }
 
@@ -44,9 +53,12 @@ public partial class CameraManager : MonoBehaviour
         selectedBattalions.Add(target);
 
         DeselectAllCompanies();
+        DeselectAllArtilleryBatteries();
 
         uimanager.BattalionCommandTabCheck();
         uimanager.HighlightBattalionCard(target.battalionNumber, true);
+
+        target.OnSelection();
     }
     public void DeselectBattalion(CaptainManager target)
     {
@@ -54,6 +66,8 @@ public partial class CameraManager : MonoBehaviour
 
         uimanager.BattalionCommandTabCheck();
         uimanager.HighlightBattalionCard(target.battalionNumber, false);
+
+        target.OnDeselection();
     }
     public void DeselectAllBattalions()
     {
@@ -63,6 +77,7 @@ public partial class CameraManager : MonoBehaviour
             foreach (CaptainManager t in selectedBattalions)
             {
                 uimanager.HighlightBattalionCard(t.battalionNumber, false);
+                t.OnDeselection();
             }
         }
 
@@ -79,6 +94,7 @@ public partial class CameraManager : MonoBehaviour
 
         uimanager.ArtilleryBatteryCommandTabCheck();
         uimanager.HighlightArtilleryBatteryCard(target.batteryNumber, true);
+        target.OnSelection();
     }
     public void DeselectArtilleryBattery(ArtilleryOfficerManager target)
     {
@@ -86,15 +102,17 @@ public partial class CameraManager : MonoBehaviour
 
         uimanager.ArtilleryBatteryCommandTabCheck();
         uimanager.HighlightArtilleryBatteryCard(target.batteryNumber, false);
+        target.OnDeselection();
     }
     public void DeselectAllArtilleryBatteries()
     {
         //Remove highlight to all units
-        if (selectedBattalions.Count != 0)
+        if (selectedArtilleryBatteries.Count != 0)
         {
-            foreach (CaptainManager t in selectedBattalions)
+            foreach (ArtilleryOfficerManager t in selectedArtilleryBatteries)
             {
-                uimanager.HighlightArtilleryBatteryCard(t.battalionNumber, false);
+                uimanager.HighlightArtilleryBatteryCard(t.batteryNumber, false);
+                t.OnDeselection();
             }
         }
 

@@ -5,9 +5,9 @@ using UnityEngine.UI;
 
 public partial class UIManager : MonoBehaviour
 {
-    List<(GameObject, GameObject)> companyFlags = new List<(GameObject, GameObject)>();     //(target, flag)
-    List<(GameObject, GameObject)> battalionFlags = new List<(GameObject, GameObject)>();   //(target, flag)
-    List<(GameObject, GameObject)> artilleryBattalionFlags = new List<(GameObject, GameObject)>();   //(target, flag)
+    List<(GameObject, GameObject)> companyFlags = new List<(GameObject, GameObject)>();                 //(target, flag)
+    List<(GameObject, GameObject)> battalionFlags = new List<(GameObject, GameObject)>();               //(target, flag)
+    List<(GameObject, GameObject)> artilleryBattalionFlags = new List<(GameObject, GameObject)>();      //(target, flag)
     
     [Header("Flag variables")]
     public float baseFlagScale = 0.5f;
@@ -119,7 +119,7 @@ public partial class UIManager : MonoBehaviour
 
                 RectTransform r = o.Item2.GetComponent<RectTransform>();
 
-                r.sizeDelta = scale * new Vector2(80, 53);
+                r.localScale = scale * Vector3.one;
             }
             else
             {
@@ -151,7 +151,7 @@ public partial class UIManager : MonoBehaviour
 
                 RectTransform r = o.Item2.GetComponent<RectTransform>();
 
-                r.sizeDelta = scale * new Vector2(80, 53);
+                r.localScale = scale * Vector3.one;
             }
             else
             {
@@ -183,7 +183,7 @@ public partial class UIManager : MonoBehaviour
 
                 RectTransform r = o.Item2.GetComponent<RectTransform>();
 
-                r.sizeDelta = scale * new Vector2(80, 53);
+                r.localScale = scale * Vector3.one;
             }
             else
             {
