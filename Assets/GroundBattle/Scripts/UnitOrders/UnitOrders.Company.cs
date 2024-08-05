@@ -20,6 +20,7 @@ public static partial class UnitOrders
         {
             Formation f = new Column(om.companySize);
             om.SetFormation(f);
+            om.ReceiveMovementOrder(false, Utility.V3toV2(om.transform.position), om.transform.rotation);
         }
     }
     public static void Company_SendStopOrder(OfficerManager[] companies)

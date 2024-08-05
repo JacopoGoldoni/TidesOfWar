@@ -42,6 +42,11 @@ public class ArtilleryCarriageManager : UnitManager
         throw new System.NotImplementedException();
     }
 
+    public override float GetLenght()
+    {
+        throw new System.NotImplementedException();
+    }
+
     public override void OnSelection()
     {
         throw new System.NotImplementedException();

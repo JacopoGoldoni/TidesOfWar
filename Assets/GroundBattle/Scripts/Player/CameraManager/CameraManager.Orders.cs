@@ -16,7 +16,7 @@ public partial class CameraManager : MonoBehaviour
             //CALCULATE SELECTED FORMATION WIDTH
             for (int i = 0; i < selectedCompanies.Count; i++)
             {
-                comapnyFormationWidth += companySpace + selectedCompanies[i].GetCompanyWidth();
+                comapnyFormationWidth += companySpace + selectedCompanies[i].GetWidth();
             }
 
             //COMPANY MOVEMENT ORDER
@@ -29,11 +29,11 @@ public partial class CameraManager : MonoBehaviour
                 {
                     if (j == i)
                     {
-                        localX += companySpace + selectedCompanies[j].GetCompanyWidth() / 2f;
+                        localX += companySpace + selectedCompanies[j].GetWidth() / 2f;
                     }
                     else
                     {
-                        localX += companySpace + selectedCompanies[j].GetCompanyWidth();
+                        localX += companySpace + selectedCompanies[j].GetWidth();
                     }
                 }
 
@@ -41,20 +41,20 @@ public partial class CameraManager : MonoBehaviour
 
                 Vector2 pos = Utility.V3toV2(OrderPoint) + relativePos;
 
-
-                if (unit.IsObstructedAt(pos))
-                {
-                    continue;
-                }
-
                 Quaternion rot = Quaternion.LookRotation(Utility.V2toV3(Orientation), Vector3.up);
 
                 //SEND ORDER
-                unit.ReceiveMovementOrder(Input.GetKey(KeyCode.LeftShift), pos, rot);
-
-                //UPDATE PROJECTIONS
-                //DeleteAllProjections();
-                //ProjectAll();
+                if (selectedCompanies[i].companyFormation.name == "Column")
+                {
+                    float lenght = selectedCompanies[i].companyFormation.Ranks * selectedCompanies[i].companyFormation.b;
+                    Vector2 pos1 = pos + Utility.V3toV2(rot * Vector3.forward * -lenght);
+                    unit.ReceiveMovementOrder(false, pos1, rot);
+                    unit.ReceiveMovementOrder(true, pos, rot);
+                }
+                else
+                {
+                    unit.ReceiveMovementOrder(Input.GetKey(KeyCode.LeftShift), pos, rot);
+                }
             }
 
             ShowOrderArrow = false;

@@ -196,6 +196,11 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
         float width = (batteryFormation.Lines - 1) * batteryFormation.a;
         return width;
     }
+    public override float GetLenght()
+    {
+        float width = (batteryFormation.Ranks - 1) * batteryFormation.a;
+        return width;
+    }
 
     //BATTERY FIRE MANAGEMENT
     public bool CheckLoadedStatus()

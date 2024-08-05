@@ -53,13 +53,10 @@ public partial class CaptainManager : UnitManager
     }
     public override float GetWidth()
     {
-        int size = 0;
-
-        foreach (OfficerManager company in companies)
-        {
-            size += company.companySize;
-        }
-
-        return size;
+        return battalionFormation.GetWidth();
+    }
+    public override float GetLenght()
+    {
+        return battalionFormation.GetLenght();
     }
 }

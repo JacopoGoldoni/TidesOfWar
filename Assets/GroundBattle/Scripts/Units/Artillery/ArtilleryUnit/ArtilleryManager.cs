@@ -500,6 +500,10 @@ public class ArtilleryManager : UnitManager, IVisitable
     {
         throw new System.NotImplementedException();
     }
+    public override float GetLenght()
+    {
+        throw new System.NotImplementedException();
+    }
 
     //GIZMOS
     public void OnDrawGizmos()

@@ -14,7 +14,18 @@ public abstract class Formation
     public float b = 1f;
 
     public abstract Vector2 GetPos(int ID);
+    public Vector2 GetCenter()
+    {
+        int i = Lines * Ranks;
+        Vector2 p = new Vector2();
 
+        for(int j = 0; j < i; j++)
+        {
+            p += GetPos(j);
+        }
+        p /= i;
+        return p;
+    }
     public int GetRank(int ID)
     {
         int r = (ID / Lines + 1);
@@ -88,30 +99,33 @@ public class Column : Formation
 
     public override Vector2 GetPos(int ID)
     {
-        Vector2 pos;
+        Vector2 pos = new Vector2();
 
-        if (Lines == 1)
-        {
-            pos.x = 0;
-            pos.y = (ID) * b;
-        }
-        else
-        {
-            int n = ID / Ranks;
+        pos.x = (GetLine(ID) - Lines / 2) * a;
+        pos.y = GetRank(ID) * b;
+
+        //if (Lines == 1)
+        //{
+        //    pos.x = 0;
+        //    pos.y = (ID) * b;
+        //}
+        //else
+        //{
+        //    int n = ID / Ranks;
             
-            pos.x = (n - (float)(Lines-1) / 2f ) * a;
+        //    pos.x = (n - (float)(Lines-1) / 2f ) * a;
             
-            if(n % 2 == 0)
-            {
-                //UP
-                pos.y = (ID % Ranks) * b;
-            }
-            else
-            {
-                //DOWN
-                pos.y = (Ranks - (ID % Ranks + 1)) * b;
-            }
-        }
+        //    if(n % 2 == 0)
+        //    {
+        //        //UP
+        //        pos.y = (ID % Ranks) * b;
+        //    }
+        //    else
+        //    {
+        //        //DOWN
+        //        pos.y = (Ranks - (ID % Ranks + 1)) * b;
+        //    }
+        //}
 
 
         return pos;

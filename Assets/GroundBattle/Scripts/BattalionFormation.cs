@@ -153,16 +153,16 @@ public class BattalionFormation
         float w = 0f;
 
         //FIRST
-        w += companies[0].GetCompanyWidth() / 2f;
+        w += companies[0].GetWidth() / 2f;
         p[0] = w;
-        w += companies[0].GetCompanyWidth() / 2f;
+        w += companies[0].GetWidth() / 2f;
 
         for (int i = 1; i < companies.Count; i++)
         {
             w += space;
-            w += companies[i].GetCompanyWidth() / 2f;
+            w += companies[i].GetWidth() / 2f;
             p[i] = w;
-            w += companies[i].GetCompanyWidth() / 2f;
+            w += companies[i].GetWidth() / 2f;
         }
         
         for(int i = 0; i < companies.Count; i++)
@@ -245,7 +245,7 @@ public class BattalionFormation
         {
             for (int i = 0; i < FrontCompanies.Count; i++)
             {
-                f += FrontCompanies[i].GetCompanyWidth();
+                f += FrontCompanies[i].GetWidth();
             }
             f += (FrontCompanies.Count - 1) * spaceX;
         }
@@ -255,7 +255,7 @@ public class BattalionFormation
         {
             for (int i = 0; i < LineCompanies.Count; i++)
             {
-                l += LineCompanies[i].GetCompanyWidth();
+                l += LineCompanies[i].GetWidth();
             }
             l += (LineCompanies.Count - 1) * spaceX;
         }
@@ -265,12 +265,31 @@ public class BattalionFormation
         {
             for (int i = 0; i < RearCompanies.Count; i++)
             {
-                r += RearCompanies[i].GetCompanyWidth();
+                r += RearCompanies[i].GetWidth();
             }
             r += (RearCompanies.Count - 1) * spaceX;
         }
 
         return Mathf.Max(f,l,r);
+    }
+    public float GetLenght()
+    {
+        float l = 0;
+
+        if(FrontCompanies.Count != 0)
+        {
+            l += spaceY;
+        }
+        if (LineCompanies.Count != 0)
+        {
+            l += spaceY;
+        }
+        if (RearCompanies.Count != 0)
+        {
+            l += spaceY;
+        }
+
+        return l;
     }
 
     //FORMATION MANAGFEMENT

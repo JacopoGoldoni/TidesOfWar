@@ -9,13 +9,6 @@ public partial class CameraManager : MonoBehaviour
     private InputAction hideUI_Key;
     private InputAction timeScale_Axis;
 
-    //3D UI ELEMENTS
-    List<GameObject> projectionSights = new List<GameObject>();
-
-    //SIGHTS VARIABLES
-    List<float> sizes = new List<float>();
-    List<Mesh> sm = new List<Mesh>();
-
     [Header("Player info")]
     public Factions faction = Factions.France;
 
@@ -35,6 +28,8 @@ public partial class CameraManager : MonoBehaviour
     Vector3 OrderPoint2 = new Vector3(0, 0, 0);
     Vector3 OrderPoint3 = new Vector3(0, 0, 0);
     bool ShowOrderArrow = false;
+    GameObject formationProjection;
+    float formationProjectionOffset = 0f;
 
     int UILayer;
 
@@ -120,17 +115,7 @@ public partial class CameraManager : MonoBehaviour
 
         if (ShowOrderArrow)
         {
-            tr.enabled = true;
-
-            Ray ray = GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit))
-            {
-                OrderPoint3 = hit.point;
-            }
-
-            tr.SetPosition(0, OrderPoint + (GetComponent<Camera>().transform.position - OrderPoint).normalized * 0.1f);
-            tr.SetPosition(1, OrderPoint3 + (GetComponent<Camera>().transform.position - OrderPoint3).normalized * 0.1f);
+            OrderProjection();
         }
         else
         {
@@ -184,10 +169,101 @@ public partial class CameraManager : MonoBehaviour
         {
             OrderPoint2 = hit.point;
         }
+
+        //RESET PROJECTION
+        Destroy(formationProjection);
+        formationProjection = null;
+        formationProjectionOffset = 0f;
+    }
+    private void OrderProjection()
+    {
+        //ORIENTATION ARROW
+        tr.enabled = true;
+
+        Ray ray = GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit))
+        {
+            OrderPoint3 = hit.point;
+        }
+
+        tr.SetPosition(0, OrderPoint + (GetComponent<Camera>().transform.position - OrderPoint).normalized * 0.1f);
+        tr.SetPosition(1, OrderPoint3 + (GetComponent<Camera>().transform.position - OrderPoint3).normalized * 0.1f);
+
+        //FORMATION HOLOGRAM
+        if(formationProjection == null)
+        {
+            float selectedWidth = 0f;
+            float selectedLenght = 0f;
+
+            formationProjection = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            formationProjection.GetComponent<Collider>().enabled = false;
+            formationProjection.GetComponent<MeshRenderer>().material = OlogramMaterial2;
+
+            //WIDTH
+            if(selectedCompanies.Count != 0)
+            {
+                //CALCULATE SELECTED FORMATION WIDTH
+                for (int i = 0; i < selectedCompanies.Count; i++)
+                {
+                    selectedWidth += companySpace + selectedCompanies[i].GetWidth();
+                }
+            }
+            else if(selectedBattalions.Count != 0)
+            {
+                selectedWidth += selectedBattalions[0].battalionFormation.GetWidth();
+                for (int i = 1; i < selectedBattalions.Count; i++)
+                {
+                    selectedWidth += battalionSpace;
+                    selectedWidth += selectedBattalions[i].GetWidth();
+                }
+            }
+
+            //LENGHT
+            if (selectedCompanies.Count != 0)
+            {
+                for(int i = 0; i < selectedCompanies.Count; i++)
+                {
+                    float l = selectedCompanies[i].GetLenght();
+                    selectedLenght = Mathf.Max(selectedLenght, l);
+                }
+            }
+            else if (selectedBattalions.Count != 0)
+            {
+                for (int i = 0; i < selectedBattalions.Count; i++)
+                {
+                    float l = selectedBattalions[i].GetLenght();
+                    selectedLenght = Mathf.Max(selectedLenght, l);
+                }
+            }
+
+            //OFFSET
+            if(selectedCompanies.Count != 0)
+            {
+                for(int i = 0; i < selectedCompanies.Count; i++)
+                {
+                    formationProjectionOffset = Mathf.Max(formationProjectionOffset, selectedCompanies[i].companyFormation.GetCenter().y);
+                }
+            }
+            else if(selectedBattalions.Count != 0)
+            {
+                formationProjectionOffset = 0f;
+            }
+
+            formationProjection.transform.localScale = new Vector3(selectedWidth, 1f, selectedLenght);
+        }
+
+        formationProjection.transform.position = OrderPoint - Utility.V2toV3((Utility.V3toV2(OrderPoint3 - OrderPoint))).normalized * formationProjectionOffset;
+        formationProjection.transform.rotation = Quaternion.LookRotation(OrderPoint3 - OrderPoint, Vector3.up);
     }
 
     private bool AnyUnitSelected()
     {
-        return selectedCompanies.Count != 0 || selectedBattalions.Count != 0 || selectedArtilleryBatteries.Count != 0;
+        bool selected;
+
+        selected = selectedBattalions.Count != 0 || selectedArtilleryBatteries.Count != 0;
+        selected |= selectedCompanies.Count != 0 && selectedCompanies.TrueForAll(s => s.IsDetached());
+
+        return selected;
     }
 }

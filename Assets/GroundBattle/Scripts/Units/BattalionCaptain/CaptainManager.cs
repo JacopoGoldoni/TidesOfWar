@@ -272,7 +272,7 @@ public partial class CaptainManager : UnitManager
         {
             Gizmos.color = new Color(0, 0, 1, 0.5f);
             Vector3 FormationSlot = Utility.V2toV3(GetFormationCoords(companies[i])) + transform.position;
-            Gizmos.DrawSphere(FormationSlot, companies[i].GetCompanyWidth() / 2);
+            Gizmos.DrawSphere(FormationSlot, companies[i].GetWidth() / 2);
         }
     }
 }

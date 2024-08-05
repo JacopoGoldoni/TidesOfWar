@@ -49,6 +49,7 @@ public abstract class UnitManager : MonoBehaviour
     }
 
     public abstract float GetWidth();
+    public abstract float GetLenght();
 
     public abstract void OnSelection();
     public abstract void OnDeselection();

@@ -184,11 +184,6 @@ public partial class OfficerManager : UnitManager, IVisitable
 
         return false;
     }
-    public float GetCompanyWidth()
-    {
-        float width = (companyFormation.Lines - 1) * companyFormation.a;
-        return width;
-    }
 
     //COMPANY FIRE MANAGEMENT
     public void SendFireMessage()

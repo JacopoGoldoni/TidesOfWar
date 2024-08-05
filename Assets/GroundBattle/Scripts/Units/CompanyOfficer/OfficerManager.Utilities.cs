@@ -9,6 +9,10 @@ public partial class OfficerManager : UnitManager, IVisitable
     {
         return (companyFormation.Lines - 1) * companyFormation.a;
     }
+    public override float GetLenght()
+    {
+        return (companyFormation.Ranks - 1) * companyFormation.b;
+    }
     private void DrawPathLine()
     {
         lineRenderer.enabled = drawPathLine;

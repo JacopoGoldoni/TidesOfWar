@@ -98,6 +98,10 @@ public class PawnManager : UnitManager
     {
         throw new System.NotImplementedException();
     }
+    public override float GetLenght()
+    {
+        throw new System.NotImplementedException();
+    }
 
     //FIRE
     public void CallFire()
