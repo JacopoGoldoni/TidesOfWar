@@ -22,6 +22,8 @@ public partial class OfficerManager : UnitManager, IVisitable
     public CaptainManager masterCaptain;
     public CompanyCardManager companyCardRef;
 
+    public MeshFilter companySightMeshFilter;
+
     [Header("Pawns")]
     public GameObject pawnPrefab;
     public List<PawnManager> pawns = new List<PawnManager>();
@@ -81,10 +83,12 @@ public partial class OfficerManager : UnitManager, IVisitable
     public override void OnSelection()
     {
         companyCardRef.HighLight(true);
+        companySightMeshFilter.gameObject.SetActive(true);
     }
     public override void OnDeselection()
     {
         companyCardRef.HighLight(false);
+        companySightMeshFilter.gameObject.SetActive(false);
     }
     public void Detach()
     {
@@ -131,6 +135,8 @@ public partial class OfficerManager : UnitManager, IVisitable
         {
             Utility.Camera.GetComponent<UIManager>().AddCompanyCard(this);
         }
+
+        GenerateSightMesh(11, (companyFormation.Lines - 1) * companyFormation.a / 2f, companyTemplate.Range, 5f);
     }
     private void InitializeStats()
     {
@@ -206,13 +212,66 @@ public partial class OfficerManager : UnitManager, IVisitable
         //Stats.Mediator.Update(Time.deltaTime);
     }
 
+    public void GenerateSightMesh(int arcVertices, float baseWidth, float SightRadius, float CenterRadius)
+    {
+        Mesh sightMesh = new Mesh
+        {
+            name = "Sight mesh"
+        };
+
+        float unitAngle = Mathf.Atan(baseWidth / CenterRadius) / ((arcVertices - 1) / 2f);
+
+        Vector3 s = Vector3.forward * -CenterRadius;
+
+        //VERTICES
+        List<Vector3> vertices = new List<Vector3>
+        {
+            //BASE VERTICES
+            Vector3.zero,                       //0
+            Vector3.right * -baseWidth,         //1
+            Vector3.right * baseWidth           //2
+        };
+
+        //ARC VERTICES
+        for (int i = 0; i < arcVertices; i++)
+        {
+            float angle = (i - (arcVertices - 1) / 2f) * -unitAngle * Mathf.Rad2Deg;
+            Quaternion rot = Quaternion.AngleAxis(angle, Vector3.up);
+            Vector3 v = s + rot * Vector3.forward * (CenterRadius + SightRadius);
+
+            vertices.Add(v);
+        }
+
+        //FACES
+        List<int> faces = new List<int>
+        {
+            //BASE FACES
+            1,
+            arcVertices + 2,
+            0
+        };
+
+        //ARC FACES
+        for (int i = 0; i < arcVertices; i++)
+        {
+            faces.Add(0);
+            faces.Add(2 + i + 1);
+            faces.Add(2 + i);
+        }
+
+        sightMesh.vertices = vertices.ToArray();
+        sightMesh.triangles = faces.ToArray();
+
+        companySightMeshFilter.mesh = sightMesh;
+    }
+
     //SENSING
     private UnitManager EnemyInRange(float Range)
     {
         float R2 = 5f;
         Vector3 Start = transform.position + transform.up * 1 + transform.forward * -R2;
 
-        float d = (companyFormation.Lines/2 * (Range + R2)) / (2* R2);
+        float d = ((companyFormation.Lines - 1) * companyFormation.a * (Range + R2)) / (2* R2);
 
         Vector2 a = Utility.V3toV2((transform.forward * (R2 + Range) + transform.right * d).normalized * (R2 + Range));
         Vector2 b = Utility.V3toV2((transform.forward * (R2 + Range) + transform.right * -d).normalized * (R2 + Range));

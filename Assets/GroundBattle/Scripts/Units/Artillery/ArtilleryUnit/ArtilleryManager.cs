@@ -7,6 +7,12 @@ public class ArtilleryManager : UnitManager, IVisitable
     //COMPONENTS
     LineRenderer lineRenderer;
 
+    //BONES
+    public Transform bone_Root;
+    public Transform bone_Barrel;
+    public Transform bone_WheelL;
+    public Transform bone_WheelR;
+
     //STATS
     [SerializeField] public CompanyTemplate unitTemplate;
     public Stats stats { get; private set; }
@@ -60,7 +66,7 @@ public class ArtilleryManager : UnitManager, IVisitable
     public bool ShowFiringLine = false;
     public bool ShowCrewFormation = false;
 
-
+    //INITIALIZERS
     public override void Initialize()
     {
         smr = GetComponentInChildren<SkinnedMeshRenderer>();
@@ -90,6 +96,7 @@ public class ArtilleryManager : UnitManager, IVisitable
         StateMachineInitializer();
 
         InitializeTimers();
+        //InitializeBones();
 
         SpawnCrew();
 
@@ -99,6 +106,13 @@ public class ArtilleryManager : UnitManager, IVisitable
     {
         mountTimer.OnTimerStop = () => { Mount(); };
         dismountTimer.OnTimerStop = () => { Dismount(); };
+    }
+    private void InitializeBones()
+    {
+        bone_Root = Utility.GetChildByName(gameObject, "Root");
+        bone_WheelL = Utility.GetChildByName(gameObject, "Wheel.L");
+        bone_WheelR = Utility.GetChildByName(gameObject, "Wheel.R");
+        bone_Barrel = Utility.GetChildByName(gameObject, "Barrel");
     }
 
     public void MoveTo(Vector2 dest, Quaternion quat)
@@ -167,23 +181,6 @@ public class ArtilleryManager : UnitManager, IVisitable
         Destroy(transform.gameObject);
     }
 
-    /*
-    private Vector2 GetFormationCoords(int ID)
-    {
-        Vector2 pos2 = crewFormation.GetPos(ID);
-
-        pos2.y *= -0.5f;
-
-        Vector3 pos3 = Utility.V2toV3(pos2);
-
-        Quaternion rotation = transform.rotation;
-
-        pos3 = rotation * pos3;
-
-        return Utility.V3toV2(pos3);
-    }
-    */
-
     //FIRE
     public void CallFire()
     {
@@ -210,7 +207,10 @@ public class ArtilleryManager : UnitManager, IVisitable
         audioData.Play(0);
 
         //PLAY PARTCLE EFFECT
-        particleSystem.Play();
+        if(particleSystem != null)
+        {
+            particleSystem.Play();
+        }
 
         float d = Utility.V3toV2(transform.position - targetUnit.transform.position).magnitude;
         float angleElevation = -0.5f * Mathf.Asin(9.81f * d / Mathf.Pow(projectileSpeed, 2));
@@ -263,12 +263,12 @@ public class ArtilleryManager : UnitManager, IVisitable
     private void Mount()
     {
         mounted = true;
-        transform.transform.localScale = new Vector3(1, 1, -1);
+        bone_Root.localRotation = Quaternion.Euler(-90f, 90f, 90f);
     }
     private void Dismount()
     {
         mounted = false;
-        transform.transform.localScale = new Vector3(1, 1, 1);
+        bone_Root.localRotation = Quaternion.Euler(90f, 90f, 90f);
     }
 
     //STATE MACHINE

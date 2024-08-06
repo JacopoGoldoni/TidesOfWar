@@ -165,7 +165,7 @@ public class PawnManager : UnitManager
     //RELOAD
     public void CallReload()
     {
-        reloadTimer = new CountdownTimer(10f);
+        reloadTimer = new CountdownTimer(masterOfficer.companyTemplate.ReloadTime);
         reloadTimer.OnTimerStop = Reload;
         reloadTimer.Start();
         TakeRifleUp();

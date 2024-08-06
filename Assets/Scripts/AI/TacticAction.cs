@@ -20,7 +20,3 @@ public class AttackEnemy : TacticAction
 {
     public int enemyID;
 }
-public class AttackNearest : TacticAction
-{
-
-}

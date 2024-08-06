@@ -103,17 +103,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   faction: 0
-  ms: {fileID: 0}
+  mr: {fileID: 0}
+  smr: {fileID: 0}
   m: {fileID: 0}
   um: {fileID: 0}
   UnitMesh: {fileID: 4064786809506695948, guid: 84504a8247ebf044c84f362232097cb8,
     type: 3}
   UnitMaterial: {fileID: 2100000, guid: ef561f36c67d42c4dbea3f3a2082e033, type: 2}
   Killable: 0
-  sightMeshFilter: {fileID: 3527839363118081194}
   companyTemplate: {fileID: 0}
   ID: 0
   masterCaptain: {fileID: 0}
+  companyCardRef: {fileID: 0}
+  companySightMeshFilter: {fileID: 3527839363118081194}
   pawnPrefab: {fileID: 1997580412286425343, guid: b8496d99f613dc542aa07b81cf37d467,
     type: 3}
   pawns: []
@@ -127,7 +129,7 @@ MonoBehaviour:
   Ammo: 50
   drawPathLine: 0
   FireAll: 1
-  targetCompany: {fileID: 0}
+  targetUnit: {fileID: 0}
   stateName: 
   Morale: 100
   FleeThreashold: 35

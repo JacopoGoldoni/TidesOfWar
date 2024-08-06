@@ -51,4 +51,8 @@ public static class GroundBattleUtility
     {
         return companiesRef.IndexOf(om);
     }
+    public static int GetIDOfBattalion(CaptainManager cm)
+    {
+        return battallionsRef.IndexOf(cm);
+    }
 }

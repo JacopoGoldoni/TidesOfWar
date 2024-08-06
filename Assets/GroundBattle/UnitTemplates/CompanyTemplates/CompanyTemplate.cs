@@ -22,6 +22,7 @@ public class CompanyTemplate : ScriptableObject
     public int Precision;
     public int Range;
     public int Speed;
+    public int ReloadTime;
     public int MaxAmmo;
     public int MeleeAttack;
     public int MeleeDefense;

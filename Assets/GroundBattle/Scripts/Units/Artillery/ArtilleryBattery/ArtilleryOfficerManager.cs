@@ -100,7 +100,7 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
             Utility.Camera.GetComponent<UIManager>().AddArtilleryBatteryCard(this);
         }
 
-        GenerateSightMesh(11, artilleryBatteryTemplate.BatterySize * 0.25f, artilleryBatteryTemplate.Range, artilleryBatteryTemplate.BatterySize * 0.5f);
+        GenerateSightMesh(11, (batteryFormation.Lines - 1) * batteryFormation.a / 2f, artilleryBatteryTemplate.Range, 5f);
     }
     private void InitializeStats()
     {
@@ -451,9 +451,9 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
     private UnitManager EnemyInRange(float Range)
     {
         float R2 = 5f;
-        Vector3 Start = transform.position + transform.up * 1 + transform.forward * -R2;
+        Vector3 Start = transform.position + transform.up + transform.forward * - R2;
 
-        float d = (batteryFormation.Lines/2 * (Range + R2)) / (2* R2);
+        float d = ((batteryFormation.Lines - 1) * batteryFormation.a * (Range + R2)) / (2 * R2);
 
         Vector2 a = Utility.V3toV2((transform.forward * (R2 + Range) + transform.right * d).normalized * (R2 + Range));
         Vector2 b = Utility.V3toV2((transform.forward * (R2 + Range) + transform.right * -d).normalized * (R2 + Range));
@@ -493,7 +493,6 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
     //GIZMOS
     public void OnDrawGizmos()
     {
-
         if (ShowFormation)
             FormationGizmo();
     }

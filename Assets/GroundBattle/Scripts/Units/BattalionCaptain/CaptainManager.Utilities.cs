@@ -59,4 +59,33 @@ public partial class CaptainManager : UnitManager
     {
         return battalionFormation.GetLenght();
     }
+    public int GetSize()
+    {
+        int n = 0;
+        foreach(OfficerManager om in companies)
+        {
+            n += om.pawns.Count;
+        }
+        return n;
+    }
+    public int GetMaxSize()
+    {
+        int n = 0;
+        foreach (OfficerManager om in companies)
+        {
+            n += om.companyTemplate.CompanySize;
+        }
+        return n;
+    }
+    public float GetStrenght()
+    {
+        float firePower = 0f;
+
+        foreach(OfficerManager om in companies)
+        {
+            firePower += om.GetFirePower();
+        }
+
+        return firePower;
+    }
 }

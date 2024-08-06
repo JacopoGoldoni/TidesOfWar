@@ -27,7 +27,7 @@ MonoBehaviour:
   CarriageSize: 2
   BaseMorale: 100
   Precision: 0
-  Range: 200
+  Range: 500
   ReloadTime: 60
   Speed: 2
   MaxAmmo: 30

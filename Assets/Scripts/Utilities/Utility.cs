@@ -49,6 +49,20 @@ public static class Utility
         }
         return false;
     }
+
+    public static Transform GetChildByName(GameObject parent, string name)
+    {
+        for(int i = 0; i < parent.transform.childCount; i++)
+        {
+            Transform child = parent.transform.GetChild(i);
+            if(child.gameObject.name == name)
+            {
+                return child;
+            }
+        }
+
+        return null;
+    }
 }
 
 public static class SFXUtility

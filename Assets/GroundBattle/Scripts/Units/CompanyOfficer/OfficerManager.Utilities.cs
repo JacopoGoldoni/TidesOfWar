@@ -82,4 +82,20 @@ public partial class OfficerManager : UnitManager, IVisitable
     {
         return (masterCaptain == null);
     }
+    public float GetSizeRatio()
+    {
+        return (float)pawns.Count / (float)companyTemplate.CompanySize;
+    }
+    public float GetMaxFirePower()
+    {
+        float maxFirePower = 
+            (1f / companyTemplate.ReloadTime) * GameUtility.UNIT_STRENGHT_RELOADTIME_FACTOR 
+            + Precision * GameUtility.UNIT_STRENGHT_PRECISION_FACTOR;
+        
+        return maxFirePower;
+    }
+    public float GetFirePower()
+    {
+        return GetSizeRatio() * GetMaxFirePower();
+    }
 }
