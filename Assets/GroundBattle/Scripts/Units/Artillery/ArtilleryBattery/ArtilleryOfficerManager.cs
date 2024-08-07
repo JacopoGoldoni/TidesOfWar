@@ -95,7 +95,7 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
         //APPEND COMPANY FLAG
         Utility.Camera.GetComponent<UIManager>().AppendArtilleryBatteryFlag(this);
         //APPEND COMPANY CARD
-        if (Utility.Camera.GetComponent<CameraManager>().faction == faction)
+        if (TAG == Utility.CameraManager.TAG)
         {
             Utility.Camera.GetComponent<UIManager>().AddArtilleryBatteryCard(this);
         }
@@ -145,7 +145,7 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
         cannons.Add(artilleryManager);
         artilleryManager.masterOfficer = this;
         artilleryManager.ArtilleryLocalID = cannons.Count - 1;
-        artilleryManager.faction = faction;
+        artilleryManager.TAG = TAG;
 
         artilleryMovememnt.MovementSpeed = Speed * 1.5f;
 
@@ -175,7 +175,7 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
         carriages.Add(carriageManager);
         carriageManager.masterArtilleryOfficer = this;
         carriageManager.local_ID = carriages.Count - 1;
-        carriageManager.faction = faction;
+        carriageManager.TAG = TAG;
 
         carriageMovememnt.MovementSpeed = Speed * 1.5f;
 
@@ -458,7 +458,7 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
         Vector2 a = Utility.V3toV2((transform.forward * (R2 + Range) + transform.right * d).normalized * (R2 + Range));
         Vector2 b = Utility.V3toV2((transform.forward * (R2 + Range) + transform.right * -d).normalized * (R2 + Range));
 
-        if(faction == Factions.France && ShowSightLines)
+        if(TAG == Utility.CameraManager.TAG && ShowSightLines)
         {
             Debug.DrawLine(Start, Start + transform.forward * (R2 + Range), Color.red, 0f, true);
             Debug.DrawLine(Start, Start + Utility.V2toV3(a), Color.red, 0f, true);
@@ -468,13 +468,13 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
 
         foreach(OfficerManager of in Units)
         {
-            if(of.faction != faction)
+            if(of.TAG != TAG)
             {
                 //IF NOT SAME FACTION
                 Vector2 p = Utility.V3toV2(of.transform.position - Start);
 
 
-                if (faction == Factions.France && ShowSightLines)
+                if (TAG == Utility.CameraManager.TAG && ShowSightLines)
                 {
                     Debug.DrawLine(Start, Start + Utility.V2toV3(p), Color.yellow, 0f, true);
                 }

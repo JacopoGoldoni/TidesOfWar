@@ -43,7 +43,7 @@ public static class GFXUtility
     }
     public static Sprite GetFlag(string TAG)
     {
-        string flagLocation = "GFX/" + TAG;
+        string flagLocation = "GFX/Flags/" + TAG;
 
         Sprite sprite = Resources.Load<Sprite>(flagLocation);
         return sprite;

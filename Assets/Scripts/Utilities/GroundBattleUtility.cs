@@ -33,6 +33,11 @@ public static class GroundBattleUtility
         companiesRef.Add(om);
         om.ID = companiesRef.Count;
     }
+    public static void RegisterBattallion(CaptainManager cm)
+    {
+        battallionsRef.Add(cm);
+        //cm.ID = battallionsRef.Count;
+    }
     public static bool IsCompany(OfficerManager om1, OfficerManager om2)
     {
         return om1.ID == om2.ID;

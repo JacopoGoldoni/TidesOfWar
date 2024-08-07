@@ -77,7 +77,7 @@ public class ArtilleryManager : UnitManager, IVisitable
 
         Material m = Instantiate(UnitMaterial);
 
-        if (Utility.Camera.GetComponent<CameraManager>().faction == faction)
+        if (TAG == Utility.CameraManager.TAG)
         {
             m.SetColor("_Color", Color.green);
         }
@@ -141,7 +141,7 @@ public class ArtilleryManager : UnitManager, IVisitable
 
         crewManager.masterArtillery = this;
         crewManager.ID = crew.Count;
-        crewManager.faction = faction;
+        crewManager.TAG = TAG;
 
         crewMovement.MovementSpeed = masterOfficer.Speed + 1;
 

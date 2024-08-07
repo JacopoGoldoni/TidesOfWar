@@ -526,6 +526,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5757737711545003554, guid: 072a1ee00ba36c3499a188e9622cfd84,
         type: 3}
+      propertyPath: TAG
+      value: AUS
+      objectReference: {fileID: 0}
+    - target: {fileID: 5757737711545003554, guid: 072a1ee00ba36c3499a188e9622cfd84,
+        type: 3}
       propertyPath: faction
       value: 1
       objectReference: {fileID: 0}
@@ -538,7 +543,7 @@ PrefabInstance:
         type: 3}
       propertyPath: battalionTemplate
       value: 
-      objectReference: {fileID: 11400000, guid: 883a53e196f0cfb448ad9cce936638e5,
+      objectReference: {fileID: 11400000, guid: 126489c282d48164aa6242ec6f04e832,
         type: 2}
     - target: {fileID: 5757737711545003554, guid: 072a1ee00ba36c3499a188e9622cfd84,
         type: 3}
@@ -981,6 +986,89 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 490511209}
   m_CullTransparentMesh: 1
+--- !u!1001 &542513800
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2239997807417923273, guid: 1146f6291f1bd4849af8045756fda135,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2239997807417923273, guid: 1146f6291f1bd4849af8045756fda135,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2239997807417923273, guid: 1146f6291f1bd4849af8045756fda135,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2239997807417923273, guid: 1146f6291f1bd4849af8045756fda135,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2239997807417923273, guid: 1146f6291f1bd4849af8045756fda135,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2239997807417923273, guid: 1146f6291f1bd4849af8045756fda135,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2239997807417923273, guid: 1146f6291f1bd4849af8045756fda135,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2239997807417923273, guid: 1146f6291f1bd4849af8045756fda135,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2239997807417923273, guid: 1146f6291f1bd4849af8045756fda135,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2239997807417923273, guid: 1146f6291f1bd4849af8045756fda135,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2956930152628163470, guid: 1146f6291f1bd4849af8045756fda135,
+        type: 3}
+      propertyPath: debugUnitInfos
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2956930152628163470, guid: 1146f6291f1bd4849af8045756fda135,
+        type: 3}
+      propertyPath: debugStrategyCall
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2956930152628163470, guid: 1146f6291f1bd4849af8045756fda135,
+        type: 3}
+      propertyPath: strategyTimerTime
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8031332682869641188, guid: 1146f6291f1bd4849af8045756fda135,
+        type: 3}
+      propertyPath: m_Name
+      value: ArmyAI
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 1146f6291f1bd4849af8045756fda135, type: 3}
 --- !u!1 &560072090
 GameObject:
   m_ObjectHideFlags: 0
@@ -1487,6 +1575,18 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 5394780246951686513}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &966076446 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5394780246718189891, guid: 3823c1e2af760374b986b193d71abe8f,
+    type: 3}
+  m_PrefabInstance: {fileID: 5394780246951686513}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 966076443}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6302224c984aa974288b6d93486a0f54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1179930219
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2328,6 +2428,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 5394780246718189888, guid: 3823c1e2af760374b986b193d71abe8f,
         type: 3}
+      propertyPath: uimanager
+      value: 
+      objectReference: {fileID: 966076446}
+    - target: {fileID: 5394780246718189888, guid: 3823c1e2af760374b986b193d71abe8f,
+        type: 3}
       propertyPath: battalionSpace
       value: 4
       objectReference: {fileID: 0}
@@ -2569,6 +2674,7 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 5394780246951686513}
+  - {fileID: 542513800}
   - {fileID: 1794547134}
   - {fileID: 47644301}
   - {fileID: 162825301}

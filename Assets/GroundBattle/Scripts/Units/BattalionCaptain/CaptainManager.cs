@@ -58,11 +58,12 @@ public partial class CaptainManager : UnitManager
 
         InitializeMaterial();
         InitializeFormation();
+        GroundBattleUtility.RegisterBattallion(this);
 
         //APPEND BATTALION FLAG
         Utility.Camera.GetComponent<UIManager>().AppendBattalionFlag(this);
         //APPEND BATTALION CARD
-        if (Utility.Camera.GetComponent<CameraManager>().faction == faction)
+        if (TAG == Utility.CameraManager.TAG)
         {
             Utility.Camera.GetComponent<UIManager>().AddBattalionCard(this);
         }
@@ -106,8 +107,7 @@ public partial class CaptainManager : UnitManager
 
         officerManager.companyTemplate = battalionTemplate.companies[localCompanyIndex];
         officerManager.masterCaptain = this;
-        officerManager.faction = faction;
-        GroundBattleUtility.RegisterCompany(officerManager);
+        officerManager.TAG = TAG;
         officerManager.companyNumber = GroundBattleUtility.companiesRef.Count;
 
         officerManager.Initialize();

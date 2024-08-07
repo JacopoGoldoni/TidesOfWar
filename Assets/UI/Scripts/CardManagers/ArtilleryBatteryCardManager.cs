@@ -23,15 +23,15 @@ public class ArtilleryBatteryCardManager : MonoBehaviour, IPointerEnterHandler, 
         artilleryBatteryRef = artilleryBattery;
         artilleryBatteryRef.artilleryBatteryCardManager = this;
 
-        SetFlag(artilleryBattery.faction);
+        SetFlag(artilleryBattery.TAG);
         SetUnit(artilleryBattery.artilleryBatteryTemplate.ArtilleryBatteryIcon);
         SetBattalionTextName(artilleryBattery.batteryNumber, artilleryBattery.batteryName, artilleryBattery.artilleryBatteryTemplate.hardness);
         SetAmmoSlide();
     }
 
-    public void SetFlag(Factions faction)
+    public void SetFlag(string TAG)
     {
-        flagImage.sprite = GFXUtility.GetFlag(faction);
+        flagImage.sprite = GFXUtility.GetFlag(TAG);
     }
     public void SetAmmoSlide()
     {

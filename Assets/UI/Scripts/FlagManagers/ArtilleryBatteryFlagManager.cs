@@ -13,7 +13,7 @@ public class ArtilleryBatteryFlagManager : MonoBehaviour, IPointerClickHandler, 
 
     public void Initialize(ArtilleryOfficerManager aom)
     {
-        Sprite flagSprite = GFXUtility.GetFlag(aom.faction);
+        Sprite flagSprite = GFXUtility.GetFlag(aom.TAG);
         Sprite unitIconSprite = GFXUtility.GetUnitSprite(aom.artilleryBatteryTemplate.ArtilleryBatteryIcon);
 
         flagImage.sprite = flagSprite;

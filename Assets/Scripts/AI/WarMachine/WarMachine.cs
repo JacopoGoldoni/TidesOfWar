@@ -23,7 +23,9 @@ public class WarMachine
         AttackEnemyTroops attackStrategy = new AttackEnemyTroops(controlledBattalions, enemydBattalions);
         Retreat retreatStrategy = new Retreat();
 
-        if(attackStrategy.CalculateDifficulty() >= 1f)
+        //STRATEGY LOGIC
+        float d = attackStrategy.CalculateDifficulty();
+        if(d >= 1f)
         {
             strategy.Add(attackStrategy);
         }

@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 public abstract class UnitManager : MonoBehaviour
 {
     //UNIT FACTION
-    public Factions faction = Factions.France;
+    public string TAG = "FRA";
 
     //Components
     [HideInInspector] public MeshRenderer mr;
@@ -25,7 +26,7 @@ public abstract class UnitManager : MonoBehaviour
     public virtual void InitializeMaterial()
     {
         m = Instantiate(UnitMaterial);
-        if (Utility.Camera.GetComponent<CameraManager>().faction == faction)
+        if (TAG == Utility.CameraManager.TAG)
         {
             m.SetColor("_Color", Color.green);
         }

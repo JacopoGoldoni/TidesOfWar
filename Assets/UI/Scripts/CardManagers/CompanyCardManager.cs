@@ -23,15 +23,15 @@ public class CompanyCardManager : MonoBehaviour, IPointerEnterHandler, IPointerE
         companyRef = company;
         companyRef.companyCardRef = this;
 
-        SetFlag(company.faction);
+        SetFlag(company.TAG);
         SetUnit(company.companyTemplate.CompanyIcon);
         SetBattalionTextName(company.companyNumber, company.companyName, company.companyTemplate.hardness);
         SetAmmoSlide();
     }
 
-    public void SetFlag(Factions faction)
+    public void SetFlag(string TAG)
     {
-        flagImage.sprite = GFXUtility.GetFlag(faction);
+        flagImage.sprite = GFXUtility.GetFlag(TAG);
     }
     public void SetAmmoSlide()
     {

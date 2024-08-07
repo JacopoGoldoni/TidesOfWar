@@ -39,7 +39,7 @@ public class PawnManager : UnitManager
 
         Material m = Instantiate(pawnMaterial);
 
-        if (Utility.Camera.GetComponent<CameraManager>().faction == faction)
+        if (TAG == Utility.CameraManager.TAG)
         {
             m.SetColor("_Color", Color.green);
         }

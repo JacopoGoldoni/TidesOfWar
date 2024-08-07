@@ -21,14 +21,14 @@ public class BattalionCardManager : MonoBehaviour, IPointerEnterHandler, IPointe
         bg = GetComponent<Image>();
         battallionRef = battalion;
 
-        SetFlag(battalion.faction);
+        SetFlag(battalion.TAG);
         SetUnit(battalion.battalionTemplate.BattalionIcon);
         SetBattalionTextName(battalion.battalionNumber ,battalion.battalionName);
     }
 
-    public void SetFlag(Factions faction)
+    public void SetFlag(string TAG)
     {
-        flagImage.sprite = GFXUtility.GetFlag(faction);
+        flagImage.sprite = GFXUtility.GetFlag(TAG);
     }
     public void SetUnit(string unit)
     {

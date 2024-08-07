@@ -16,6 +16,16 @@ public static class Utility
             return _camera;
         }
     }
+    private static CameraManager _cameraManager;
+    public static CameraManager CameraManager
+    {
+        get
+        {
+            if (_cameraManager == null) _cameraManager = Camera.GetComponent<CameraManager>();
+            return _cameraManager;
+        }
+    }
+
 
     public static Vector2 V3toV2(Vector3 v3)
     {

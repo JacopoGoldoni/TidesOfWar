@@ -115,6 +115,8 @@ public partial class OfficerManager : UnitManager, IVisitable
         um = GetComponent<OfficerMovement>();
         lineRenderer = GetComponent<LineRenderer>();
 
+        GroundBattleUtility.RegisterCompany(this);
+
         //GET COMPANY ICON
 
         //SET MATERIAL
@@ -131,7 +133,7 @@ public partial class OfficerManager : UnitManager, IVisitable
         //APPEND COMPANY FLAG
         Utility.Camera.GetComponent<UIManager>().AppendCompanyFlag(this);
         //APPEND COMPANY CARD
-        if (Utility.Camera.GetComponent<CameraManager>().faction == faction)
+        if (Utility.Camera.GetComponent<CameraManager>().TAG == TAG)
         {
             Utility.Camera.GetComponent<UIManager>().AddCompanyCard(this);
         }
@@ -176,7 +178,7 @@ public partial class OfficerManager : UnitManager, IVisitable
         pawns.Add(pawnManager);
         pawnManager.masterOfficer = this;
         pawnManager.ID = pawns.Count - 1;
-        pawnManager.faction = faction;
+        pawnManager.TAG = TAG;
 
         pawnMovememnt.MovementSpeed = Speed * 1.5f;
 
@@ -276,7 +278,7 @@ public partial class OfficerManager : UnitManager, IVisitable
         Vector2 a = Utility.V3toV2((transform.forward * (R2 + Range) + transform.right * d).normalized * (R2 + Range));
         Vector2 b = Utility.V3toV2((transform.forward * (R2 + Range) + transform.right * -d).normalized * (R2 + Range));
 
-        if(faction == Factions.France && ShowSightLines)
+        if(TAG == Utility.CameraManager.TAG && ShowSightLines)
         {
             Debug.DrawLine(Start, Start + transform.forward * (R2 + Range), Color.red, 0f, true);
             Debug.DrawLine(Start, Start + Utility.V2toV3(a), Color.red, 0f, true);
@@ -286,13 +288,13 @@ public partial class OfficerManager : UnitManager, IVisitable
 
         foreach(OfficerManager of in Units)
         {
-            if(of.faction != faction)
+            if(of.TAG != TAG)
             {
                 //IF NOT SAME FACTION
                 Vector2 p = Utility.V3toV2(of.transform.position - Start);
 
 
-                if (faction == Factions.France && ShowSightLines)
+                if (TAG == Utility.CameraManager.TAG && ShowSightLines)
                 {
                     Debug.DrawLine(Start, Start + Utility.V2toV3(p), Color.yellow, 0f, true);
                 }

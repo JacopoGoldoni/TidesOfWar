@@ -24,6 +24,7 @@ MonoBehaviour:
   Precision: 12
   Range: 0
   Speed: 2
+  ReloadTime: 10
   MaxAmmo: 50
   MeleeAttack: 0
   MeleeDefense: 0

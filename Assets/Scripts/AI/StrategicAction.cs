@@ -10,7 +10,7 @@ public class Retreat : StrategicAction
 {
     public override void Execute()
     {
-
+        Debug.Log("Retreat!");
     }
 }
 public class ConquerFlag : StrategicAction
@@ -58,7 +58,7 @@ public class AttackEnemyTroops : StrategicAction
 
     public override void Execute()
     {
-        
+        Debug.Log("Attack!");
     }
 
     public float CalculateDifficulty()

@@ -15,7 +15,7 @@ public class ArtilleryCarriageManager : UnitManager
 
         Material m = Instantiate(UnitMaterial);
 
-        if (Utility.Camera.GetComponent<CameraManager>().faction == faction)
+        if (TAG == Utility.CameraManager.TAG)
         {
             m.SetColor("_Color", Color.green);
         }

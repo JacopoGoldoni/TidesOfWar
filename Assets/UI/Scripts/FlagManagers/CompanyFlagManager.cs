@@ -14,7 +14,7 @@ public class CompanyFlagManager : MonoBehaviour, IPointerClickHandler, IPointerE
 
     public void Initialize(OfficerManager om)
     {
-        Sprite flagSprite = GFXUtility.GetFlag(om.faction);
+        Sprite flagSprite = GFXUtility.GetFlag(om.TAG);
         Sprite unitIconSprite = GFXUtility.GetUnitSprite(om.companyTemplate.CompanyIcon);
 
         flagImage.sprite = flagSprite;

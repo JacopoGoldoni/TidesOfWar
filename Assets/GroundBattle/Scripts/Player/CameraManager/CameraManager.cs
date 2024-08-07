@@ -10,7 +10,7 @@ public partial class CameraManager : MonoBehaviour
     private InputAction timeScale_Axis;
 
     [Header("Player info")]
-    public Factions faction = Factions.France;
+    public string TAG = "FRA";
 
     [Header("Formation")]
     public float battalionSpace = 4f;

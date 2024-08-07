@@ -13,7 +13,7 @@ public class BattalionFlagManager : MonoBehaviour, IPointerClickHandler, IPointe
 
     public void Initialize(CaptainManager cm)
     {
-        Sprite flagSprite = GFXUtility.GetFlag(cm.faction);
+        Sprite flagSprite = GFXUtility.GetFlag(cm.TAG);
         Sprite unitIconSprite = GFXUtility.GetUnitSprite(cm.battalionTemplate.BattalionIcon);
 
         flagImage.sprite = flagSprite;

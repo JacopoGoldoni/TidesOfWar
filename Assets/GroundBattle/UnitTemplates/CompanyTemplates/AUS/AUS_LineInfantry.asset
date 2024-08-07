@@ -13,17 +13,23 @@ MonoBehaviour:
   m_Name: AUS_LineInfantry
   m_EditorClassIdentifier: 
   type: 0
-  RegimentSize: 72
-  OfficerMesh: {fileID: 0}
-  PawnMesh: {fileID: 0}
-  RegimentIcon: {fileID: 0}
+  hardness: 1
+  officerPrefab: {fileID: 1622135471481153879, guid: 992e891c3975e994aaddbef655bcf49b,
+    type: 3}
+  CompanySize: 180
+  OfficerMesh: {fileID: 4064786809506695948, guid: 84504a8247ebf044c84f362232097cb8,
+    type: 3}
+  SoldierMesh: {fileID: 1705324974331375986, guid: 3814d160ee982a7498039caba0f34eb4,
+    type: 3}
+  CompanyIcon: LineInfantry
   BaseMorale: 100
   Precision: 12
+  Range: 20
   Speed: 2
+  ReloadTime: 10
   MaxAmmo: 50
   MeleeAttack: 0
   MeleeDefense: 0
   MultipleFire: 1
   Fortification: 1
-  SquareFormation: 1
   Skirmish: 0
