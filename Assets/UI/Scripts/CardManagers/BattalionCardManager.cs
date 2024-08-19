@@ -23,7 +23,7 @@ public class BattalionCardManager : MonoBehaviour, IPointerEnterHandler, IPointe
 
         SetFlag(battalion.TAG);
         SetUnit(battalion.battalionTemplate.BattalionIcon);
-        SetBattalionTextName(battalion.battalionNumber ,battalion.battalionName);
+        SetBattalionTextName(battalion.battalionName);
     }
 
     public void SetFlag(string TAG)
@@ -34,9 +34,9 @@ public class BattalionCardManager : MonoBehaviour, IPointerEnterHandler, IPointe
     {
         unitImage.sprite = GFXUtility.GetUnitSprite(unit);
     }
-    public void SetBattalionTextName(int battalioNumber, string name)
+    public void SetBattalionTextName(string name)
     {
-        nameText.text = battalioNumber + " Batt. " + name;
+        nameText.text = name;
     }
 
     public void HighLight(bool highlight)

@@ -10,10 +10,10 @@ public class ArtilleryBatteryTemplate : ScriptableObject
 
     [Header("Prefabs")]
     public GameObject artilleryOfficerPrefab;
+    public GameObject cannonPrefab;
 
     [Header("Esthetics")]
     public Mesh ArtilleryOfficerMesh;
-    public Mesh CannonMesh;
     public Mesh CrewMesh;
     public string ArtilleryBatteryIcon;
 
@@ -32,6 +32,16 @@ public class ArtilleryBatteryTemplate : ScriptableObject
     [Header("Abilities")]
     public bool ExplosiveShells;
     public bool GrapeShots;
+
+    [Header("Bone names")]
+    public string Root = "Root";
+    public string Body = "Root/Body";
+    public string Barrel = "Root/Body/Barrel";
+    public string LeftWheel = "Root/Wheel.L";
+    public string RightWheel = "Root/Wheel.R";
+
+    [Header("Crew positions names")]
+    public string[] FirstClassCrew_Positions;
 }
 
 public enum ArtilleryType

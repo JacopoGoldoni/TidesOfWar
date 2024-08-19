@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Services.Analytics.Internal;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
@@ -68,6 +69,7 @@ public partial class OfficerManager : UnitManager, IVisitable
     public bool Skirmish { get { return companyTemplate.Skirmish; } }
 
     [Header("Company state")]
+    public bool isRouting { get { return stateName == "Fleeing"; } }
     public bool FireAll = true;
     public UnitManager targetUnit = null;
     private FiniteStateMachine OfficerStateMachine;
@@ -111,7 +113,7 @@ public partial class OfficerManager : UnitManager, IVisitable
     public override void Initialize()
     {
         //GET COMPONENTS
-        mr = GetComponent<MeshRenderer>();
+        //mr = GetComponent<MeshRenderer>();
         um = GetComponent<OfficerMovement>();
         lineRenderer = GetComponent<LineRenderer>();
 
@@ -120,7 +122,7 @@ public partial class OfficerManager : UnitManager, IVisitable
         //GET COMPANY ICON
 
         //SET MATERIAL
-        InitializeMaterial();
+        //InitializeMaterial();
 
         InitializeStats();
         InitializeFormation();
@@ -154,6 +156,8 @@ public partial class OfficerManager : UnitManager, IVisitable
     private void InitializeFormation()
     {
         companyFormation = new Line((int)companySize);
+        companyFormation.a = companyTemplate.FilesDistances;
+        companyFormation.b = companyTemplate.RankDistance;
         companyBounds = CalculateCompanyBounds();
     }
 
@@ -163,13 +167,13 @@ public partial class OfficerManager : UnitManager, IVisitable
         for (int i = 0; i < companySize; i++)
         {
             Vector2 v2 = GetFormationCoords(i);
-            SpawnPawn(Utility.V2toV3(v2) + transform.position);
+            SpawnPawn(v2 + Utility.V3toV2(transform.position));
         }
     }
-    private void SpawnPawn(Vector3 pos)
+    private void SpawnPawn(Vector2 pos)
     {
         GameObject pawn = Instantiate(pawnPrefab);
-        pawn.transform.position = pos;
+        pawn.transform.position = GroundBattleUtility.GetMapPosition(pos);
         pawn.transform.rotation = transform.rotation;
 
         PawnManager pawnManager = pawn.GetComponent<PawnManager>();
@@ -183,6 +187,8 @@ public partial class OfficerManager : UnitManager, IVisitable
         pawnMovememnt.MovementSpeed = Speed * 1.5f;
 
         pawnManager.name = "Company" + companyNumber.ToString() + "_" + pawnManager.ID;
+
+        GroundBattleUtility.WarpAgentToNavMesh(pawn);
 
         pawnManager.Initialize();
     }

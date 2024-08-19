@@ -16,7 +16,7 @@ MonoBehaviour:
   hardness: 1
   officerPrefab: {fileID: 1622135471481153879, guid: 992e891c3975e994aaddbef655bcf49b,
     type: 3}
-  CompanySize: 120
+  CompanySize: 140
   OfficerMesh: {fileID: 4064786809506695948, guid: 84504a8247ebf044c84f362232097cb8,
     type: 3}
   SoldierMesh: {fileID: -5836900086478109309, guid: 728f8898744e77048a7ff5529d0e4a59,
@@ -24,7 +24,7 @@ MonoBehaviour:
   CompanyIcon: LineInfantry
   BaseMorale: 100
   Precision: 12
-  Range: 20
+  Range: 40
   Speed: 2
   ReloadTime: 10
   MaxAmmo: 50
@@ -33,3 +33,5 @@ MonoBehaviour:
   MultipleFire: 1
   Fortification: 1
   Skirmish: 0
+  FilesDistances: 0.5
+  RankDistance: 1

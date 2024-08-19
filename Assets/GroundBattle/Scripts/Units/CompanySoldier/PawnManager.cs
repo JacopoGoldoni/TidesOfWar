@@ -31,7 +31,7 @@ public class PawnManager : UnitManager
 
     public override void Initialize()
     {
-        mr = GetComponent<MeshRenderer>();
+        //mr = GetComponent<MeshRenderer>();
         um = GetComponent<PawnMovement>();
 
         audioData = GetComponent<AudioSource>();
@@ -48,7 +48,7 @@ public class PawnManager : UnitManager
             m.SetColor("_Color", Color.red);
         }
 
-        mr.material = m;
+        //mr.material = m;
 
         rifle = transform.GetChild(0).gameObject;
 

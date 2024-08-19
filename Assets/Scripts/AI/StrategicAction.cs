@@ -59,6 +59,9 @@ public class AttackEnemyTroops : StrategicAction
     public override void Execute()
     {
         Debug.Log("Attack!");
+        UnitOrders.Battalion_SendAttack(
+            GroundBattleUtility.GetBattalionsByID(assignedBattalions), 
+            GroundBattleUtility.GetBattalionsByID(targetBattalions));
     }
 
     public float CalculateDifficulty()

@@ -116,7 +116,7 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
     {
         batteryFormation = new Line(artilleryBatteryTemplate.BatterySize);
         batteryFormation.SetSizeByRanks(artilleryBatteryTemplate.BatterySize, 1);
-        batteryFormation.a = 2f;
+        batteryFormation.a = 4f;
         batteryBounds = CalculateCompanyBounds();
 
         carriageFormation = new Column(artilleryBatteryTemplate.CarriageSize);
@@ -146,6 +146,7 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
         artilleryManager.masterOfficer = this;
         artilleryManager.ArtilleryLocalID = cannons.Count - 1;
         artilleryManager.TAG = TAG;
+        artilleryManager.firstClassCrewSize = 6;
 
         artilleryMovememnt.MovementSpeed = Speed * 1.5f;
 
@@ -271,12 +272,6 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
     //UPDATES
     void Update()
     {
-        /*
-        if(stateName != "Fleeing")
-        {
-            targetCompany = EnemyInRange(Range);
-        }
-        */
 
         CalculateMorale();
 

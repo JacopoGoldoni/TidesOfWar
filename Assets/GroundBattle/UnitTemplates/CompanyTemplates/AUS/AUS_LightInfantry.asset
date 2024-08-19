@@ -24,7 +24,7 @@ MonoBehaviour:
   CompanyIcon: 
   BaseMorale: 60
   Precision: 4
-  Range: 30
+  Range: 60
   Speed: 3
   ReloadTime: 10
   MaxAmmo: 50

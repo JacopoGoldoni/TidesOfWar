@@ -1,0 +1,6 @@
+{
+	"ID": 1,
+	"name": "2° army",
+	"TAG": "AUS",
+	"battalions": [2, 3]
+}

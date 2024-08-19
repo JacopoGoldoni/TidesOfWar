@@ -13,7 +13,10 @@ MonoBehaviour:
   m_Name: BASE_LineInfantry
   m_EditorClassIdentifier: 
   type: 0
+  battalionType: 0
   BattalionIcon: LineInfantry
+  captainPrefab: {fileID: 4641858504647192894, guid: 072a1ee00ba36c3499a188e9622cfd84,
+    type: 3}
   companies:
   - {fileID: 11400000, guid: 2bfdd6aa94461604fb6921fca755f665, type: 2}
   - {fileID: 11400000, guid: 6070203ac32ec7f499070e62c0e723bb, type: 2}
@@ -22,3 +25,5 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 6070203ac32ec7f499070e62c0e723bb, type: 2}
   - {fileID: 11400000, guid: 7f53202fac01d1549924df66778ab770, type: 2}
   SquareFormation: 1
+  CompanyXDistance: 2
+  CompanyYDistance: 6

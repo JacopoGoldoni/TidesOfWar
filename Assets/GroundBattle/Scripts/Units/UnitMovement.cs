@@ -40,7 +40,7 @@ public abstract class UnitMovement : MonoBehaviour
         MovementPoints.Clear();
         MovementPoints.Add(
              new MovementOrder(
-                 Utility.V2toV3(newDest),
+                 GroundBattleUtility.GetMapPosition(newDest),
                  newQuat
                  )
              );
@@ -49,7 +49,7 @@ public abstract class UnitMovement : MonoBehaviour
     {
         MovementPoints.Add(
             new MovementOrder(
-                Utility.V2toV3(newDest),
+                GroundBattleUtility.GetMapPosition(newDest),
                 newQuat
                 )
             );

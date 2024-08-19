@@ -32,8 +32,7 @@ Transform:
   m_LocalPosition: {x: -7.957, y: 0, z: -1.951}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 4578932910475840047}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8068101394866217866
@@ -48,7 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40b581c642f09a944bbb27a3466e3a0a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  faction: 0
+  TAG: FRA
   mr: {fileID: 0}
   smr: {fileID: 0}
   m: {fileID: 0}
@@ -57,7 +56,7 @@ MonoBehaviour:
     type: 3}
   UnitMaterial: {fileID: 2100000, guid: 2136bb957162a8446b0f8bd2ed644df3, type: 2}
   Killable: 0
-  bone_Root: {fileID: 649708224230047914}
+  bone_Root: {fileID: 0}
   bone_Barrel: {fileID: 0}
   bone_WheelL: {fileID: 0}
   bone_WheelR: {fileID: 0}
@@ -218,83 +217,3 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!1001 &4035535627809156548
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 5015145013605866037}
-    m_Modifications:
-    - target: {fileID: -8679921383154817045, guid: 6c4bead83c645cf46a0fc8080254e732,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 6c4bead83c645cf46a0fc8080254e732,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 6c4bead83c645cf46a0fc8080254e732,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 6c4bead83c645cf46a0fc8080254e732,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 6c4bead83c645cf46a0fc8080254e732,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 6c4bead83c645cf46a0fc8080254e732,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 6c4bead83c645cf46a0fc8080254e732,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 6c4bead83c645cf46a0fc8080254e732,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 6c4bead83c645cf46a0fc8080254e732,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 6c4bead83c645cf46a0fc8080254e732,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: 6c4bead83c645cf46a0fc8080254e732,
-        type: 3}
-      propertyPath: m_Name
-      value: 6PoundGribeauvalCannon
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 6c4bead83c645cf46a0fc8080254e732, type: 3}
---- !u!4 &649708224230047914 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -5691106864056586898, guid: 6c4bead83c645cf46a0fc8080254e732,
-    type: 3}
-  m_PrefabInstance: {fileID: 4035535627809156548}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &4578932910475840047 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 6c4bead83c645cf46a0fc8080254e732,
-    type: 3}
-  m_PrefabInstance: {fileID: 4035535627809156548}
-  m_PrefabAsset: {fileID: 0}

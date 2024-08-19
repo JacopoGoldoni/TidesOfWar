@@ -21,13 +21,15 @@ MonoBehaviour:
   SoldierMesh: {fileID: 0}
   CompanyIcon: LightInfantry
   BaseMorale: 100
-  Precision: 12
-  Range: 0
+  Precision: 8
+  Range: 60
   Speed: 2
-  ReloadTime: 10
+  ReloadTime: 5
   MaxAmmo: 50
   MeleeAttack: 0
   MeleeDefense: 0
   MultipleFire: 1
   Fortification: 1
   Skirmish: 0
+  FilesDistances: 0.5
+  RankDistance: 1

@@ -43,20 +43,15 @@ public partial class CaptainManager : UnitManager
     public bool ShowCompanyFormations = false;
     public bool ShowCompaniesSightLines = false;
 
-    private void Awake()
-    {
-        Initialize();
-    }
-
     //INITALIZE METHODS
     public override void Initialize()
     {
         //GET COMPONENTS
-        mr = GetComponent<MeshRenderer>();
+        //mr = GetComponent<MeshRenderer>();
         um = GetComponent<CaptainMovement>();
         lineRenderer = GetComponent<LineRenderer>();
 
-        InitializeMaterial();
+        //InitializeMaterial();
         InitializeFormation();
         GroundBattleUtility.RegisterBattallion(this);
 
@@ -74,9 +69,10 @@ public partial class CaptainManager : UnitManager
     }
     private void InitializeFormation()
     {
+        //INITIALIZE FORMATIO  PARAMETERS
         battalionFormation = new BattalionFormation(battalionTemplate);
-        battalionFormation.spaceX = 2f;
-        battalionFormation.spaceY = 6f;
+        battalionFormation.spaceX = battalionTemplate.CompanyXDistance;
+        battalionFormation.spaceY = battalionTemplate.CompanyYDistance;
 
         for (int i = 0; i < battallionSize; i++)
         {
@@ -88,7 +84,8 @@ public partial class CaptainManager : UnitManager
 
         for(int i = 0; i < companies.Count; i++)
         {
-            companies[i].transform.position = Utility.V2toV3(GetFormationCoords(companies[i])) + transform.position;
+            Vector3 worldPos = GroundBattleUtility.GetMapPosition(GetFormationCoords(companies[i]) + Utility.V3toV2(transform.position));
+            companies[i].transform.position = worldPos;
             companies[i].SpawnCompanyPawns();
         }
 
@@ -120,7 +117,9 @@ public partial class CaptainManager : UnitManager
 
         companies.Add(officerManager);
 
-        if(InitializationDebug)
+        GroundBattleUtility.WarpAgentToNavMesh(officer);
+
+        if (InitializationDebug)
         {
             Debug.Log("Company spawned.");
         }

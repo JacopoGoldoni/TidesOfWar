@@ -31,6 +31,10 @@ public class CompanyTemplate : ScriptableObject
     public bool MultipleFire;
     public bool Fortification;
     public bool Skirmish;
+
+    [Header("Dimensions")]
+    public float FilesDistances = 0.5f;
+    public float RankDistance = 1.0f;
 }
 
 public enum UnitType

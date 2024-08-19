@@ -43,14 +43,16 @@ public class ArtilleryManager : UnitManager, IVisitable
 
     [Header("Crew")]
     public GameObject crewPrefab;
-    public List<ArtilleryCrewManager> crew = new List<ArtilleryCrewManager>();
+    public List<ArtilleryCrewManager> firstClassCrew = new List<ArtilleryCrewManager>();
+    public List<ArtilleryCrewManager> secondClassCrew = new List<ArtilleryCrewManager>();
 
     [Header("Artillery piece identifier")]
     public int ArtilleryLocalID;
 
     [Header("Crew formation")]
-    public int crewSize = 4;
-    //private ArtilleryCrewFormation crewFormation;
+    public int firstClassCrewSize = 6;
+    public int secondClassCrewSize = 7;
+    private ArtilleryCrewFormation firstClassCrewFormation;
 
     [Header("Artillery movement")]
     public bool mounted = false;
@@ -69,13 +71,24 @@ public class ArtilleryManager : UnitManager, IVisitable
     //INITIALIZERS
     public override void Initialize()
     {
-        smr = GetComponentInChildren<SkinnedMeshRenderer>();
+        //MESH INITIALIZATION
+        GameObject cannonGameObject = Instantiate(masterOfficer.artilleryBatteryTemplate.cannonPrefab);
+        cannonGameObject.transform.parent = transform;
+        cannonGameObject.transform.position = transform.position;
+        cannonGameObject.transform.rotation = transform.rotation;
+        cannonGameObject.transform.localScale = Vector3.one;
+        cannonGameObject.transform.GetChild(0).transform.localScale = Vector3.one;
+        Material m = Instantiate(UnitMaterial);
+        smr = cannonGameObject.GetComponentInChildren<SkinnedMeshRenderer>();
         um = GetComponent<ArtilleryMovement>();
+        smr.material = m;
+
+        InitializeBones();
+        InitializeFormation();
 
         audioData = GetComponent<AudioSource>();
         particleSystem = GetComponentInChildren<ParticleSystem>();
 
-        Material m = Instantiate(UnitMaterial);
 
         if (TAG == Utility.CameraManager.TAG)
         {
@@ -86,9 +99,6 @@ public class ArtilleryManager : UnitManager, IVisitable
             m.SetColor("_Color", Color.red);
         }
 
-        smr.sharedMesh = masterOfficer.artilleryBatteryTemplate.CannonMesh;
-        smr.material = m;
-
         //CREW FORMATION INITALIZATION
 
         //FINITE STATE MACHINE INITALIZATION
@@ -96,7 +106,6 @@ public class ArtilleryManager : UnitManager, IVisitable
         StateMachineInitializer();
 
         InitializeTimers();
-        //InitializeBones();
 
         SpawnCrew();
 
@@ -109,10 +118,38 @@ public class ArtilleryManager : UnitManager, IVisitable
     }
     private void InitializeBones()
     {
-        bone_Root = Utility.GetChildByName(gameObject, "Root");
-        bone_WheelL = Utility.GetChildByName(gameObject, "Wheel.L");
-        bone_WheelR = Utility.GetChildByName(gameObject, "Wheel.R");
-        bone_Barrel = Utility.GetChildByName(gameObject, "Barrel");
+        Transform rigTransform = transform.GetChild(0).GetChild(0);
+
+        bone_Root = rigTransform.Find(masterOfficer.artilleryBatteryTemplate.Root);
+        bone_WheelL = rigTransform.Find(masterOfficer.artilleryBatteryTemplate.LeftWheel);
+        bone_WheelR = rigTransform.Find(masterOfficer.artilleryBatteryTemplate.RightWheel);
+        bone_Barrel = rigTransform.Find(masterOfficer.artilleryBatteryTemplate.Barrel);
+    }
+    private void InitializeFormation()
+    {
+        List<Vector2> FirstClassGunnerPositions = new List<Vector2>();
+        List<Vector2> SecondClassGunnerPositions = new List<Vector2>();
+
+        Transform rigTransform = transform.GetChild(0).GetChild(0);
+        
+        //FIRST CLASS CREW
+        for(int i = 0; i < firstClassCrewSize; i++)
+        {
+            FirstClassGunnerPositions.Add(
+                Utility.V3toV2(
+                rigTransform.Find("Root/" + masterOfficer.artilleryBatteryTemplate.FirstClassCrew_Positions[i]).transform.localPosition
+                ));
+        }
+
+        //SECOND CLASS CREW
+        for (int i = 0; i < secondClassCrewSize; i++)
+        {
+            SecondClassGunnerPositions.Add(
+                new Vector2( (i - secondClassCrewSize / 2f) * 0.5f, 4f)
+                );
+        }
+
+        firstClassCrewFormation = new ArtilleryCrewFormation(FirstClassGunnerPositions.ToArray(), SecondClassGunnerPositions.ToArray());
     }
 
     public void MoveTo(Vector2 dest, Quaternion quat)
@@ -123,13 +160,18 @@ public class ArtilleryManager : UnitManager, IVisitable
     //CREW
     private void SpawnCrew()
     {
-        for (int i = 0; i < crewSize; i++)
+        for (int i = 0; i < firstClassCrewSize; i++)
         {
-            Vector2 v2 = GetFormationCoords(i);
-            SpawnCrewPawn(Utility.V2toV3(v2) + transform.position);
+            Vector2 v2 = GetFormationCoords(1,i);
+            SpawnCrewPawn(Utility.V2toV3(v2) + transform.position, 1);
+        }
+        for (int i = 0; i < secondClassCrewSize; i++)
+        {
+            Vector2 v2 = GetFormationCoords(2, i);
+            SpawnCrewPawn(Utility.V2toV3(v2) + transform.position, 2);
         }
     }
-    private void SpawnCrewPawn(Vector3 pos)
+    private void SpawnCrewPawn(Vector3 pos, int crewClass)
     {
         GameObject crewMember = Instantiate(crewPrefab);
         crewMember.transform.position = pos;
@@ -140,7 +182,7 @@ public class ArtilleryManager : UnitManager, IVisitable
         ArtilleryCrewMovement crewMovement = crewManager.GetComponent<ArtilleryCrewMovement>();
 
         crewManager.masterArtillery = this;
-        crewManager.ID = crew.Count;
+        crewManager.ID = firstClassCrew.Count;
         crewManager.TAG = TAG;
 
         crewMovement.MovementSpeed = masterOfficer.Speed + 1;
@@ -149,7 +191,16 @@ public class ArtilleryManager : UnitManager, IVisitable
 
         crewManager.Initialize();
 
-        crew.Add(crewManager);
+        switch(crewClass)
+        {
+            case 1:
+                firstClassCrew.Add(crewManager);
+                break;
+
+            case 2:
+                secondClassCrew.Add(crewManager);
+                break;
+        }
     }
 
     public void Update()
@@ -181,15 +232,22 @@ public class ArtilleryManager : UnitManager, IVisitable
         Destroy(transform.gameObject);
     }
 
+    private void RotateGun(Quaternion rot)
+    {
+        bone_Root.rotation = rot;
+        SendFormation();
+    }
+
     //FIRE
     public void CallFire()
     {
         fireTimer = new CountdownTimer(Random.Range(0f, 2f));
         fireTimer.OnTimerStop = Fire;
         fireTimer.Start();
-        transform.rotation = Quaternion.LookRotation(
-            Utility.V2toV3( ( Utility.V3toV2(targetUnit.transform.position - transform.position) ) ).normalized , 
-            Vector3.up);
+        RotateGun(Quaternion.LookRotation(
+            Utility.V2toV3((Utility.V3toV2(- targetUnit.transform.position + transform.position))).normalized,
+            Vector3.up)
+            );
     }
     public void AbortFire()
     {
@@ -470,11 +528,10 @@ public class ArtilleryManager : UnitManager, IVisitable
         artilleryStateMachine.Initialize();
     }
 
-    private Vector2 GetFormationCoords(int ID)
+    private Vector2 GetFormationCoords(int GunnderClass, int ID)
     {
-        Vector2 pos2 = Vector2.up * (1 + ID);
-
-        pos2.y *= -1;
+        Vector2 pos2 = firstClassCrewFormation.GetPos(GunnderClass, ID);
+        pos2.y *= -1f;
 
         Vector3 pos3 = Utility.V2toV3(pos2);
 
@@ -487,12 +544,19 @@ public class ArtilleryManager : UnitManager, IVisitable
 
     private void SendFormation()
     {
-        for (int i = 0; i < crew.Count; i++)
+        for (int i = 0; i < firstClassCrew.Count; i++)
         {
-            if (crew[i] != null)
+            if (firstClassCrew[i] != null)
             {
-                crew[i].MoveTo(GetFormationCoords(i) + Utility.V3toV2(transform.position),um.CurrentRotation());
+                firstClassCrew[i].MoveTo(GetFormationCoords(1, i) + Utility.V3toV2(transform.position),um.CurrentRotation());
             } 
+        }
+        for (int i = 0; i < secondClassCrew.Count; i++)
+        {
+            if (secondClassCrew[i] != null)
+            {
+                secondClassCrew[i].MoveTo(GetFormationCoords(2, i) + Utility.V3toV2(transform.position), um.CurrentRotation());
+            }
         }
     }
 

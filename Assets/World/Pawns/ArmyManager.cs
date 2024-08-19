@@ -31,7 +31,6 @@ public class ArmyManager : MonoBehaviour
 
     public void ArmyInitialize()
     {
-        army = new Army();
         agent.enabled = true;
     }
 

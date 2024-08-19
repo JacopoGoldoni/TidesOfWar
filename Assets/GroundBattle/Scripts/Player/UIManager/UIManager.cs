@@ -108,8 +108,8 @@ public partial class UIManager : MonoBehaviour
         BattalionCommands.Add(UnitOrders.Battalion_SendLightLine);
         BattalionCommands.Add(UnitOrders.Battalion_SendHeavyLine);
 
-        BattalionCommands.Add(UnitOrders.Battalion_SendDefend);
-        BattalionCommands.Add(UnitOrders.Battalion_SendAttack);
+        //BattalionCommands.Add(UnitOrders.Battalion_SendDefend);
+        //BattalionCommands.Add(UnitOrders.Battalion_SendAttack);
 
         //ARTILLERY BATTERY
         ArtilleryBatteryCommands.Add(UnitOrders.ArtilleryBattery_SendLineFormation);

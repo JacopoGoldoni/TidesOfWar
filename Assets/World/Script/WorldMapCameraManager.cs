@@ -12,7 +12,7 @@ public class WorldMapCameraManager : MonoBehaviour
 
     public List<ArmyManager> selectedArmies = new List<ArmyManager>();
 
-    public Factions faction = Factions.France;
+    public string TAG = "FRA";
 
     //COMPONENTS
     Camera camera;

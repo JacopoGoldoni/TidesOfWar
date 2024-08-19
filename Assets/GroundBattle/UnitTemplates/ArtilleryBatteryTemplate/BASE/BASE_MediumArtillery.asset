@@ -16,15 +16,15 @@ MonoBehaviour:
   hardness: 1
   artilleryOfficerPrefab: {fileID: 1622135471481153879, guid: 9c69f5e92b6a2684ba92953ebbc12163,
     type: 3}
-  ArtilleryOfficerMesh: {fileID: 4064786809506695948, guid: 84504a8247ebf044c84f362232097cb8,
+  cannonPrefab: {fileID: 919132149155446097, guid: 68b9f089cb0c2a84a88f957c1ae9d719,
     type: 3}
-  CannonMesh: {fileID: 6239754950454420669, guid: 68b9f089cb0c2a84a88f957c1ae9d719,
+  ArtilleryOfficerMesh: {fileID: 4064786809506695948, guid: 84504a8247ebf044c84f362232097cb8,
     type: 3}
   CrewMesh: {fileID: -1277366460620338370, guid: 2dee33fd68d527d49997a23c5e1cefb5,
     type: 3}
   ArtilleryBatteryIcon: Artillery
   BatterySize: 4
-  CarriageSize: 2
+  CarriageSize: 4
   BaseMorale: 100
   Precision: 0
   Range: 300
@@ -35,3 +35,15 @@ MonoBehaviour:
   MeleeDefense: 0
   ExplosiveShells: 0
   GrapeShots: 0
+  Root: Root
+  Body: Root/Body
+  Barrel: Root/Body/Barrel
+  LeftWheel: Root/Wheel.L
+  RightWheel: Root/Wheel.R
+  FirstClassCrew_Positions:
+  - Crew_0.001
+  - Crew_1.001
+  - Crew_2.001
+  - Crew_3.001
+  - Crew_4.001
+  - Crew_5.001

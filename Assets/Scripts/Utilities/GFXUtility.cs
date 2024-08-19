@@ -4,21 +4,6 @@ using UnityEngine;
 
 public static class GFXUtility
 {
-    private static Dictionary<Factions, string> FactionCodes = new Dictionary<Factions, string>()
-    {
-        { Factions.France, "FRA" },
-        { Factions.Austria, "AUS" },
-        { Factions.England, "ENG" },
-        { Factions.Russia, "RUS" },
-        { Factions.Prussia, "PRU" },
-        //ADD SPAIN
-        //ADD PIEDMONT
-        //ADD HOLAND
-        //ADD SWEDEN
-        //ADD POLAND
-        //ADD PORTUGAL
-    };
-
     //GENERAL
     public static Sprite GetSprite(string path)
     {
@@ -30,17 +15,6 @@ public static class GFXUtility
     }
 
     //FLAG
-    public static string GetFlagCode(Factions faction)
-    {
-        return FactionCodes[faction];
-    }
-    public static Sprite GetFlag(Factions faction)
-    {
-        string flagLocation = "GFX/Flags/" + GetFlagCode(faction);
-
-        Sprite sprite = Resources.Load<Sprite>(flagLocation);
-        return sprite;
-    }
     public static Sprite GetFlag(string TAG)
     {
         string flagLocation = "GFX/Flags/" + TAG;

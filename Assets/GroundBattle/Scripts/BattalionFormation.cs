@@ -30,14 +30,13 @@ public class BattalionFormation
         switch(company.companyTemplate.hardness)
         {
             case UnitHardness.Light:
-                if (battalionTemplate.battalionType == BattalionType.Light) { LineCompanies.Add(company); }
-                else { RearCompanies.Add(company); }
+                LineCompanies.Add(company);
                 break;
             case UnitHardness.Medium:
                 LineCompanies.Add(company);
                 break;
             case UnitHardness.Heavy:
-                RearCompanies.Add(company);
+                LineCompanies.Add(company);
                 break;
         }
     }
@@ -140,7 +139,6 @@ public class BattalionFormation
                 break;
         }
     }
-
 
     public float[] CalculateXPositions(List<OfficerManager> companies, float space)
     {

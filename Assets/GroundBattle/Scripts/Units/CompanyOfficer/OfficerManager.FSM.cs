@@ -121,7 +121,7 @@ public partial class OfficerManager : UnitManager, IVisitable
                 Firing,
                 Reloading,
                 () => {
-                    if (CheckUnLoadedStatus() && um.MovementPoints.Count == 0)
+                    if (CheckUnLoadedStatus() && um.MovementPoints.Count == 0 && FireAll)
                     {
                         return true;
                     }
@@ -178,7 +178,10 @@ public partial class OfficerManager : UnitManager, IVisitable
     }
     private void Idle_Cycle()
     {
-        targetUnit = EnemyInRange(Range);
+        if(FireAll)
+        {
+            targetUnit = EnemyInRange(Range);
+        }
     }
     private void Moving_Cycle()
     {

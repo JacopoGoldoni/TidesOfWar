@@ -22,7 +22,7 @@ MonoBehaviour:
   CompanyIcon: LightInfantry
   BaseMorale: 100
   Precision: 12
-  Range: 0
+  Range: 40
   Speed: 2
   ReloadTime: 10
   MaxAmmo: 50

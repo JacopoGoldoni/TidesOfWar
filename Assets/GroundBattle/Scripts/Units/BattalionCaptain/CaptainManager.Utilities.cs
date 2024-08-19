@@ -88,4 +88,51 @@ public partial class CaptainManager : UnitManager
 
         return firePower;
     }
+
+    public float GetMaxRange()
+    {
+        float r = 0f;
+
+        if(battalionFormation.FrontCompanies.Count != 0)
+        {
+            //USE FRONT
+            foreach(OfficerManager om in battalionFormation.FrontCompanies)
+            {
+                r = Mathf.Max(r, om.companyTemplate.Range);
+            }
+        }
+        else
+        {
+            //USE LINE
+            foreach(OfficerManager om in battalionFormation.LineCompanies)
+            {
+                r = Mathf.Max(r, om.companyTemplate.Range);
+            }
+        }
+
+        return r;
+    }
+    public float GetMinRange()
+    {
+        float r = float.PositiveInfinity;
+
+        if (battalionFormation.FrontCompanies.Count != 0)
+        {
+            //USE FRONT
+            foreach (OfficerManager om in battalionFormation.FrontCompanies)
+            {
+                r = Mathf.Min(r, om.companyTemplate.Range);
+            }
+        }
+        else
+        {
+            //USE LINE
+            foreach (OfficerManager om in battalionFormation.LineCompanies)
+            {
+                r = Mathf.Min(r, om.companyTemplate.Range);
+            }
+        }
+
+        return r;
+    }
 }

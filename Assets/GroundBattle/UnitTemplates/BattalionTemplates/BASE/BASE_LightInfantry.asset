@@ -15,6 +15,8 @@ MonoBehaviour:
   type: 0
   battalionType: 1
   BattalionIcon: LightInfantry
+  captainPrefab: {fileID: 4641858504647192894, guid: 072a1ee00ba36c3499a188e9622cfd84,
+    type: 3}
   companies:
   - {fileID: 11400000, guid: 1fed02cf791645a4d8b4dba56dc5af17, type: 2}
   - {fileID: 11400000, guid: 98cf56784d492b147be01735c1caf6dc, type: 2}
@@ -23,3 +25,5 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 98cf56784d492b147be01735c1caf6dc, type: 2}
   - {fileID: 11400000, guid: 055ff36dbe9b56341a72d7b6cd20f625, type: 2}
   SquareFormation: 0
+  CompanyXDistance: 2
+  CompanyYDistance: 6

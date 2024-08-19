@@ -37,6 +37,7 @@ public class WM_Interface : MonoBehaviour
             GetUnitInfos();
             StrategicCall();
             strategyTimer.Reset();
+            //strategyTimer.Start();
         };
         strategyTimer.Start();
     }
