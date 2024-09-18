@@ -1,5 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using Unity.Collections;
+using Unity.Jobs;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
@@ -24,11 +27,15 @@ public class PawnMovement : UnitMovement
 
     private void UpdateMove()
     {
+
         //IF HAS ORDERS
         if (MovementPoints.Count != 0)
         {
-            //SET DESTINATION
-            navAgent.SetDestination(MovementPoints[0].pos);
+            // OLD VERSION
+            //navAgent.SetDestination(MovementPoints[0].pos);
+
+            // NEW VERSION
+            ((PawnManager)um).navAgentAuthoring.targetPos = MovementPoints[0].pos;
 
             if (!IsMoving())
             {

@@ -47,11 +47,12 @@ public partial class CaptainManager : UnitManager
     public override void Initialize()
     {
         //GET COMPONENTS
-        //mr = GetComponent<MeshRenderer>();
         um = GetComponent<CaptainMovement>();
         lineRenderer = GetComponent<LineRenderer>();
 
-        //InitializeMaterial();
+        InitializeMeshes();
+        InitializeMaterial();
+        
         InitializeFormation();
         GroundBattleUtility.RegisterBattallion(this);
 
@@ -64,7 +65,6 @@ public partial class CaptainManager : UnitManager
         }
 
         //INITALIZE FINITE STATE MACHINE
-        captainStateMachine = new FiniteStateMachine();
         FiniteStateMachineInitializer();
     }
     private void InitializeFormation()
@@ -95,30 +95,44 @@ public partial class CaptainManager : UnitManager
     //SPAWN CONTROLLED COMPANIES
     private OfficerManager SpawnOfficer(Vector3 pos, int localCompanyIndex)
     {
+        if(InitializationDebug)
+        {
+            Debug.Log("Spawning officer: " + localCompanyIndex);
+        }
+
+        //INSTANTIATE OFFICER
         GameObject officer = Instantiate(battalionTemplate.companies[localCompanyIndex].officerPrefab);
         officer.transform.position = pos;
         officer.transform.rotation = transform.rotation;
 
+        //GET COMPONENTS
         OfficerManager officerManager = officer.GetComponent<OfficerManager>();
         OfficerMovement officerMovememnt = officer.GetComponent<OfficerMovement>();
 
+        //APPEND TO BATTALION COMAPNIES
+        companies.Add(officerManager);
+
+        //LOAD INFOS INTO OFFICER
         officerManager.companyTemplate = battalionTemplate.companies[localCompanyIndex];
         officerManager.masterCaptain = this;
         officerManager.TAG = TAG;
         officerManager.companyNumber = GroundBattleUtility.companiesRef.Count;
+        officerManager.meshes_LODs = battalionTemplate.companies[localCompanyIndex].OfficerMesh_LODS;
+        officerManager.unitMaterial = battalionTemplate.companies[localCompanyIndex].officerMaterial;
 
-        officerManager.Initialize();
-
-        officer.name = "Offier_" + officerManager.companyNumber;
+        //NAME OFFICER
+        officer.name = "Officer_" + officerManager.companyNumber;
 
         //SET GIZMOS VISIBILITY
         officerManager.ShowFormation = ShowCompanyFormations;
         officerManager.ShowSightLines = ShowCompaniesSightLines;
 
-        companies.Add(officerManager);
-
+        //WARP AGENT TO NAVMESH
         GroundBattleUtility.WarpAgentToNavMesh(officer);
 
+        officerManager.Initialize();
+
+        //DEBUG
         if (InitializationDebug)
         {
             Debug.Log("Company spawned.");
@@ -151,6 +165,8 @@ public partial class CaptainManager : UnitManager
     }
     private void FiniteStateMachineInitializer()
     {
+        captainStateMachine = new FiniteStateMachine();
+
         List<State> captainStates = new List<State>();
         List<Transition> captainTransitions = new List<Transition>();
 

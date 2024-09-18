@@ -17,6 +17,9 @@ MonoBehaviour:
   BattalionIcon: LineInfantry
   captainPrefab: {fileID: 4641858504647192894, guid: 072a1ee00ba36c3499a188e9622cfd84,
     type: 3}
+  captainMesh: {fileID: 5626925631471267929, guid: 876bd02491ed1bf42ad5f0bdb8750b91,
+    type: 3}
+  captainMaterial: {fileID: 2100000, guid: ef561f36c67d42c4dbea3f3a2082e033, type: 2}
   companies:
   - {fileID: 11400000, guid: 2bfdd6aa94461604fb6921fca755f665, type: 2}
   - {fileID: 11400000, guid: 6070203ac32ec7f499070e62c0e723bb, type: 2}

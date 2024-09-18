@@ -10,21 +10,10 @@ public class ArtilleryCarriageManager : UnitManager
 
     public override void Initialize()
     {
-        mr = GetComponent<MeshRenderer>();
         um = GetComponent<ArtilleryCarriageMovement>();
 
-        Material m = Instantiate(UnitMaterial);
-
-        if (TAG == Utility.CameraManager.TAG)
-        {
-            m.SetColor("_Color", Color.green);
-        }
-        else
-        {
-            m.SetColor("_Color", Color.red);
-        }
-
-        mr.material = m;
+        InitializeMeshes();
+        InitializeMaterial();
     }
 
     public void MoveTo(Vector2 dest, Quaternion quat)

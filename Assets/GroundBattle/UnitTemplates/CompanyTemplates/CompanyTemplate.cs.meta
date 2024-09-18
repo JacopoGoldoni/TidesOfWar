@@ -1,2 +1,13 @@
 fileFormatVersion: 2
 guid: 1d343e26452f3b24ba3169302610b6d0
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - officerPrefab: {fileID: 1622135471481153879, guid: 992e891c3975e994aaddbef655bcf49b,
+      type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

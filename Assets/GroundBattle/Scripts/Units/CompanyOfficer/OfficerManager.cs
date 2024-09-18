@@ -1,12 +1,17 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using Unity.Services.Analytics.Internal;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
+using Unity.Entities;
+using Unity.Mathematics;
+using Unity.Transforms;
+using UnityEngine.UIElements;
+using UnityEngine.SceneManagement;
+using Unity.Scenes;
 
 public partial class OfficerManager : UnitManager, IVisitable
 {
@@ -113,19 +118,15 @@ public partial class OfficerManager : UnitManager, IVisitable
     public override void Initialize()
     {
         //GET COMPONENTS
-        //mr = GetComponent<MeshRenderer>();
         um = GetComponent<OfficerMovement>();
         lineRenderer = GetComponent<LineRenderer>();
 
-        GroundBattleUtility.RegisterCompany(this);
-
-        //GET COMPANY ICON
-
-        //SET MATERIAL
-        //InitializeMaterial();
+        InitializeMeshes();
+        InitializeMaterial();
 
         InitializeStats();
         InitializeFormation();
+        GroundBattleUtility.RegisterCompany(this);
         //SpawnCompanyPawns();
 
         //INITIALIZE FINITE STATE MACHINE
@@ -172,22 +173,33 @@ public partial class OfficerManager : UnitManager, IVisitable
     }
     private void SpawnPawn(Vector2 pos)
     {
+        //INSTANTIATE PAWN
         GameObject pawn = Instantiate(pawnPrefab);
         pawn.transform.position = GroundBattleUtility.GetMapPosition(pos);
         pawn.transform.rotation = transform.rotation;
 
+        //GET COMPONENTS
         PawnManager pawnManager = pawn.GetComponent<PawnManager>();
         PawnMovement pawnMovememnt = pawnManager.GetComponent<PawnMovement>();
 
+        Scene targetScene = SceneManager.GetSceneByName("EntitySubScene");
+        SceneManager.MoveGameObjectToScene(pawn, targetScene);
+
+        //APPEND TO COMPANY PAWNS
         pawns.Add(pawnManager);
+
+        //LOAD INFOS INTO PAWN
         pawnManager.masterOfficer = this;
-        pawnManager.ID = pawns.Count - 1;
+        pawnManager.local_ID = pawns.Count - 1;
         pawnManager.TAG = TAG;
-
         pawnMovememnt.MovementSpeed = Speed * 1.5f;
+        pawnManager.meshes_LODs = companyTemplate.SoldierMesh_LODS;
+        pawnManager.unitMaterial = companyTemplate.officerMaterial;
 
-        pawnManager.name = "Company" + companyNumber.ToString() + "_" + pawnManager.ID;
+        //NAME PAWN
+        pawnManager.name = "Company" + companyNumber.ToString() + "_" + pawnManager.local_ID;
 
+        //WARP AGENT TO NAVMESH
         GroundBattleUtility.WarpAgentToNavMesh(pawn);
 
         pawnManager.Initialize();

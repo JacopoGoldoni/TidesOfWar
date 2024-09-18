@@ -13,8 +13,10 @@ public class CompanyTemplate : ScriptableObject
     public int CompanySize;
 
     [Header("Esthetics")]
-    public Mesh OfficerMesh;
-    public Mesh SoldierMesh;
+    public Mesh[] OfficerMesh_LODS;
+    public Material officerMaterial;
+    public Mesh[] SoldierMesh_LODS;
+    public Material soldierMaterial;
     public string CompanyIcon;
 
     [Header("STATS")]

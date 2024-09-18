@@ -11,6 +11,9 @@ public class BattalionTemplate : ScriptableObject
 
     public GameObject captainPrefab;
 
+    public Mesh captainMesh;
+    public Material captainMaterial;
+
     public CompanyTemplate[] companies;
 
     [Header("Abilities")]

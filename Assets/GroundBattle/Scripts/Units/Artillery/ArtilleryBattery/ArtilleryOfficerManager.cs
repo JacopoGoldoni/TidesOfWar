@@ -76,11 +76,10 @@ public partial class ArtilleryOfficerManager : UnitManager, IVisitable
     public override void Initialize()
     {
         //GET COMPONENTS
-        mr = GetComponent<MeshRenderer>();
         um = GetComponent<ArtilleryOfficerMovement>();
         lineRenderer = GetComponent<LineRenderer>();
 
-        //SET MATERIAL
+        InitializeMeshes();
         InitializeMaterial();
 
         InitializeStats();

@@ -5,13 +5,13 @@ using UnityEngine;
 
 public class PawnManager : UnitManager
 {
-    public Material pawnMaterial;
-
     public OfficerManager masterOfficer;
+    public NavAgentAuthoring navAgentAuthoring;
 
-    public int ID;
+    public int local_ID;
 
     private GameObject rifle;
+    bool riflePose = false; //UP true
 
     public bool Loaded = true;
     private float fireRange = 0f;
@@ -23,35 +23,20 @@ public class PawnManager : UnitManager
     private CountdownTimer fireTimer;
     private CountdownTimer reloadTimer;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        Initialize();
-    }
-
     public override void Initialize()
     {
-        //mr = GetComponent<MeshRenderer>();
+        //INITIALIZE COMPONENTS
         um = GetComponent<PawnMovement>();
-
         audioData = GetComponent<AudioSource>();
         particleSystem = GetComponentInChildren<ParticleSystem>();
+        navAgentAuthoring = GetComponent<NavAgentAuthoring>();
 
-        Material m = Instantiate(pawnMaterial);
+        navAgentAuthoring.moveSpeed = masterOfficer.Speed + 1f;
 
-        if (TAG == Utility.CameraManager.TAG)
-        {
-            m.SetColor("_Color", Color.green);
-        }
-        else
-        {
-            m.SetColor("_Color", Color.red);
-        }
-
-        //mr.material = m;
+        InitializeMeshes();
+        InitializeMaterial();
 
         rifle = transform.GetChild(0).gameObject;
-
         fireRange = masterOfficer.Range;
     }
 
@@ -64,17 +49,17 @@ public class PawnManager : UnitManager
     {
         if (masterOfficer.companyFormation.name == "Column")
         {
-            TakeRifleUp();
+            SetRifle(true);
         }
         else
         {
             if (!um.IsIdle())
             {
-                TakeRifleUp();
+                SetRifle(true);
             }
             else
             {
-                TakeRifleDown();
+                SetRifle(false);
             }
         }
 
@@ -138,7 +123,7 @@ public class PawnManager : UnitManager
         Vector3 targetPos = target.transform.position;
         Vector3 targetRight = target.transform.right;
         
-        float s = (float)(ID + 1) / masterOfficer.companyFormation.Lines;
+        float s = (float)(local_ID + 1) / masterOfficer.companyFormation.Lines;
 
         FireDirection = (targetPos - targetRight * (targetWidth * (s - 0.5f)) ) - transform.position;
         FireDirection.Normalize();
@@ -168,27 +153,36 @@ public class PawnManager : UnitManager
         reloadTimer = new CountdownTimer(masterOfficer.companyTemplate.ReloadTime);
         reloadTimer.OnTimerStop = Reload;
         reloadTimer.Start();
-        TakeRifleUp();
+        SetRifle(true);
     }
     public void AbortReload()
     {
         reloadTimer.Stop();
         reloadTimer.Reset();
-        TakeRifleDown();
+        SetRifle(false);
     }
     private void Reload()
     {
         Loaded = true;
-        TakeRifleDown();
+        SetRifle(false);
     }
 
-    public void TakeRifleUp()
+    public void SetRifle(bool newPose)
     {
-        rifle.transform.localEulerAngles = new Vector3(-90,0,0);
-    }
-    public void TakeRifleDown()
-    {
-        rifle.transform.localEulerAngles = new Vector3(0, 0, 0);
+        if(riflePose != newPose)
+        {
+            riflePose = newPose;
+            if (newPose)
+            {
+                //UP
+                rifle.transform.localEulerAngles = new Vector3(-90, 0, 0);
+            }
+            else
+            {
+                //DOWN
+                rifle.transform.localEulerAngles = new Vector3(0, 0, 0);
+            }
+        }
     }
 
     public override void OnSelection()

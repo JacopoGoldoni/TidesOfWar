@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Scenes;
 using UnityEngine;
 
 public class GroundBattleManager : MonoBehaviour
@@ -24,6 +25,8 @@ public class GroundBattleManager : MonoBehaviour
         ArmyUtility.LoadAllCompanies();
         ArmyUtility.LoadAllBattalions();
         ArmyUtility.LoadAllArmies();
+
+        GroundBattleUtility.spawningPoints.Clear();
 
         GroundBattleUtility.spawningPoints.Add("FRA", new Vector2(40f, 100f));
         GroundBattleUtility.spawningPoints.Add("AUS", new Vector2(40f, 20f));
@@ -93,8 +96,8 @@ public class GroundBattleManager : MonoBehaviour
         int i = 0;
         foreach (Battalion battalion in army.battalions)
         {
-            float y = ((i % 2) * 2 - 1) * 10f;
-            float x = (i / 2) + 1f;
+            float y = i * 20f;
+            float x = 0f;
             Vector2 pos = sp + new Vector2(x, y);
             SpawnBattalion(battalion, pos);
             i++;
@@ -111,8 +114,10 @@ public class GroundBattleManager : MonoBehaviour
                 "Template: " + battalion.template.name);
         }
 
+        //INSTANTIATE NEW CAPTAIN
         GameObject captain = Instantiate(battalion.template.captainPrefab, new Vector3(pos.x, GroundBattleUtility.GetMapHeight(pos), pos.y), Quaternion.identity);
 
+        //GET COMPONENTS
         CaptainManager cm = captain.GetComponent<CaptainManager>();
 
         //LOAD INFORMATIONS INTO NEW BATTALION
@@ -120,11 +125,20 @@ public class GroundBattleManager : MonoBehaviour
         cm.battalionName = battalion.name;
         cm.TAG = battalion.TAG;
         cm.battalionNumber = battalion.ID;
+        cm.meshes_LODs = new Mesh[1];
+        cm.meshes_LODs[0] = battalion.template.captainMesh;
+        cm.unitMaterial = battalion.template.captainMaterial;
 
+        //LOAD DEBUG INFOS
+        cm.InitializationDebug = initializationDebug;
+
+        //WARP CAPTAIN TO NAVMESH
         GroundBattleUtility.WarpAgentToNavMesh(captain);
 
-        cm.Initialize();
+        //REGISTER BATTALION TO ARMYUTILITY
         GroundBattleUtility.RegisterBattallion(cm);
+
+        cm.Initialize();
     }
 
     private void CheckWin()

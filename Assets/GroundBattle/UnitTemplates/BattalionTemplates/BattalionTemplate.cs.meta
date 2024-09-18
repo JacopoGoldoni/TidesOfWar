@@ -1,2 +1,15 @@
 fileFormatVersion: 2
 guid: 8e38c2948d07bda4f9fc2a6c7341de92
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - captainPrefab: {instanceID: 0}
+  - captainMesh: {fileID: 5626925631471267929, guid: 876bd02491ed1bf42ad5f0bdb8750b91,
+      type: 3}
+  - captainMaterial: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

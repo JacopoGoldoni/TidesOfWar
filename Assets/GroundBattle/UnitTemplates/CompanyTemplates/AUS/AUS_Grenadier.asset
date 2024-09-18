@@ -17,10 +17,14 @@ MonoBehaviour:
   officerPrefab: {fileID: 1622135471481153879, guid: 992e891c3975e994aaddbef655bcf49b,
     type: 3}
   CompanySize: 140
-  OfficerMesh: {fileID: 4064786809506695948, guid: 84504a8247ebf044c84f362232097cb8,
-    type: 3}
-  SoldierMesh: {fileID: 1705324974331375986, guid: 3814d160ee982a7498039caba0f34eb4,
-    type: 3}
+  OfficerMesh_LODS:
+  - {fileID: -6064206364740278900, guid: fad689b68ad7e82419aeccf510c91ab3, type: 3}
+  - {fileID: 9127143004884344669, guid: fad689b68ad7e82419aeccf510c91ab3, type: 3}
+  officerMaterial: {fileID: 2100000, guid: ef561f36c67d42c4dbea3f3a2082e033, type: 2}
+  SoldierMesh_LODS:
+  - {fileID: 673196183781031777, guid: 7e36924e2ab2ae84ea662a88d6c934e8, type: 3}
+  - {fileID: -440622277842314186, guid: 7e36924e2ab2ae84ea662a88d6c934e8, type: 3}
+  soldierMaterial: {fileID: 2100000, guid: ef561f36c67d42c4dbea3f3a2082e033, type: 2}
   CompanyIcon: LineInfantry
   BaseMorale: 100
   Precision: 12

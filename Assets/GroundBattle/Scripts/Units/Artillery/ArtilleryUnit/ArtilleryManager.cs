@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class ArtilleryManager : UnitManager, IVisitable
@@ -8,10 +9,10 @@ public class ArtilleryManager : UnitManager, IVisitable
     LineRenderer lineRenderer;
 
     //BONES
-    public Transform bone_Root;
-    public Transform bone_Barrel;
-    public Transform bone_WheelL;
-    public Transform bone_WheelR;
+    public Transform[] bone_Root;
+    public Transform[] bone_Barrel;
+    public Transform[] bone_WheelL;
+    public Transform[] bone_WheelR;
 
     //STATS
     [SerializeField] public CompanyTemplate unitTemplate;
@@ -71,6 +72,11 @@ public class ArtilleryManager : UnitManager, IVisitable
     //INITIALIZERS
     public override void Initialize()
     {
+        //GET COMPONENTS
+        um = GetComponent<ArtilleryMovement>();
+        audioData = GetComponent<AudioSource>();
+        particleSystem = GetComponentInChildren<ParticleSystem>();
+
         //MESH INITIALIZATION
         GameObject cannonGameObject = Instantiate(masterOfficer.artilleryBatteryTemplate.cannonPrefab);
         cannonGameObject.transform.parent = transform;
@@ -78,28 +84,14 @@ public class ArtilleryManager : UnitManager, IVisitable
         cannonGameObject.transform.rotation = transform.rotation;
         cannonGameObject.transform.localScale = Vector3.one;
         cannonGameObject.transform.GetChild(0).transform.localScale = Vector3.one;
-        Material m = Instantiate(UnitMaterial);
-        smr = cannonGameObject.GetComponentInChildren<SkinnedMeshRenderer>();
-        um = GetComponent<ArtilleryMovement>();
-        smr.material = m;
+        
+        smr = cannonGameObject.GetComponentsInChildren<SkinnedMeshRenderer>();
+
+        InitializeMeshes();
+        InitializeMaterial();
 
         InitializeBones();
         InitializeFormation();
-
-        audioData = GetComponent<AudioSource>();
-        particleSystem = GetComponentInChildren<ParticleSystem>();
-
-
-        if (TAG == Utility.CameraManager.TAG)
-        {
-            m.SetColor("_Color", Color.green);
-        }
-        else
-        {
-            m.SetColor("_Color", Color.red);
-        }
-
-        //CREW FORMATION INITALIZATION
 
         //FINITE STATE MACHINE INITALIZATION
         artilleryStateMachine = new FiniteStateMachine();
@@ -118,12 +110,25 @@ public class ArtilleryManager : UnitManager, IVisitable
     }
     private void InitializeBones()
     {
-        Transform rigTransform = transform.GetChild(0).GetChild(0);
+        Transform[] rigTransforms = new Transform[smr.Length];
 
-        bone_Root = rigTransform.Find(masterOfficer.artilleryBatteryTemplate.Root);
-        bone_WheelL = rigTransform.Find(masterOfficer.artilleryBatteryTemplate.LeftWheel);
-        bone_WheelR = rigTransform.Find(masterOfficer.artilleryBatteryTemplate.RightWheel);
-        bone_Barrel = rigTransform.Find(masterOfficer.artilleryBatteryTemplate.Barrel);
+        for(int i = 0; i < smr.Length; i++)
+        {
+            rigTransforms[i] = transform.GetChild(0).GetChild(0);
+        }
+
+        bone_Root = new Transform[smr.Length];
+        bone_WheelL = new Transform[smr.Length];
+        bone_WheelR = new Transform[smr.Length];
+        bone_Barrel = new Transform[smr.Length];
+
+        for (int i = 0; i < smr.Length; i++)
+        {
+            bone_Root[i] = rigTransforms[i].Find(masterOfficer.artilleryBatteryTemplate.Root);
+            bone_WheelL[i] = rigTransforms[i].Find(masterOfficer.artilleryBatteryTemplate.LeftWheel);
+            bone_WheelR[i] = rigTransforms[i].Find(masterOfficer.artilleryBatteryTemplate.RightWheel);
+            bone_Barrel[i] = rigTransforms[i].Find(masterOfficer.artilleryBatteryTemplate.Barrel);
+        }
     }
     private void InitializeFormation()
     {
@@ -234,7 +239,10 @@ public class ArtilleryManager : UnitManager, IVisitable
 
     private void RotateGun(Quaternion rot)
     {
-        bone_Root.rotation = rot;
+        for (int i = 0; i < smr.Length; i++)
+        {
+            bone_Root[i].rotation = rot;
+        }
         SendFormation();
     }
 
@@ -321,12 +329,18 @@ public class ArtilleryManager : UnitManager, IVisitable
     private void Mount()
     {
         mounted = true;
-        bone_Root.localRotation = Quaternion.Euler(-90f, 90f, 90f);
+        for(int i = 0; i < smr.Length; i++)
+        {
+            bone_Root[i].localRotation = Quaternion.Euler(-90f, 90f, 90f);
+        }
     }
     private void Dismount()
     {
         mounted = false;
-        bone_Root.localRotation = Quaternion.Euler(90f, 90f, 90f);
+        for (int i = 0; i < smr.Length; i++)
+        {
+            bone_Root[i].localRotation = Quaternion.Euler(90f, 90f, 90f);
+        }
     }
 
     //STATE MACHINE

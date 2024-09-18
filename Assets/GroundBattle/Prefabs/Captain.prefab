@@ -139,25 +139,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb4edc9f2b61bab43bbcfd3287e787da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  faction: 0
-  ms: {fileID: 0}
+  TAG: FRA
+  meshes_LODs: []
+  unitMaterial: {fileID: 0}
   m: {fileID: 0}
+  mf:
+  - {fileID: 8975456967147414561}
+  mr:
+  - {fileID: 6587585135979303147}
+  smr: []
   um: {fileID: 0}
-  UnitMesh: {fileID: 5626925631471267929, guid: 876bd02491ed1bf42ad5f0bdb8750b91,
-    type: 3}
-  UnitMaterial: {fileID: 2100000, guid: 2136bb957162a8446b0f8bd2ed644df3, type: 2}
   Killable: 0
   drawPathLine: 0
   battalionNumber: 0
   battalionName: 
   battalionTemplate: {fileID: 0}
+  Speed: 1.5
   FireAll: 1
   stateName: 
   Morale: 0
   FleeThreashold: 25
   companies: []
-  ShowSightLines: 0
-  ShowFormation: 0
+  InitializationDebug: 0
+  ShowBattalionFormation: 0
+  ShowCompanyFormations: 0
+  ShowCompaniesSightLines: 0
 --- !u!114 &3997354972869105768
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -286,3 +292,15 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
+--- !u!23 &6587585135979303147 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 876bd02491ed1bf42ad5f0bdb8750b91,
+    type: 3}
+  m_PrefabInstance: {fileID: 5524325090299350127}
+  m_PrefabAsset: {fileID: 0}
+--- !u!33 &8975456967147414561 stripped
+MeshFilter:
+  m_CorrespondingSourceObject: {fileID: -5754084199372789682, guid: 876bd02491ed1bf42ad5f0bdb8750b91,
+    type: 3}
+  m_PrefabInstance: {fileID: 5524325090299350127}
+  m_PrefabAsset: {fileID: 0}

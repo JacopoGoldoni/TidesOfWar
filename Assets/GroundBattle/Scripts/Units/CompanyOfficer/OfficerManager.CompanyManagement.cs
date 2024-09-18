@@ -51,7 +51,7 @@ public partial class OfficerManager : UnitManager, IVisitable
                         if (pawns[z] != null)
                         {
                             pawns[l] = pawns[z];
-                            pawns[l].ID = l;
+                            pawns[l].local_ID = l;
                             pawns[z] = null;
                             break;
                         }
@@ -73,7 +73,7 @@ public partial class OfficerManager : UnitManager, IVisitable
                         if (pawns[z] != null)
                         {
                             pawns[l] = pawns[z];
-                            pawns[l].ID = l;
+                            pawns[l].local_ID = l;
                             pawns[z] = null;
                             break;
                         }
@@ -84,7 +84,7 @@ public partial class OfficerManager : UnitManager, IVisitable
                 if (pawns[m] != null)
                 {
                     pawns[l] = pawns[m];
-                    pawns[l].ID = l;
+                    pawns[l].local_ID = l;
                     pawns[m] = null;
                     break;
                 }
@@ -287,11 +287,11 @@ public partial class OfficerManager : UnitManager, IVisitable
         {
             if(status)
             {
-                pm.TakeRifleDown();
+                pm.SetRifle(false); ;
             }
             else
             {
-                pm.TakeRifleUp();
+                pm.SetRifle(true); ;
             }
         }
     }

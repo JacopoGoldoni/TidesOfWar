@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
@@ -8,15 +9,14 @@ public abstract class UnitManager : MonoBehaviour
     //UNIT FACTION
     public string TAG = "FRA";
 
-    //Components
-    [HideInInspector] public MeshRenderer mr;
-    [HideInInspector] public SkinnedMeshRenderer smr;
-    [HideInInspector] public Material m;
+    [Header("Components")]
+    public Mesh[] meshes_LODs;
+    public Material unitMaterial;
+    public Material m;
+    public MeshFilter[] mf;
+    public MeshRenderer[] mr;
+    public SkinnedMeshRenderer[] smr;
     [HideInInspector] public UnitMovement um;
-
-    [Header("Esthetics")]
-    public Mesh UnitMesh;
-    public Material UnitMaterial;
 
     [Header("Behaviour")]
     public bool Killable = false;
@@ -25,7 +25,7 @@ public abstract class UnitManager : MonoBehaviour
     public abstract void Initialize();
     public virtual void InitializeMaterial()
     {
-        m = Instantiate(UnitMaterial);
+        m = Instantiate(unitMaterial);
         if (TAG == Utility.CameraManager.TAG)
         {
             m.SetColor("_Color", Color.green);
@@ -34,7 +34,28 @@ public abstract class UnitManager : MonoBehaviour
         {
             m.SetColor("_Color", Color.red);
         }
-        mr.material = m;
+
+        if(mr.Length != 0)
+        {
+            for(int i = 0; i < mr.Length; i++)
+            {
+                mr[i].material = m;
+            }
+        }
+        else if(smr.Length != 0)
+        {
+            for (int i = 0; i < smr.Length; i++)
+            {
+                smr[i].material = m;
+            }
+        }
+    }
+    public virtual void InitializeMeshes()
+    {
+        for (int i = 0; i < mr.Length; i++)
+        {
+            mf[i].mesh = meshes_LODs[i];
+        }
     }
 
     public virtual void ReceiveMovementOrder(bool add, Vector2 pos, Quaternion rot)
