@@ -44,6 +44,8 @@ public abstract class UnitMovement : MonoBehaviour
                  newQuat
                  )
              );
+
+        navAgent.SetDestination(MovementPoints[0].pos);
     }
     public void AddDestination(Vector2 newDest, Quaternion newQuat)
     {

@@ -19,28 +19,20 @@ public class PawnMovement : UnitMovement
     {
         UpdateMove();
 
-        if(IsMoving())
-        {
-            UpdateAgentSpeed();
-        }
+        //if(IsMoving())
+        //{
+        //    UpdateAgentSpeed();
+        //}
     }
 
     private void UpdateMove()
     {
-
-        //IF HAS ORDERS
         if (MovementPoints.Count != 0)
         {
-            // OLD VERSION
-            //navAgent.SetDestination(MovementPoints[0].pos);
-
-            // NEW VERSION
-            ((PawnManager)um).navAgentAuthoring.targetPos = MovementPoints[0].pos;
-
             if (!IsMoving())
             {
                 //ARRIVED AT DESTINATION
-                if(!IsRotating())
+                if (!IsRotating())
                 {
                     //ALIGNED WITH FORMATION
                     MovementPoints.RemoveAt(0);

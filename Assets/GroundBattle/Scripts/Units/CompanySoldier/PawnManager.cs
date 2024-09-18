@@ -1,12 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Entities;
+using Unity.Rendering;
 using Unity.VisualScripting;
 using UnityEngine;
 
 public class PawnManager : UnitManager
 {
     public OfficerManager masterOfficer;
-    public NavAgentAuthoring navAgentAuthoring;
 
     public int local_ID;
 
@@ -29,9 +30,6 @@ public class PawnManager : UnitManager
         um = GetComponent<PawnMovement>();
         audioData = GetComponent<AudioSource>();
         particleSystem = GetComponentInChildren<ParticleSystem>();
-        navAgentAuthoring = GetComponent<NavAgentAuthoring>();
-
-        navAgentAuthoring.moveSpeed = masterOfficer.Speed + 1f;
 
         InitializeMeshes();
         InitializeMaterial();

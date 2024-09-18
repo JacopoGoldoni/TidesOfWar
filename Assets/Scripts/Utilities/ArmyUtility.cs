@@ -17,6 +17,17 @@ public static class ArmyUtility
     public static List<Battalion> battalions = new List<Battalion>();
     public static List<Company> companies = new List<Company>();
 
+    //INITIALIZE
+    public static void ClearAll()
+    {
+        battalionTemplates.Clear();
+        companyTemplates.Clear();
+
+        armies.Clear();
+        battalions.Clear();
+        companies.Clear();
+    }
+
     //LOADERS
     public static void LoadAllCompaniesTemplates()
     {

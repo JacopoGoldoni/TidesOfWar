@@ -19,6 +19,8 @@ public class GroundBattleManager : MonoBehaviour
 
     void Start()
     {
+        ArmyUtility.ClearAll();
+
         ArmyUtility.LoadAllCompaniesTemplates();
         ArmyUtility.LoadAllBattalionsTemplates();
 

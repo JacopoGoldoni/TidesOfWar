@@ -1,6 +1,6 @@
 {
 	"ID": 5,
-	"name": "2st Line Battalion",
+	"name": "4st Line Battalion",
 	"TAG": "FRA",
 	"template_name": "BASE_LineInfantry",
 	"companies": [0, 1, 2, 3, 4, 5]

@@ -85,7 +85,7 @@ public class CameraMovement : MonoBehaviour
         Vector2 cameraDisplacement = 
             moveDirection.normalized * 
             speed * ( 0.1f + Mathf.Lerp(0f, 0.9f, (y - minHeight) / (maxHeight - minHeight)) ) * 
-            Time.deltaTime;
+            Time.unscaledDeltaTime;
 
         transform.position += frw * cameraDisplacement.y + rgt * cameraDisplacement.x;
     }
@@ -95,7 +95,10 @@ public class CameraMovement : MonoBehaviour
         {
             lookDirection = look.ReadValue<Vector2>();
 
-            transform.eulerAngles = new Vector3(transform.eulerAngles.x + lookDirection.y * -verticalRotationSpeed * Time.deltaTime, transform.eulerAngles.y + lookDirection.x * horizontalRotationSpeed * Time.deltaTime, 0);
+            transform.eulerAngles = new Vector3(
+                transform.eulerAngles.x + lookDirection.y * -verticalRotationSpeed * Time.unscaledDeltaTime, 
+                transform.eulerAngles.y + lookDirection.x * horizontalRotationSpeed * Time.unscaledDeltaTime, 
+                0);
 
             //SET frw rgt VECTORS
             frw = new Vector3(transform.forward.x, 0, transform.forward.z).normalized;
@@ -106,7 +109,7 @@ public class CameraMovement : MonoBehaviour
     {
         scrollDirection = scroll.ReadValue<float>();
 
-        y += scrollDirection * ElevationSpeed * Time.deltaTime;
+        y += scrollDirection * ElevationSpeed * Time.unscaledDeltaTime;
         y = Mathf.Clamp(y, minHeight, maxHeight);
 
         transform.position = new Vector3(transform.position.x, y, transform.position.z);

@@ -12,6 +12,7 @@ using Unity.Transforms;
 using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
 using Unity.Scenes;
+using Unity.Rendering;
 
 public partial class OfficerManager : UnitManager, IVisitable
 {
@@ -181,9 +182,6 @@ public partial class OfficerManager : UnitManager, IVisitable
         //GET COMPONENTS
         PawnManager pawnManager = pawn.GetComponent<PawnManager>();
         PawnMovement pawnMovememnt = pawnManager.GetComponent<PawnMovement>();
-
-        Scene targetScene = SceneManager.GetSceneByName("EntitySubScene");
-        SceneManager.MoveGameObjectToScene(pawn, targetScene);
 
         //APPEND TO COMPANY PAWNS
         pawns.Add(pawnManager);

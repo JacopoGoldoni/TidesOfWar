@@ -2,5 +2,5 @@
 	"ID": 0,
 	"name": "1° army",
 	"TAG": "FRA",
-	"battalions": [0]
+	"battalions": [0,1,4,5]
 }
