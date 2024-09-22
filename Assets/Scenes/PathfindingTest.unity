@@ -119,59 +119,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &10516384
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 10516386}
-  - component: {fileID: 10516385}
-  m_Layer: 0
-  m_Name: EntitySubScene
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &10516385
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 10516384}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 45a335734b1572644a6a5d09d87adc65, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _SceneAsset: {fileID: 102900000, guid: 3817bc18dd6a62d46a0e0992bd27ae2a, type: 3}
-  _HierarchyColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  AutoLoadScene: 1
-  _SceneGUID:
-    Value:
-      x: 2177593731
-      y: 1294378717
-      z: 697360550
-      w: 2733273819
---- !u!4 &10516386
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 10516384}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &47644297
 GameObject:
   m_ObjectHideFlags: 0
@@ -479,6 +426,59 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 7030717833788151153}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &708472086
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 708472088}
+  - component: {fileID: 708472087}
+  m_Layer: 0
+  m_Name: EntitySubScene
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &708472087
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 708472086}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45a335734b1572644a6a5d09d87adc65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _SceneAsset: {fileID: 102900000, guid: 3817bc18dd6a62d46a0e0992bd27ae2a, type: 3}
+  _HierarchyColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  AutoLoadScene: 1
+  _SceneGUID:
+    Value:
+      x: 2177593731
+      y: 1294378717
+      z: 697360550
+      w: 2733273819
+--- !u!4 &708472088
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 708472086}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &755964351 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2048210879502165875, guid: a07d946d40414614989e68c786b5d8a9,
@@ -794,17 +794,22 @@ PrefabInstance:
     - target: {fileID: 8284457485711828087, guid: efe18723230a7b845a44e759d037da08,
         type: 3}
       propertyPath: spawnArmies
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8284457485711828087, guid: efe18723230a7b845a44e759d037da08,
         type: 3}
       propertyPath: entitySubScene
       value: 
-      objectReference: {fileID: 10516385}
+      objectReference: {fileID: 0}
     - target: {fileID: 8284457485711828087, guid: efe18723230a7b845a44e759d037da08,
         type: 3}
       propertyPath: generateTerrain
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8284457485711828087, guid: efe18723230a7b845a44e759d037da08,
+        type: 3}
+      propertyPath: initializationDebug
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1317,4 +1322,4 @@ SceneRoots:
   - {fileID: 162825301}
   - {fileID: 1754389719}
   - {fileID: 7030717833788151153}
-  - {fileID: 10516386}
+  - {fileID: 708472088}

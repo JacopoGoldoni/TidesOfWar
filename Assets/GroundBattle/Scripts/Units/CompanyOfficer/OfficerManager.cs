@@ -166,11 +166,26 @@ public partial class OfficerManager : UnitManager, IVisitable
     //SPAWN CONTROLLED PAWNS
     public void SpawnCompanyPawns()
     {
-        for (int i = 0; i < companySize; i++)
+        //NEW SYSTEM
+        OfficerSpawnManager officerSpawnManager = GetComponent<OfficerSpawnManager>();
+        float3[] pawnPositions = new float3[companySize];
+        for(int i = 0; i < companySize; i++)
         {
+            //GET WORLD POSITION
             Vector2 v2 = GetFormationCoords(i);
-            SpawnPawn(v2 + Utility.V3toV2(transform.position));
+            v2 += Utility.V3toV2(transform.position);
+
+            //CONVERT TO FLOAT3
+            pawnPositions[i] = new float3(v2.x ,0f, v2.y);
         }
+        officerSpawnManager.Spawn(pawnPositions);
+
+        //OLD SYSTEM
+        //for (int i = 0; i < companySize; i++)
+        //{
+        //    Vector2 v2 = GetFormationCoords(i);
+        //    SpawnPawn(v2 + Utility.V3toV2(transform.position));
+        //}
     }
     private void SpawnPawn(Vector2 pos)
     {

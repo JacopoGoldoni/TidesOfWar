@@ -119,7 +119,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &1031786360
+--- !u!1 &2124628603
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -127,8 +127,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1031786361}
-  - component: {fileID: 1031786362}
+  - component: {fileID: 2124628605}
+  - component: {fileID: 2124628606}
   m_Layer: 0
   m_Name: PawnSpawner
   m_TagString: Untagged
@@ -136,38 +136,36 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1031786361
+--- !u!4 &2124628605
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1031786360}
+  m_GameObject: {fileID: 2124628603}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -0.7430287, y: 19.687098, z: 23.72738}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1031786362
+--- !u!114 &2124628606
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1031786360}
+  m_GameObject: {fileID: 2124628603}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 842dfa22a28ab4f4b85dde186adc84a0, type: 3}
+  m_Script: {fileID: 11500000, guid: d906cbc4cc1aed340817d099344b03a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pawnPrefab: {fileID: 1997580412286425343, guid: b8496d99f613dc542aa07b81cf37d467,
-    type: 3}
-  amountToSpawn: 0
+  prefab: {fileID: 1997580412286425343, guid: cca39e76952868c4c9965df897b3bdcd, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 1031786361}
+  - {fileID: 2124628605}
