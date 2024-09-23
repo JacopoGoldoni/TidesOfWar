@@ -1,0 +1,6 @@
+{
+	"ID": 3,
+	"name": "4° line company",
+	"TAG": "FRA",
+	"template_name": "BASE_LineInfantry"
+}

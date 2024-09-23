@@ -3,7 +3,17 @@ public enum StatType {MoraleStrenght, MeleeAttack, MeleeDefense , Precision, Spe
 public class Stats
 {
     readonly StatsMediator mediator;
-    readonly CompanyTemplate baseStats;
+
+    //STATS
+    readonly STATS baseStats;
+    public struct STATS
+    {
+        public int MoraleStrenght;
+        public int MeleeAttack;
+        public int MeleeDefense;
+        public int Precision;
+        public int Speed;
+    }
 
     public StatsMediator Mediator => mediator;
 
@@ -53,12 +63,33 @@ public class Stats
         }
     }
 
-    public Stats(StatsMediator mediator, CompanyTemplate baseStats)
+    public Stats(StatsMediator mediator, CompanyTemplate unitTemplate)
     {
         this.mediator = mediator;
-        this.baseStats = baseStats;
+
+        baseStats = new STATS();
+        baseStats.MoraleStrenght = unitTemplate.BaseMorale;
+        baseStats.MeleeAttack = unitTemplate.MeleeAttack;
+        baseStats.MeleeDefense = unitTemplate.MeleeDefense;
+        baseStats.Precision = unitTemplate.Precision;
+        baseStats.Speed = unitTemplate.Speed;
+    }
+    public Stats(StatsMediator mediator, ArtilleryBatteryTemplate unitTemplate)
+    {
+        this.mediator = mediator;
+
+        baseStats = new STATS();
+        baseStats.MoraleStrenght = unitTemplate.BaseMorale;
+        baseStats.MeleeAttack = unitTemplate.MeleeAttack;
+        baseStats.MeleeDefense = unitTemplate.MeleeDefense;
+        baseStats.Precision = unitTemplate.Precision;
+        baseStats.Speed = unitTemplate.Speed;
     }
 
     public override string ToString() => 
-        $"Morale: {MoraleStrenght}, MeleeAttack: {MeleeAttack}, MeleeDefense: {MeleeDefense}";
+        $"Morale: {MoraleStrenght}, " +
+        $"MeleeAttack: {MeleeAttack}, " +
+        $"MeleeDefense: {MeleeDefense}" +
+        $"Precision: {Precision}" +
+        $"Speed: {Speed}";
 }

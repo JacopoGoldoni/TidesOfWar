@@ -1,11 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.AI.Navigation;
-using Unity.VisualScripting;
 using UnityEditor;
-using UnityEditor.Localization.Plugins.XLIFF.V12;
 using UnityEngine;
-using UnityEngine.Analytics;
 
 public class GroundBattleTerrainManager : MonoBehaviour
 {
@@ -13,7 +10,11 @@ public class GroundBattleTerrainManager : MonoBehaviour
     MiniTerrainDecorator terrainDecorator;
     NavMeshSurface navMeshSurface;
 
+    [Header("Activated features")]
     public bool active = true;
+    public bool riverActive = false;
+    public bool decorateActive = false;
+    public bool treeActive = false;
 
     [Header("World settings")]
     public int resolution = 500;
@@ -30,6 +31,7 @@ public class GroundBattleTerrainManager : MonoBehaviour
     public Material terrainMaterial;
 
     [Header("Layers")]
+    public Texture2D terrainHeightmap;
     public List<TerrainLayer> terrainLayers;
 
     [Header("Erosion settings")]
@@ -66,15 +68,19 @@ public class GroundBattleTerrainManager : MonoBehaviour
     {
         erosion = GetComponent<Erosion>();
     }
-    private void Start()
+    public void CallGeneration()
     {
         if(active)
         {
             roadNodes = new List<RoadNode>();
 
-            GenerateRivers();
+            if (riverActive)
+                GenerateRivers();
+
             BuildTerrain();
-            Decorate();
+
+            if(decorateActive)
+                Decorate();
 
             //GenerateTowns();
             //GenerateRoads();
@@ -91,59 +97,65 @@ public class GroundBattleTerrainManager : MonoBehaviour
 
         string name = "Terrain" + 0 + "_" + 0;
 
-        terrainData.baseMapResolution = worldSize + 1;
-        terrainData.heightmapResolution = worldSize + 1;
+        terrainData.baseMapResolution = resolution + 1;
+        terrainData.heightmapResolution = resolution + 1;
         terrainData.size = new Vector3(worldSize, height, worldSize);
 
         //terrainData.baseMapResolution = resolution;
-        //terrainData.heightmapResolution = resolution;
         //chunkTerrainData.alphamapResolution = controlTextureResolution;
         terrainData.SetDetailResolution(grassDensity, detailResolutionPerPatch);
 
         terrainData.terrainLayers = terrainLayers.ToArray();
 
         //GENERATE HEIGHTMAP
-        Texture2D terrainHeightMap = new Texture2D(worldSize, worldSize);
-        terrainHeightMap = TextureMath.AdvancedPerlinTexture
+        Texture2D terrainHeightMap = TextureMath.AdvancedPerlinTexture
             (worldSize, perlinNoiseScale, octaves, lacunarity, persistence);
 
-        if(erode)
+        if (erode)
         {
             TextureMath.Erode(terrainHeightMap, erosion, erosionIterations, 0);
         }
 
-        terrainHeightMap = TextureMath.Subtraction(
-                terrainHeightMap, 
-                TextureMath.Multiplication(riverTextureMap, 0.5f)
-                );
-
-        //GENERATE RIVER MESHES
-        for (int i = 0; i < rivers.Count; i++)
+        if(riverActive)
         {
-            rivers[i].GenerateMesh();
+            terrainHeightMap = TextureMath.Subtraction(
+                    terrainHeightMap,
+                    TextureMath.Multiplication(riverTextureMap, 0.5f)
+                    );
 
-            GameObject river = new GameObject();
-            river.name = "River_" + i;
+            //GENERATE RIVER MESHES
+            for (int i = 0; i < rivers.Count; i++)
+            {
+                rivers[i].GenerateMesh();
 
-            MeshFilter mf = river.AddComponent<MeshFilter>();
-            MeshRenderer mr = river.AddComponent<MeshRenderer>();
+                GameObject river = new GameObject();
+                river.name = "River_" + i;
+                river.transform.position = Utility.V2toV3((rivers[i].start + rivers[i].end) / 2f);
 
-            mf.mesh = rivers[i].mesh;
-            mr.material = riverMaterial;
+                MeshFilter mf = river.AddComponent<MeshFilter>();
+                MeshRenderer mr = river.AddComponent<MeshRenderer>();
+
+                mf.mesh = rivers[i].mesh;
+                mr.material = riverMaterial;
+            }
         }
 
-        //TREE
-        List<TreePrototype> treePrototypes = new List<TreePrototype>();
-        foreach (TreeProfile treeProfile in treeProfiles)
+        if(treeActive)
         {
-            TreePrototype treeProrotype = new TreePrototype();
-            treeProrotype.prefab = treeProfile.treePrefab;
-            treePrototypes.Add(treeProrotype);
+            //TREE
+            List<TreePrototype> treePrototypes = new List<TreePrototype>();
+            foreach (TreeProfile treeProfile in treeProfiles)
+            {
+                TreePrototype treeProrotype = new TreePrototype();
+                treeProrotype.prefab = treeProfile.treePrefab;
+                treePrototypes.Add(treeProrotype);
+            }
+            terrainData.treePrototypes = treePrototypes.ToArray();
         }
-        terrainData.treePrototypes = treePrototypes.ToArray();
 
         terrainData.SetHeights(0, 0, TextureMath.Extract(terrainHeightMap, 0));
 
+        terrainHeightmap = terrainHeightMap;
         terrainObject = Terrain.CreateTerrainGameObject(terrainData);
 
         terrainObject.name = name;
@@ -154,6 +166,7 @@ public class GroundBattleTerrainManager : MonoBehaviour
         terrain.materialTemplate = terrainMaterial;
 
         AssetDatabase.CreateAsset(terrainData, "Assets/" + savePath + name + ".asset");
+        GroundBattleUtility.terrainRef = terrain;
     }
 
     private void Decorate()

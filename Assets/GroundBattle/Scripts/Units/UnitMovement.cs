@@ -40,16 +40,18 @@ public abstract class UnitMovement : MonoBehaviour
         MovementPoints.Clear();
         MovementPoints.Add(
              new MovementOrder(
-                 Utility.V2toV3(newDest),
+                 GroundBattleUtility.GetMapPosition(newDest),
                  newQuat
                  )
              );
+
+        navAgent.SetDestination(MovementPoints[0].pos);
     }
     public void AddDestination(Vector2 newDest, Quaternion newQuat)
     {
         MovementPoints.Add(
             new MovementOrder(
-                Utility.V2toV3(newDest),
+                GroundBattleUtility.GetMapPosition(newDest),
                 newQuat
                 )
             );

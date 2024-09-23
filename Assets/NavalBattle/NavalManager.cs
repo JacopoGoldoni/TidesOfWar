@@ -18,7 +18,7 @@ public class NavalManager : MonoBehaviour
     private Armament[] armaments;
     int hull;
 
-    public Factions faction = Factions.France;
+    public string TAG = "FRA";
     public Vector2 target;
     public bool move = false;
     
@@ -54,7 +54,7 @@ public class NavalManager : MonoBehaviour
         //SHIP MATERIAL
         meshRenderer = shipObject.GetComponentInChildren<MeshRenderer>();
         meshRenderer.material = shipClass.shipMaterial;
-        if(Utility.Camera.GetComponent<NavalBatleCameraManager>().faction == faction)
+        if(Utility.Camera.GetComponent<NavalBatleCameraManager>().TAG == TAG)
         {
             meshRenderer.material.SetColor("_BaseColor", Color.green);
         }

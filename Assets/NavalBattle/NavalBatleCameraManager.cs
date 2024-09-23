@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class NavalBatleCameraManager : MonoBehaviour
 {
-    public Factions faction = Factions.France;
+    public string TAG = "FRA";
 
     List<NavalManager> selectedShips = new List<NavalManager>();
 
@@ -28,7 +28,7 @@ public class NavalBatleCameraManager : MonoBehaviour
             if (Physics.Raycast(ray, out hit))
             {
                 NavalManager unitManager = hit.transform.gameObject.GetComponent<NavalManager>();
-                if(unitManager != null && unitManager.faction == faction)
+                if(unitManager != null && unitManager.TAG == TAG)
                 {
                     if(Input.GetKey(KeyCode.LeftShift))
                     {

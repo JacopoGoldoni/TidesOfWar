@@ -1,0 +1,7 @@
+{
+	"id": 0,
+	"name": "manufactory",
+	"icon": "manufactory_0",
+	"description": "manufactory_description",
+	"maxDurability": 20
+}

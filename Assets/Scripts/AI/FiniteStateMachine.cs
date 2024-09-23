@@ -23,13 +23,18 @@ public class FiniteStateMachine
         //UPDATE BEHAVIOUR
         currentState.OnUpdateState();
     }
-    public bool ChangeState(State newState, bool doExit)
+    public bool ChangeState(State newState, Action transitionAction, bool doExit)
     {
         if(states.Contains(newState))
         {
             if(doExit)
             {
                 currentState.OnExitState();
+            }
+
+            if(transitionAction != null)
+            {
+                transitionAction.Invoke();
             }
 
             currentState = newState;
@@ -48,7 +53,7 @@ public class FiniteStateMachine
             {
                 if(t.IsTransitionable())
                 {
-                    ChangeState(t.targetState, true);
+                    ChangeState(t.targetState, t.transitionAction, true);
                     return;
                 }
             }
@@ -70,6 +75,7 @@ public class FiniteStateMachine
             AddState(s);
         }
     }
+
     public void AddTransition(Transition newTransition)
     {
         transitions.Add(newTransition);
@@ -132,6 +138,7 @@ public class Transition
 {
     public State neededState;
     public State targetState;
+    public Action transitionAction;
 
     public delegate bool TransitionConditionDelegate();
     TransitionConditionDelegate TransitionCondition;
@@ -140,6 +147,14 @@ public class Transition
     {
         this.neededState = neededState;
         this.targetState = targetState;
+        transitionAction = null;
+        this.TransitionCondition = TransitionCondition;
+    }
+    public Transition(State neededState, State targetState, Action transitionAction, TransitionConditionDelegate TransitionCondition)
+    {
+        this.neededState = neededState;
+        this.targetState = targetState;
+        this.transitionAction = transitionAction;
         this.TransitionCondition = TransitionCondition;
     }
 

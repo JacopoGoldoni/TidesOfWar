@@ -13,17 +13,28 @@ MonoBehaviour:
   m_Name: PRU_LightInfantry
   m_EditorClassIdentifier: 
   type: 0
-  RegimentSize: 78
-  OfficerMesh: {fileID: 0}
-  PawnMesh: {fileID: 0}
-  RegimentIcon: {fileID: 0}
+  hardness: 0
+  officerPrefab: {fileID: 0}
+  CompanySize: 0
+  OfficerMesh_LODS:
+  - {fileID: -6064206364740278900, guid: fad689b68ad7e82419aeccf510c91ab3, type: 3}
+  - {fileID: 9127143004884344669, guid: fad689b68ad7e82419aeccf510c91ab3, type: 3}
+  officerMaterial: {fileID: 0}
+  SoldierMesh_LODS:
+  - {fileID: 673196183781031777, guid: 7e36924e2ab2ae84ea662a88d6c934e8, type: 3}
+  - {fileID: -440622277842314186, guid: 7e36924e2ab2ae84ea662a88d6c934e8, type: 3}
+  soldierMaterial: {fileID: 0}
+  CompanyIcon: 
   BaseMorale: 60
   Precision: 4
+  Range: 0
   Speed: 3
+  ReloadTime: 0
   MaxAmmo: 50
   MeleeAttack: 0
   MeleeDefense: 0
   MultipleFire: 1
   Fortification: 1
-  SquareFormation: 0
   Skirmish: 1
+  FilesDistances: 0.5
+  RankDistance: 1

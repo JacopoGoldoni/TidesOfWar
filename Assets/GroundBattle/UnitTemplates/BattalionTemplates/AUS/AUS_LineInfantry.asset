@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e38c2948d07bda4f9fc2a6c7341de92, type: 3}
+  m_Name: AUS_LineInfantry
+  m_EditorClassIdentifier: 
+  type: 0
+  battalionType: 0
+  BattalionIcon: LineInfantry
+  captainPrefab: {fileID: 4641858504647192894, guid: 072a1ee00ba36c3499a188e9622cfd84,
+    type: 3}
+  companies:
+  - {fileID: 11400000, guid: 5de1d76917ff936419ff8059ac6cc5bd, type: 2}
+  - {fileID: 11400000, guid: 5de1d76917ff936419ff8059ac6cc5bd, type: 2}
+  - {fileID: 11400000, guid: 5de1d76917ff936419ff8059ac6cc5bd, type: 2}
+  - {fileID: 11400000, guid: 5de1d76917ff936419ff8059ac6cc5bd, type: 2}
+  - {fileID: 11400000, guid: 5de1d76917ff936419ff8059ac6cc5bd, type: 2}
+  - {fileID: 11400000, guid: b23010fa7649f10499c8bde78cfaaa5e, type: 2}
+  SquareFormation: 1
+  CompanyXDistance: 2
+  CompanyYDistance: 6

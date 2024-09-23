@@ -7,11 +7,18 @@ public class Army
 {
     public int ID;
     public string TAG = "FRA";
-    public string armyName;
+    public string name;
 
     private const int reinforcementPerLevel = 20;
 
-    public List<Battalion> battalions;
+    public List<Battalion> battalions = new List<Battalion>();
+
+    public Army(int ID, string name, string TAG)
+    {
+        this.ID = ID;
+        this.name = name;
+        this.TAG = TAG;
+    }
 
     public Army(string TAG)
     {
@@ -62,21 +69,28 @@ public class Army
 
 public class Battalion
 {
-    BattalionTemplate template;
+    public int ID;
+    public string name;
+    public string TAG;
+
+    public BattalionTemplate template;
 
     public List<Company> companies = new List<Company>();
+
+    public bool Deployed;
+    public int HomeBarrack;
+
+    public Battalion(int ID, string name, string TAG, BattalionTemplate template)
+    {
+        this.ID = ID;
+        this.name = name;
+        this.TAG = TAG;
+        this.template = template;
+    }
 
     public void Initialize(BattalionTemplate bt)
     {
         template = bt;
-        foreach(CompanyTemplate ct in template.companies)
-        {
-            Company company = new Company();
-
-            company.Initialize(ct);
-
-            companies.Add(company);
-        }
     }
 
     public UnitType GetBattalionType()
@@ -87,14 +101,23 @@ public class Battalion
 
 public class Company
 {
-    CompanyTemplate template;
+    public CompanyTemplate template;
 
+    public int ID;
     public string name;
     public string TAG = "FRA";
 
     public int size;
     public int experience_LVL;
     public int experience;
+
+    public Company(int ID, string name, string TAG, CompanyTemplate template)
+    {
+        this.ID = ID;
+        this.name = name;
+        this.TAG = TAG;
+        this.template = template;
+    }
 
     public void Initialize(CompanyTemplate companyTemplate)
     {

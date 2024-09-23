@@ -5,8 +5,7 @@ using UnityEngine.AI;
 
 public class ArmyManager : MonoBehaviour
 {
-    public Army army;
-    public string TAG = "FRA";
+    Army army;
 
     NavMeshAgent agent;
 
@@ -27,9 +26,12 @@ public class ArmyManager : MonoBehaviour
 
         ArmyInitialize();
     }
-    private void ArmyInitialize()
+
+    public int GetArmyID() { return army.ID; }
+
+    public void ArmyInitialize()
     {
-        army = new Army(TAG);
+        agent.enabled = true;
     }
 
     private void PositionArmy()

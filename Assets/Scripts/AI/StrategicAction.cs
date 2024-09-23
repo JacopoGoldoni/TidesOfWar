@@ -4,11 +4,13 @@ public abstract class StrategicAction
 {
     public abstract void Execute();
 }
+
+
 public class Retreat : StrategicAction
 {
     public override void Execute()
     {
-
+        Debug.Log("Retreat!");
     }
 }
 public class ConquerFlag : StrategicAction
@@ -45,15 +47,38 @@ public class DefendFlag : StrategicAction
 }
 public class AttackEnemyTroops : StrategicAction
 {
-    public int[] battalions;
+    public int[] assignedBattalions;
+    public int[] targetBattalions;
 
-    public AttackEnemyTroops(int[] battalions)
+    public AttackEnemyTroops(int[] assignedBattalions, int[] targetBattalions)
     {
-        this.battalions = battalions;
+        this.assignedBattalions = assignedBattalions;
+        this.targetBattalions = targetBattalions;
     }
 
     public override void Execute()
     {
+        Debug.Log("Attack!");
+        UnitOrders.Battalion_SendAttack(
+            GroundBattleUtility.GetBattalionsByID(assignedBattalions), 
+            GroundBattleUtility.GetBattalionsByID(targetBattalions));
+    }
 
+    public float CalculateDifficulty()
+    {
+        float assignedBattallionStrenght = 0f;
+        float targetBattallionStrenght = 0f;
+
+        for(int i = 0; i < assignedBattalions.Length; i++)
+        {
+            assignedBattallionStrenght += GroundBattleUtility.GetBattalionByID(assignedBattalions[i]).GetStrenght();
+        }
+
+        for (int i = 0; i < targetBattalions.Length; i++)
+        {
+            targetBattallionStrenght += GroundBattleUtility.GetBattalionByID(targetBattalions[i]).GetStrenght();
+        }
+
+        return assignedBattallionStrenght / targetBattallionStrenght;
     }
 }

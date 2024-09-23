@@ -1,0 +1,28 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement style="flex-grow: 1; align-items: center; background-color: rgba(154, 154, 154, 0); height: 521px;">
+        <ui:Label text="Game file maker" />
+        <ui:TabView tabindex="0" style="width: 400px; align-items: center; justify-content: flex-start; height: 390px;">
+            <ui:Tab label="Battalion" name="Tab" tabindex="0" style="width: 400px;">
+                <ui:VisualElement style="flex-grow: 1; width: auto; height: 300px;">
+                    <ui:TextField label="Battalion name" placeholder-text="battalion name" name="textField_battalionName" style="justify-content: space-between;" />
+                    <ui:TextField label="TAG" placeholder-text="tag" style="justify-content: space-between;" />
+                    <ui:TextField label="Template name" placeholder-text="template name" style="justify-content: space-between;" />
+                </ui:VisualElement>
+            </ui:Tab>
+            <ui:Tab label="Artillery battery" name="Tab" tabindex="1" style="width: 400px;">
+                <ui:VisualElement style="flex-grow: 1; width: auto; height: 300px;">
+                    <ui:TextField label="Artillery battery name" placeholder-text="artillery battery name" style="justify-content: space-around;" />
+                    <ui:TextField label="TAG" placeholder-text="tag" style="justify-content: space-around;" />
+                    <ui:TextField label="Template name" placeholder-text="template name" style="justify-content: space-around;" />
+                </ui:VisualElement>
+            </ui:Tab>
+            <ui:Tab label="Army" name="Tab" tabindex="2" style="width: 400px;">
+                <ui:VisualElement style="flex-grow: 1; width: auto; height: 300px;">
+                    <ui:TextField label="Army name" placeholder-text="army name" style="justify-content: space-around;" />
+                    <ui:TextField label="TAG" placeholder-text="tag" name="TextField" style="justify-content: space-around;" />
+                </ui:VisualElement>
+            </ui:Tab>
+        </ui:TabView>
+        <ui:Button text="Create file" name="button_createFile" style="width: 210px;" />
+    </ui:VisualElement>
+</ui:UXML>

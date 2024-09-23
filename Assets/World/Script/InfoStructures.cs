@@ -38,8 +38,6 @@ public struct CountryInfo
 
     //SCENARIO
     public int capitalProvince_ID;
-    public int government_ID;
-    public string[] SUBJECT_TAG;
 }
 
 [Serializable]
@@ -61,4 +59,22 @@ public struct LawInfo
 {
     public string name;
     public string image;
+}
+
+[Serializable]
+public struct ResourceInfo
+{
+    public string name;
+    public string icon;
+}
+
+[Serializable]
+public struct BuildingInfo
+{
+    public int id;
+
+    public string name;
+    public string icon;
+    public string description;
+    public float maxDurability;
 }

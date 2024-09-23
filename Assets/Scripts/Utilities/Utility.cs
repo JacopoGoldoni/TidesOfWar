@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Unity.VisualScripting;
 using UnityEditor.Build.Pipeline;
 using UnityEngine;
 
@@ -15,6 +16,16 @@ public static class Utility
             return _camera;
         }
     }
+    private static CameraManager _cameraManager;
+    public static CameraManager CameraManager
+    {
+        get
+        {
+            if (_cameraManager == null) _cameraManager = Camera.GetComponent<CameraManager>();
+            return _cameraManager;
+        }
+    }
+
 
     public static Vector2 V3toV2(Vector3 v3)
     {
@@ -48,6 +59,20 @@ public static class Utility
         }
         return false;
     }
+
+    public static Transform GetChildByName(GameObject parent, string name)
+    {
+        for(int i = 0; i < parent.transform.childCount; i++)
+        {
+            Transform child = parent.transform.GetChild(i);
+            if(child.gameObject.name == name)
+            {
+                return child;
+            }
+        }
+
+        return null;
+    }
 }
 
 public static class SFXUtility
@@ -62,44 +87,5 @@ public static class SFXUtility
     public static AudioClip GetAudio(string clipName)
     {
         return Audios[clipName];
-    }
-}
-
-public static class GFXUtility
-{
-    private static Dictionary<Factions, string> FactionCodes = new Dictionary<Factions, string>()
-    {
-        { Factions.France, "FRA" },
-        { Factions.Austria, "AUS" },
-        { Factions.England, "ENG" },
-        { Factions.Russia, "RUS" },
-        { Factions.Prussia, "PRU" },
-        //ADD SPAIN
-        //ADD PIEDMONT
-        //ADD HOLAND
-        //ADD SWEDEN
-        //ADD POLAND
-        //ADD PORTUGAL
-    };
-
-    public static string GetFlagCode(Factions faction)
-    {
-        return FactionCodes[faction];
-    }
-
-    public static Sprite GetFlag(Factions faction)
-    {
-        string flagLocation = "GFX/" + GetFlagCode(faction);
-
-        Sprite sprite = Resources.Load<Sprite>(flagLocation);
-        return sprite;
-    }
-
-    public static Sprite GetFlag(string TAG)
-    {
-        string flagLocation = "GFX/" + TAG;
-
-        Sprite sprite = Resources.Load<Sprite>(flagLocation);
-        return sprite;
     }
 }

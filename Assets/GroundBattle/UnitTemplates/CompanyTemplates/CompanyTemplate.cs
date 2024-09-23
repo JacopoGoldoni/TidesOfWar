@@ -6,21 +6,25 @@ using UnityEngine;
 public class CompanyTemplate : ScriptableObject
 {
     public UnitType type;
+    public UnitHardness hardness;
 
     public GameObject officerPrefab;
 
     public int CompanySize;
 
     [Header("Esthetics")]
-    public Mesh OfficerMesh;
-    public Mesh SoldierMesh;
-    public Sprite CompanyIcon;
+    public Mesh[] OfficerMesh_LODS;
+    public Material officerMaterial;
+    public Mesh[] SoldierMesh_LODS;
+    public Material soldierMaterial;
+    public string CompanyIcon;
 
     [Header("STATS")]
     public int BaseMorale;
     public int Precision;
     public int Range;
     public int Speed;
+    public int ReloadTime;
     public int MaxAmmo;
     public int MeleeAttack;
     public int MeleeDefense;
@@ -29,11 +33,20 @@ public class CompanyTemplate : ScriptableObject
     public bool MultipleFire;
     public bool Fortification;
     public bool Skirmish;
+
+    [Header("Dimensions")]
+    public float FilesDistances = 0.5f;
+    public float RankDistance = 1.0f;
 }
 
 public enum UnitType
 {
     Infantry,
-    Cavalry,
-    Artillery
+    Cavalry
+}
+public enum UnitHardness
+{
+    Light,
+    Medium,
+    Heavy
 }

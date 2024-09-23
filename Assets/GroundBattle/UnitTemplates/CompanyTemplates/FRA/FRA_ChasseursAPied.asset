@@ -13,17 +13,29 @@ MonoBehaviour:
   m_Name: FRA_ChasseursAPied
   m_EditorClassIdentifier: 
   type: 0
+  hardness: 0
+  officerPrefab: {fileID: 1622135471481153879, guid: 992e891c3975e994aaddbef655bcf49b,
+    type: 3}
   CompanySize: 120
-  OfficerMesh: {fileID: 0}
-  SoldierMesh: {fileID: 0}
-  CompanyIcon: {fileID: 0}
+  OfficerMesh_LODS:
+  - {fileID: -6064206364740278900, guid: fad689b68ad7e82419aeccf510c91ab3, type: 3}
+  - {fileID: 9127143004884344669, guid: fad689b68ad7e82419aeccf510c91ab3, type: 3}
+  officerMaterial: {fileID: 2100000, guid: ef561f36c67d42c4dbea3f3a2082e033, type: 2}
+  SoldierMesh_LODS:
+  - {fileID: 673196183781031777, guid: 7e36924e2ab2ae84ea662a88d6c934e8, type: 3}
+  - {fileID: -440622277842314186, guid: 7e36924e2ab2ae84ea662a88d6c934e8, type: 3}
+  soldierMaterial: {fileID: 2100000, guid: ef561f36c67d42c4dbea3f3a2082e033, type: 2}
+  CompanyIcon: LightInfantry
   BaseMorale: 100
-  Precision: 12
+  Precision: 8
+  Range: 60
   Speed: 2
+  ReloadTime: 5
   MaxAmmo: 50
   MeleeAttack: 0
   MeleeDefense: 0
   MultipleFire: 1
   Fortification: 1
-  SquareFormation: 1
   Skirmish: 0
+  FilesDistances: 0.5
+  RankDistance: 1
