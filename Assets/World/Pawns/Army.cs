@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Services.CloudSave.Models.Data.Player;
 using UnityEngine;
 
 public class Army
@@ -18,20 +17,6 @@ public class Army
         this.ID = ID;
         this.name = name;
         this.TAG = TAG;
-    }
-
-    public Army(string TAG)
-    {
-        this.TAG = TAG;
-        WorldUtility.AppendArmy(this);
-
-        Initialize();
-    }
-
-    private void Initialize()
-    {
-        //GENERATE ARMY NAME
-        armyName = TAG + ID;
     }
 
     public int GetArmySize()
